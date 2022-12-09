@@ -1,4 +1,7 @@
 .DS_Store
 **/*.xcodeproj/xcuserdata/
 **/*.xcworkspace/xcuserdata/
-
+**/*.xcodeproj/xcshareddata/
+PerfAnalysis-iphonesimulator.xcarchive/
+PerfAnalysis-iphoneos.xcarchive/
+PerfAnalysis.xcframework/
