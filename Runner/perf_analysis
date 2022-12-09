@@ -1,0 +1,298 @@
+#!/usr/bin/env ruby
+require 'json'
+require 'tempfile'
+require 'io/console'
+require 'slop'
+
+require_relative 'flame_node'
+require_relative 'sample'
+require_relative 'utils'
+
+class SimulatorDeviceManager
+
+  def initialize(uuid)
+    @device_uuid = uuid
+  end
+
+  def copy_to_device(bundle_id, src, dst)
+    # The -R flag is necessary, as it turns out to deal with symlinks that `cp -r ...` report cause a cycle
+    # TODO: deal with symlinks that still point back to the previous directory
+    sh!(%W[cp -R #{src} #{current_home_dir(bundle_id)}/#{dst}])
+  end
+
+  def copy_from_device(bundle_id, src, dst)
+    # In order to match ios-deploy's behavior, create all ancestor directories from src and put the src dir in there
+    dst_full = "#{dst}/#{File.dirname(src)}"
+    sh!(%W[mkdir -p #{dst_full}])
+    sh!(%W[cp -R #{File.join(current_home_dir(bundle_id), src)} #{dst_full}])
+  end
+
+  def current_home_dir(bundle_id)
+    sh!(%W[xcrun simctl get_app_container #{@device_uuid} #{bundle_id} data], get_output: true)[0].chomp
+  end
+end
+
+class PhysicalDeviceManager
+
+  def copy_from_device(bundle_id, src, dst)
+    sh!(%W[ios-deploy --bundle_id #{bundle_id} --download=#{src} --to #{dst}], get_output: true)
+  end
+
+  def copy_to_device(bundle_id, src, dst)
+    sh!(%W[ios-deploy --bundle_id #{bundle_id} --upload=#{src} --to #{dst}], get_output: true)
+  end
+end
+
+class Symbolicator
+  LoadedLibrary = Struct.new(:load_addr, :path, :uuid)
+  Address = Struct.new(:addr, :lib)
+
+  def stacks_from_result(result)
+    stacks, loaded_libs_hashes = result
+    loaded_libs = loaded_libs_hashes.map do |hash|
+      path = hash['path']
+      LoadedLibrary.new(hash['loadAddress'], path, hash['uuid'])
+    end
+    sorted_libs = loaded_libs.sort_by(&:load_addr).reverse
+    first_text_size = 50 * 1024 * 1024
+    addr_to_address = {}
+    addrs = stacks.map do |stack|
+      stack['stack'].map do |addr|
+        cached_address = addr_to_address[addr]
+        next cached_address if cached_address
+        lib = sorted_libs.detect { |lib| lib.load_addr <= addr }
+        if lib == sorted_libs.first
+          # TODO: sometimes there are a few really large addresses that neither us nor instruments can symbolicate. Investigate why
+          lib = nil unless addr < sorted_libs.first.load_addr + first_text_size
+        end
+        if !lib
+          puts "#{addr} not contained within any frameworks" 
+          next Address.new(addr, nil)
+        end
+        address = Address.new(addr - lib.load_addr, lib)
+        addr_to_address[addr] = address
+        address
+      end
+    end
+    addrs
+  end
+
+  def addr_to_sym_for_binary(binary, addrs)
+    addrs_file = Tempfile.new.path
+    addition = 0x1000000 # atos can fail when the load address is 0, so add extra
+    strs = addrs.map { |addr| (addr + addition).to_s(16) }
+    arch = `file "#{binary}"`.include?("arm64e") ? "arm64e" : "arm64"
+    IO.write(addrs_file, strs.join("\n"))
+
+    syms_str = `atos -l #{addition.to_s(16)} -arch #{arch} -o "#{binary}" -f #{addrs_file}`
+    syms = syms_str.force_encoding('UTF-8').split("\n").each_with_index.map do |sym, idx|
+      sym.start_with?("0x") || sym == strs[idx] ? nil : sym
+    end
+    addrs.zip(syms).select { |_, v| v }.to_h
+  end
+
+  # Removes line number, filename to help coalesce similar stack traces
+  def format_symbol(sym)
+    cached_result = @@format_symbol_cache[sym]
+    return cached_result if cached_result
+    result = sym
+      .gsub(/:\d+\)/, ")") # static AppDelegate.$main() (in emergeTest) (AppDelegate.swift:10)
+      .gsub(/ \+ \d+$/, "") # _dyld_start (in dyld) + 0
+      .delete_suffix(" (<compiler-generated>)") # static UIApplicationDelegate.main() (in emergeTest) (<compiler-generated>)
+      .gsub(/ \(\S+.\S+\)$/, "") # static AppDelegate.$main() (in emergeTest) (AppDelegate.swift)
+      .gsub(/ \(in (\S| )+\)/, "") # static AppDelegate.$main() (in emergeTest)
+      .gsub(/^__\d+\+/, "")
+      .gsub(/^__\d+\-/, "")
+      .chomp
+    @@format_symbol_cache[sym] = result
+    result
+  end
+
+  def cleaned_up_path(path)
+    @path_to_cleaned_up_path ||= {}
+    @path_to_cleaned_up_path[path] ||= cleaned_up_path_uncached(path)
+    @path_to_cleaned_up_path[path]
+  end
+
+  def cleaned_up_path_uncached(path)
+    if path.include?(".app/") && !path.include?("/Xcode.app/")
+      return path.split("/").drop_while { |piece| !piece.end_with?(".app") }.join("/") 
+    elsif path.include?("/RuntimeRoot/")
+      return path[(path.index("/RuntimeRoot/") + "/RuntimeRoot/".size - 1)..-1]
+    else
+      return path # Paths like /usr/lib/dyld don't need adjustments
+    end
+  end
+
+  def dsym_for_lib(lib)
+    lib_path = lib.path
+    if !$is_simulator && lib_path.include?('.app/')
+      if $dsyms_dir
+        lib_name = File.basename(lib_path)
+        dsyms = Dir["#{$dsyms_dir}/#{lib_name}.*.dSYM/Contents/Resources/DWARF/#{lib_name}"]
+        if dsyms.length > 0
+          return dsyms[0]
+        end
+      end
+      found_dsyms = `mdfind "com_apple_xcode_dsym_uuids == #{lib.uuid}"`.split("\n")
+      if found_dsyms.length > 0
+        return Dir["#{found_dsyms[0]}/Contents/Resources/DWARF/*"][0]
+      end
+      return nil
+    end
+    if !$is_simulator && !lib_path.include?('.app')
+      directories = Dir["#{Dir.home}/Library/Developer/Xcode/iOS DeviceSupport/*(#{$os_version}) #{$arch}/Symbols"]
+      if directories.length > 0
+        return "#{directories[0]}#{lib_path}"
+      end
+    end
+    lib_path
+  end
+
+  def symbolicate(results_sets)
+      lib_to_addrs = {}
+      stacks = stacks_from_result(results_sets)
+      lib_to_addrs = stacks.flatten.group_by(&:lib).map { |lib, addrs| [lib, addrs.map(&:addr).uniq] }.to_h
+      lib_to_addrs.delete(nil)
+
+      lib_to_addr_to_sym = lib_to_addrs.map do |lib, addrs|
+          addr_to_sym = addr_to_sym_for_binary(dsym_for_lib(lib), addrs)
+          [lib.path, addr_to_sym]
+      end.to_h
+
+      no_lib_count = 0
+      no_sym_map = {}
+      @@format_symbol_cache ||= {}
+      result = stacks.map do |stack|
+        sym_stack = stack.map do |addr|
+          if !addr.lib
+            no_lib_count += 1
+            next ["<unknown>", "<unknown>"]
+          end
+          lib_path = addr.lib.path
+          addr_to_sym = lib_to_addr_to_sym[lib_path]
+          sym = addr_to_sym && addr_to_sym[addr.addr]
+          lib = cleaned_up_path(lib_path)
+          if !sym
+            no_sym_map[lib_path] = (no_sym_map[lib_path] || 0) + 1
+            next [lib, File.basename(lib)]
+          end
+          [lib, format_symbol(sym)]
+        end
+        # The second function gets weird results when trying to symbolicate it. When doing a backtrace with Xcode
+        # though, it shows that function as being called "start_sim". So, just set that if it looks right
+        if sym_stack.size >= 3 && sym_stack[0][1] == "start" && sym_stack[2][1] == "main"
+          sym_stack[1] = [sym_stack[0][0], "start_sim"]
+        end
+        sym_stack
+      end
+      total_count = stacks.flatten.size
+      puts "#{(no_lib_count.to_f / total_count * 100).round(2)}% have no library"
+      no_sym_map.each do |key, value|
+        puts "#{(value.to_f / total_count * 100).round(2)}% from #{key} have library but no symbol"
+      end
+      result
+    end
+end
+
+def partitions(array, size, step = nil)
+  step ||= size
+  start_idx = 0
+  end_idx = size - 1
+  partitions = []
+  while end_idx < array.size
+    partitions << array[start_idx..end_idx]
+    start_idx += step
+    end_idx += step
+  end
+  partitions
+end
+
+def generate_flamegraphs(result, syms)
+    times = result['stacks'].map { |stack| stack['time'] }
+    time_diffs = []
+    sample_interval = 0.005
+    unattributed_time = 0
+    for t1, t2 in partitions(times, 2, 1)
+      if t2 - t1 > sample_interval * 2
+        unattributed_time += t2 - t1 - sample_interval * 2
+        time_diffs << sample_interval * 2
+      else
+        time_diffs << t2 - t1
+      end
+    end
+    time_diffs << sample_interval # Assume last stack was the usual amount of time
+    samples = syms.zip(time_diffs).map do |stack_syms, time_diff|
+      Sample.new(time_diff, stack_syms)
+    end
+    samples << Sample.new(unattributed_time, [[nil, "<unattributed>"]]) if unattributed_time > 0
+    IO.write('output.folded', samples.map(&:to_s).join("\n"))
+    node = FlameNode.from_samples(samples)
+    node.to_h
+end
+
+opts = Slop.parse do |o|
+  o.string '-d', '--dsyms', 'directory with dsyms'
+  o.string '-b', '--bundle_id', 'app bundle id', required: true
+  o.string '-i', '--uuid', 'simulator uuid'
+  o.bool '-l', '--launch', 'relaunch app with profiling from startup'
+  o.on '--help' do
+    puts o
+    exit
+  end
+end
+
+bundle_id = opts[:bundle_id]
+$dsyms_dir = opts[:dsyms]
+
+device_manager = opts[:uuid] ? SimulatorDeviceManager.new(opts[:uuid]) : PhysicalDeviceManager.new
+
+state = {
+  'running': true,
+  'runAtStartup': opts.launch?,
+}
+tmp_file = '/tmp/emerge-perf-analysis/state.json'
+dir = File.dirname(tmp_file)
+Dir.mkdir(dir) unless Dir.exist?(dir)
+File.write(tmp_file, JSON.dump(state))
+device_manager.copy_to_device(bundle_id, tmp_file, '/Documents/emerge-perf-analysis/state.json')
+
+if opts.launch?
+  puts "Re-launch the app to start recording, then press any key to exit"
+else
+  puts "Started recording, press any key to exit"
+end
+STDIN.getch                                                                                                              
+print "            \r"
+
+state = {
+  'running': false,
+  'runAtStartup': false,
+}
+tmp_file = '/tmp/emerge-perf-analysis/state.json'
+File.write(tmp_file, JSON.dump(state))
+device_manager.copy_to_device(bundle_id, tmp_file, '/Documents/emerge-perf-analysis/state.json')
+
+sleep(1)
+
+device_manager.copy_from_device(bundle_id, '/Documents/emerge-output/output.json', '/tmp/emerge-perf-analysis/')
+
+puts "Stopped recording, symbolicating..."
+
+response_data = JSON.parse(IO.read('/tmp/emerge-perf-analysis/Documents/emerge-output/output.json'))
+
+$is_simulator = response_data['isSimulator']
+$arch = response_data['cpuType'].downcase
+$arch.strip!
+$os_version = response_data['osBuild']
+$os_version.strip!
+
+all_results_arrays = [response_data['stacks'], response_data['libraryInfo']['loadedLibraries']]
+
+syms = Symbolicator.new.symbolicate(all_results_arrays)
+
+flamegraph = generate_flamegraphs(response_data, syms)
+
+IO.write('output.json', JSON.generate(flamegraph, :max_nesting => false))
+
+`open https://emergetools.com/flamegraph`

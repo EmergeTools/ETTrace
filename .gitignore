@@ -5,3 +5,5 @@
 PerfAnalysis-iphonesimulator.xcarchive/
 PerfAnalysis-iphoneos.xcarchive/
 PerfAnalysis.xcframework/
+output.json
+output.folded
