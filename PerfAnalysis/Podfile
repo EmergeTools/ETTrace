@@ -1,0 +1,3 @@
+target 'PerfAnalysis' do
+  pod 'FirebaseCrashlytics', :path => '../Unwinding'
+end

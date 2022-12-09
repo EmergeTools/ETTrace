@@ -1,0 +1,153 @@
+FirebaseAuth/Tests/Sample/Sample/Application.plist
+FirebaseAuth/Tests/Sample/Sample/AuthCredentials.h
+FirebaseAuth/Tests/Sample/Sample/GoogleService-Info_multi.plist
+FirebaseAuth/Tests/Sample/Sample/GoogleService-Info.plist
+FirebaseAuth/Tests/Sample/Sample/Sample.entitlements
+FirebaseAuth/Tests/Sample/ApiTests/AuthCredentials.h
+FirebaseAuth/Tests/Sample/SwiftApiTests/Credentials.swift
+
+FirebaseDatabase/Tests/Resources/GoogleService-Info.plist
+
+FirebaseRemoteConfig/Tests/Sample/GoogleService-Info.plist
+
+# FirebaseStorage integration tests GoogleService-Info.plist
+FirebaseStorage/Tests/Integration/Resources/GoogleService-Info.plist
+
+# FirebaseInstallations integration tests GoogleService-Info.plist
+FirebaseInstallations/Source/Tests/Resources/GoogleService-Info.plist
+
+# FirebaseMessaging integration tests GoogleService-Info.plist
+FirebaseMessaging/Tests/IntegrationTests/Resources/GoogleService-Info.plist
+# FirebaseMessaging test app GoogleService-Info.plist
+FirebaseMessaging/Apps/Shared/GoogleService-Info.plist
+FirebaseMessaging/Apps/AdvancedSample/SampleWatchWatchKitExtension/GoogleService-Info.plist
+FirebaseMessaging/Apps/AdvancedSample/AppClips/GoogleService-Info.plist
+
+# Credentials for Firebase Storage Integration Tests
+FirebaseStorage/Tests/Integration/Credentials.h
+FirebaseStorage/Tests/SwiftIntegration/Credentials.swift
+FirebaseStorageSwift/Tests/Integration/Credentials.swift
+
+# FirebaseMLModelDownloader integration tests GoogleService-Info.plist
+FirebaseMLModelDownloader/Tests/Integration/Resources/GoogleService-Info.plist
+FirebaseMLModelDownloader/Apps/Sample/**/GoogleService-Info.plist
+
+# FirebasePerformance dev test App and integration tests GoogleService-Info.plist
+FirebasePerformance/**/GoogleService-Info.plist
+
+Secrets.tar
+
+# OS X
+.DS_Store
+
+# Xcode
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+profile
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+
+# Swift Package Manager
+Package.resolved
+*/.build
+ReleaseTooling/.swiftpm
+ReleaseTooling/Packages
+ReleaseTooling/*.xcodeproj
+ReleaseTooling/Package.resolved
+scripts/code_coverage_report/*/Package.resolved
+scripts/code_coverage_report/*/.build
+
+# Bad sorts get generated if the package .xcscheme is not regenerated.
+# Anything committed to xcshareddata gets propagated to clients. (#8167)
+.swiftpm/xcode/xcshareddata/
+
+# Mint package manager
+Mint
+
+# IntelliJ
+.idea
+
+# Vim
+*.swo
+*.swp
+*~
+
+# Bundler
+/.bundle
+/vendor
+
+Carthage
+# Cocoapods recommends against adding the Pods directory to your .gitignore. See
+# http://guides.cocoapods.org/using/using-cocoapods.html#should-i-ignore-the-pods-directory-in-source-control
+
+# Since Firebase is building libraries, not apps, we should not check in Pods.
+# Pods are only used in the Examples and tests and doing a 'pod install' better
+# matches our customers' environments.
+#
+# Note: if you ignore the Pods directory, make sure to uncomment
+# `pod install` in .travis.yml
+#
+Pods/
+Podfile.lock
+*.xcworkspace
+
+# CMake
+.downloads
+Debug
+Release
+Ninja
+
+# CLion
+/cmake-build-debug
+/cmake-build-release
+
+# Python
+*.pyc
+
+# Visual Studio
+/.vs
+
+# Visual Studio Code
+/.vscode
+
+# clangd support file
+compile_commands.json
+
+# CocoaPods generate
+gen/
+
+# b/111916494
+default.profraw
+
+# Firestore emulator
+cloud-firestore-emulator.log
+cloud-firestore-emulator.pid
+
+# Let Gemfiles in CocoaPodsIntegrationTest float to catch issues asap
+CocoaPodsIntegrationTest/**/Gemfile.lock
+CocoaPodsIntegrationTest/Gemfile
+CocoaPodsIntegrationTest/Podfile
+
+# In-app messaging integration tests
+FirebaseInAppMessaging/Tests/Integration/FunctionalTestApp/GoogleService-Info.plist
+FirebaseInAppMessaging/Tests/Integration/FunctionalTestApp/App/InAppMessaging-Example-iOS/AppDelegate.m
+
+# FIRAppCheckTestApp
+FirebaseAppCheck/Apps/FIRAppCheckTestApp/FIRAppCheckTestApp/GoogleService-Info.plist
+FirebaseAppCheck/Apps/AppCheckCustomProvideApp/AppCheckCustomProvideApp/GoogleService-Info.plist
+
+# FirestoreSample
+/Example/FirestoreSample/FirestoreSample/GoogleService-Info.plist
+/Example/FirestoreSample/ui-debug.log
+/Example/FirestoreSample/firestore-debug.log
