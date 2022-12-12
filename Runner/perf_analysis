@@ -141,7 +141,7 @@ class Symbolicator
       return nil
     end
     if !$is_simulator && !lib_path.include?('.app')
-      directories = Dir["#{Dir.home}/Library/Developer/Xcode/iOS DeviceSupport/*(#{$os_version}) #{$arch}/Symbols"]
+      directories = Dir["#{Dir.home}/Library/Developer/Xcode/iOS DeviceSupport/*(#{$os_version})#{$arch}/Symbols"]
       if directories.length > 0
         return "#{directories[0]}#{lib_path}"
       end
@@ -284,6 +284,11 @@ response_data = JSON.parse(IO.read('/tmp/emerge-perf-analysis/Documents/emerge-o
 $is_simulator = response_data['isSimulator']
 $arch = response_data['cpuType'].downcase
 $arch.strip!
+if $arch == 'arm64e'
+  $arch = ' arm64e'
+else
+  $arch = ''
+end
 $os_version = response_data['osBuild']
 $os_version.strip!
 
