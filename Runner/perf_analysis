@@ -3,6 +3,7 @@ require 'json'
 require 'tempfile'
 require 'io/console'
 require 'slop'
+require 'webrick'
 
 require_relative 'flame_node'
 require_relative 'sample'
@@ -298,6 +299,21 @@ syms = Symbolicator.new.symbolicate(all_results_arrays)
 
 flamegraph = generate_flamegraphs(response_data, syms)
 
-IO.write('output.json', JSON.generate(flamegraph, :max_nesting => false))
+json_output = JSON.generate(flamegraph, :max_nesting => false)
+
+IO.write('output.json', json_output)
+
+dev_null = WEBrick::Log::new("/dev/null", 7)
+server = WEBrick::HTTPServer.new(Port: 37577, :Logger => dev_null, :AccessLog => dev_null, DocumentRoot: "/tmp/emerge-perf-analysis/")
+server.mount_proc '/output.json' do |req, res|
+  res.body = json_output
+  res.header['content-type'] = 'application/json'
+  res.header['access-control-allow-origin'] = '*'
+  server.shutdown
+end
+server_thread = Thread.new { server.start }
 
 `open https://emergetools.com/flamegraph`
+
+puts 'Waiting for browser to load'
+server_thread.join
