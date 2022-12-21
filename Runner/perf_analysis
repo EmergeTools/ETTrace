@@ -4,6 +4,7 @@ require 'tempfile'
 require 'io/console'
 require 'slop'
 require 'webrick'
+require 'parallel'
 
 require_relative 'flame_node'
 require_relative 'sample'
@@ -156,7 +157,7 @@ class Symbolicator
       lib_to_addrs = stacks.flatten.group_by(&:lib).map { |lib, addrs| [lib, addrs.map(&:addr).uniq] }.to_h
       lib_to_addrs.delete(nil)
 
-      lib_to_addr_to_sym = lib_to_addrs.map do |lib, addrs|
+      lib_to_addr_to_sym = Parallel.map(lib_to_addrs) do |lib, addrs|
           addr_to_sym = addr_to_sym_for_binary(dsym_for_lib(lib), addrs)
           [lib.path, addr_to_sym]
       end.to_h
