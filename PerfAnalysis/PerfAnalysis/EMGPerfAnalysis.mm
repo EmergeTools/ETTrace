@@ -103,7 +103,6 @@ static dispatch_source_t source;
                     if (runAtStartup) {
                         exit(0);
                     }
-                    dispatch_async(dispatch_get_main_queue(), ^{
                         if (running && sStackRecordingThread == nil) {
                             [self setupStackRecording];
                         } else if (!running && sStackRecordingThread) {
@@ -113,7 +112,6 @@ static dispatch_source_t source;
                                 [EMGPerfAnalysis stopRecording];
                             });
                         }
-                    });
                 } else {
                     NSLog(@"Error parsing perf analysis dictionary %@", error);
                 }
@@ -196,6 +194,7 @@ static dispatch_source_t source;
 }
 
 + (void)load {
+    printf("Starting perf analysis\n");
     sMainMachThread = mach_thread_self();
     fileEventsQueue = dispatch_queue_create("com.emerge.file_queue", DISPATCH_QUEUE_SERIAL);
     EMGBeginCollectingLibraries();
