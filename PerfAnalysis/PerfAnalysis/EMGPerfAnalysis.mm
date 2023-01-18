@@ -190,7 +190,12 @@ static dispatch_source_t source;
         [[NSFileManager defaultManager] createDirectoryAtURL:emergeDirectoryURL withIntermediateDirectories:YES attributes:nil error:nil];
     }
     NSURL *outputURL = [emergeDirectoryURL URLByAppendingPathComponent:@"output.json"];
-    [data writeToURL:outputURL atomically:YES];
+    BOOL result = [data writeToURL:outputURL options:NSDataWritingAtomic error:&error];
+    if (!result || error) {
+        NSLog(@"Error writing PerfAnalysis state %@", error);
+    } else {
+        NSLog(@"PerfAnalysis result written");
+    }
 }
 
 + (void)load {
