@@ -279,9 +279,15 @@ sleep(1)
 
 device_manager.copy_from_device(bundle_id, '/Documents/emerge-output/output.json', '/tmp/emerge-perf-analysis/')
 
+output_json_path = '/tmp/emerge-perf-analysis/Documents/emerge-output/output.json'
+if !File.exists?(output_json_path)
+  puts 'File not found'
+  return
+end
+
 puts "Stopped recording, symbolicating..."
 
-response_data = JSON.parse(IO.read('/tmp/emerge-perf-analysis/Documents/emerge-output/output.json'))
+response_data = JSON.parse(IO.read(output_json_path))
 
 $is_simulator = response_data['isSimulator']
 $arch = response_data['cpuType'].downcase
