@@ -27,6 +27,7 @@
 		F4CB9D3529B7C49000F50446 /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3429B7C49000F50446 /* ResponseModel.swift */; };
 		F4CB9D3729B7C4BE00F50446 /* Symbolicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3629B7C4BE00F50446 /* Symbolicator.swift */; };
 		F4CB9D3929B7C50400F50446 /* FlamegraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3829B7C50400F50446 /* FlamegraphGenerator.swift */; };
+		F4CB9D3F29B907DE00F50446 /* RunnerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */; };
 		FA1A91A2294373F600D70989 /* PerfAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = FA1A91A1294373F600D70989 /* PerfAnalysis.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FA1A91A92943741600D70989 /* EMGPerfAnalysis.mm in Sources */ = {isa = PBXBuildFile; fileRef = FA1A91A82943741600D70989 /* EMGPerfAnalysis.mm */; };
 		FA1A91AC2943748100D70989 /* EMGWriteLibraries.m in Sources */ = {isa = PBXBuildFile; fileRef = FA1A91AB2943748100D70989 /* EMGWriteLibraries.m */; };
@@ -85,6 +86,7 @@
 		F4CB9D3429B7C49000F50446 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
 		F4CB9D3629B7C4BE00F50446 /* Symbolicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Symbolicator.swift; sourceTree = "<group>"; };
 		F4CB9D3829B7C50400F50446 /* FlamegraphGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlamegraphGenerator.swift; sourceTree = "<group>"; };
+		F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerHelper.swift; sourceTree = "<group>"; };
 		FA1A919E294373F600D70989 /* PerfAnalysis.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PerfAnalysis.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1A91A1294373F600D70989 /* PerfAnalysis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PerfAnalysis.h; sourceTree = "<group>"; };
 		FA1A91A82943741600D70989 /* EMGPerfAnalysis.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EMGPerfAnalysis.mm; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				F4BDB20A29B6959000996FDB /* Devices */,
 				F4CB9D2E29B7C2D400F50446 /* Models */,
 				F4BDB1F929B6932F00996FDB /* PerfAnalysisRunner.swift */,
+				F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */,
 			);
 			path = PerfAnalysisRunner;
 			sourceTree = "<group>";
@@ -457,6 +460,7 @@
 				F4CB9D3529B7C49000F50446 /* ResponseModel.swift in Sources */,
 				F4CB9D3729B7C4BE00F50446 /* Symbolicator.swift in Sources */,
 				F4CB9D3929B7C50400F50446 /* FlamegraphGenerator.swift in Sources */,
+				F4CB9D3F29B907DE00F50446 /* RunnerHelper.swift in Sources */,
 				F4CB9D3029B7C2E600F50446 /* FlameNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

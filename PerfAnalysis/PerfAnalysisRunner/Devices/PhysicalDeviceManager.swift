@@ -33,10 +33,11 @@ class PhysicalDevicemanager: DeviceManager {
                         return
                     }
                     
-                    NotificationCenter.default.removeObserver(self?.observer)
+                    NotificationCenter.default.removeObserver(self?.observer as Any)
                     
                     channel.connect(to: PTPortNumber, over: usbHub, deviceID: deviceID) { error in
                         if error != nil {
+                            print("Connection failed, make sure the app is open on your device")
                             continuation.resume(throwing: ConnectionError.connectionFailed)
                         } else {
                             print("Connected")

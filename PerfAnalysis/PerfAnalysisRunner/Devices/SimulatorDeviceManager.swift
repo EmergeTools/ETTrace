@@ -23,7 +23,7 @@ struct SimulatorDeviceManager: DeviceManager {
         guard let sourceURL = NSURL(string: source) else {
             return
         }
-        let dstFull = "\(destination)/\(sourceURL.lastPathComponent)"
+        let dstFull = "\(destination)/\(String(describing: sourceURL.lastPathComponent))"
         
         try safeShell("mkdir -p \(dstFull)")
         try safeShell("cp -R \(currentHomeDir(bundleId))/\(source) \(dstFull)")
