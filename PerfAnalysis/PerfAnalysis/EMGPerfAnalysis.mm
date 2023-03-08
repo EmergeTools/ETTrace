@@ -13,6 +13,7 @@
 #import <mach/mach.h>
 #import <sys/sysctl.h>
 #import <mach-o/arch.h>
+#import "EMGChannelListener.h"
 
 #import "PerfAnalysis.h"
 
@@ -30,6 +31,8 @@ static std::vector<Stack> *sStacks;
 static std::mutex sStacksLock;
 
 static dispatch_queue_t fileEventsQueue;
+
+static EMGChannelListener *channelListener;
 
 extern "C" {
 void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesCapacity, uint64_t *framesWritten);
@@ -77,8 +80,18 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     [sStackRecordingThread start];
 }
 
-static NSFileHandle* handle;
-static dispatch_source_t source;
++ (void)stopRecordingThread {
+    [sStackRecordingThread cancel];
+    sStackRecordingThread = nil;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [EMGPerfAnalysis stopRecording];
+    });
+}
+
++ (void)setupRunAtStartup {
+    [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"runAtStartup"];
+    exit(0);
+}
 
 + (void)startObserving {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -87,38 +100,8 @@ static dispatch_source_t source;
         if (![[NSFileManager defaultManager] fileExistsAtPath:emergeDirectoryURL.path isDirectory:NULL]) {
             [[NSFileManager defaultManager] createDirectoryAtURL:emergeDirectoryURL withIntermediateDirectories:YES attributes:nil error:nil];
         }
-        NSURL *outputURL = [emergeDirectoryURL URLByAppendingPathComponent:@"state.json"];
-        handle = [NSFileHandle fileHandleForReadingAtPath:outputURL.path];
-        source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, handle.fileDescriptor, DISPATCH_VNODE_WRITE, fileEventsQueue);
-        dispatch_source_set_event_handler(source, ^{
-            NSData *fileData = [NSData dataWithContentsOfFile:outputURL.path];
-            if (fileData) {
-                NSError *error = nil;
-                NSDictionary *state = [NSJSONSerialization JSONObjectWithData:fileData options:NULL error:&error];
-                if (!error) {
-                    NSLog(@"Parsed perf analysis state");
-                    BOOL running = [state[@"running"] boolValue];
-                    BOOL runAtStartup = [state[@"runAtStartup"] boolValue];
-                    [[NSUserDefaults standardUserDefaults] setBool:runAtStartup forKey:@"runAtStartup"];
-                    if (runAtStartup) {
-                        exit(0);
-                    }
-                        if (running && sStackRecordingThread == nil) {
-                            [self setupStackRecording];
-                        } else if (!running && sStackRecordingThread) {
-                            [sStackRecordingThread cancel];
-                            sStackRecordingThread = nil;
-                            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                                [EMGPerfAnalysis stopRecording];
-                            });
-                        }
-                } else {
-                    NSLog(@"Error parsing perf analysis dictionary %@", error);
-                }
-            }
-        });
-        dispatch_resume(source);
-        NSLog(@"started");
+        
+        channelListener = [[EMGChannelListener alloc] init];
     });
 }
 
