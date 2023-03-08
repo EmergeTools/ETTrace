@@ -1,5 +1,12 @@
+use_frameworks! :linkage => :static
+
 target 'PerfAnalysis' do
   pod 'FirebaseCrashlytics', :path => '../Unwinding'
+  pod 'PeerTalk', '0.1.0'
+end
+
+target 'PerfAnalysisRunner' do
+  pod 'PeerTalk', '0.1.0'
 end
 
 # Crashlytics fails to build for the x86_64 simulator, so force this to be only the active arch
