@@ -22,12 +22,12 @@ struct LibraryInfo: Decodable {
 }
 
 struct Stack: Decodable {
-    let stack: [Int]
+    let stack: [UInt64]
     let time: Double
 }
 
 struct LoadedLibrary: Decodable, Equatable, Hashable {
     let path: String
-    let loadAddress: Int
+    let loadAddress: UInt64
     let uuid: String
 }

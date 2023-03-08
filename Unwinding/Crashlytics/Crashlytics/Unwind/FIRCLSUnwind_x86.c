@@ -20,6 +20,7 @@
 #include "Crashlytics/Crashlytics/Helpers/FIRCLSUtility.h"
 
 #if CLS_CPU_X86
+#include <mach-o/compact_unwind_encoding.h>
 
 static bool FIRCLSCompactUnwindBPFrame(compact_unwind_encoding_t encoding,
                                        FIRCLSThreadContext* registers);

@@ -15,6 +15,8 @@ func safeShell(_ command: String) throws {
     task.standardInput = nil
 
     try task.run()
+    
+    task.waitUntilExit()
 }
 
 func safeShellWithOutput(_ command: String) throws -> String {
@@ -22,12 +24,12 @@ func safeShellWithOutput(_ command: String) throws -> String {
     let pipe = Pipe()
     
     task.standardOutput = pipe
-//    task.standardError = pipe
     task.arguments = ["--login", "-c", command]
     task.executableURL = URL(fileURLWithPath: "/bin/zsh")
     task.standardInput = nil
 
-    try task.run() //<--updated
+    try task.run()
+    task.waitUntilExit()
     
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     let output = String(data: data, encoding: .utf8)!

@@ -86,7 +86,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		01BAE90CD246134500888E3ADC64D4EF /* Pods-PerfAnalysis */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-PerfAnalysis"; path = Pods_PerfAnalysis.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		01BAE90CD246134500888E3ADC64D4EF /* Pods_PerfAnalysis.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PerfAnalysis.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		034A3AEE5870D4AC89B4D54EC1CDFE89 /* Pods-PerfAnalysis-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-PerfAnalysis-dummy.m"; sourceTree = "<group>"; };
 		086878CAFF3A75734F43FEE33A52D474 /* Pods-PerfAnalysisRunner-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-PerfAnalysisRunner-acknowledgements.plist"; sourceTree = "<group>"; };
 		0FB4D8A35692C646688FDE297230EEF0 /* Pods-PerfAnalysis-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-PerfAnalysis-acknowledgements.markdown"; sourceTree = "<group>"; };
@@ -110,11 +110,11 @@
 		4352A2353E6957094922A600C750EFAA /* Pods-PerfAnalysis-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-PerfAnalysis-umbrella.h"; sourceTree = "<group>"; };
 		460070109AC431F5DA14DEC28F67113A /* FIRCLSLogger.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FIRCLSLogger.m; sourceTree = "<group>"; };
 		48240A36DA268CA7EB3EE5C13FD97BBC /* Pods-PerfAnalysis.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-PerfAnalysis.debug.xcconfig"; sourceTree = "<group>"; };
-		4DEDA2F9D53A10BC7A94DDA79A13D0D7 /* PeerTalk-iOS */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "PeerTalk-iOS"; path = PeerTalk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DEDA2F9D53A10BC7A94DDA79A13D0D7 /* PeerTalk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PeerTalk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F5AD80902194A1C04851B521078D95A /* PeerTalk-macOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "PeerTalk-macOS.debug.xcconfig"; path = "../PeerTalk-macOS/PeerTalk-macOS.debug.xcconfig"; sourceTree = "<group>"; };
 		58020C080F3F606AC596BD0A6104044D /* dwarf.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = dwarf.h; sourceTree = "<group>"; };
 		5A54C97DEB1A3977AC3A62AFF00971BF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		5A5BDBD1FDBECFF7991CD05325D9A212 /* Pods_PerfAnalysisRunner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PerfAnalysisRunner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A5BDBD1FDBECFF7991CD05325D9A212 /* Pods-PerfAnalysisRunner */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-PerfAnalysisRunner"; path = Pods_PerfAnalysisRunner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C448A493B63981001F52F56614FBEBC /* PTUSBHub.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PTUSBHub.h; path = peertalk/PTUSBHub.h; sourceTree = "<group>"; };
 		63703160A171FFC021679858BE801518 /* PTChannel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PTChannel.h; path = peertalk/PTChannel.h; sourceTree = "<group>"; };
 		63F8035F5DD5066881AFF12B6234319D /* PTChannel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PTChannel.m; path = peertalk/PTChannel.m; sourceTree = "<group>"; };
@@ -125,7 +125,7 @@
 		7B5F09850E7077356A1EFC66AA3D76AD /* FirebaseCrashlytics.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = FirebaseCrashlytics.release.xcconfig; sourceTree = "<group>"; };
 		80DE504A684F49EBF28D1A3E099F2C44 /* FIRCLSInternalLogging.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; path = FIRCLSInternalLogging.c; sourceTree = "<group>"; };
 		8601EDBAAEFD07526B4AA2FC23A06051 /* FIRCLSThreadState.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; path = FIRCLSThreadState.c; sourceTree = "<group>"; };
-		86375444C196BA272DDBB8165BF64A15 /* FirebaseCrashlytics */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = FirebaseCrashlytics; path = FirebaseCrashlytics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		86375444C196BA272DDBB8165BF64A15 /* FirebaseCrashlytics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FirebaseCrashlytics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9136EE3B6327A3A3481700DC3067DE86 /* PeerTalk-iOS.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "PeerTalk-iOS.modulemap"; sourceTree = "<group>"; };
 		9869D31460780B4F2828385BBD1F38C0 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = Crashlytics/LICENSE; sourceTree = "<group>"; };
 		9987DB3C4FBF3CC5C1DB6A6E54D6E796 /* PeerTalk-iOS-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PeerTalk-iOS-dummy.m"; sourceTree = "<group>"; };
@@ -148,7 +148,7 @@
 		D4ED3392B1E6D32E954583B7C8541F36 /* FIRCLSUnwind.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FIRCLSUnwind.h; sourceTree = "<group>"; };
 		E2056A590FE32A479FB3E4EDA5FC54E9 /* FIRCLSUnwind_x86.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; path = FIRCLSUnwind_x86.c; sourceTree = "<group>"; };
 		E506B352817B05A99FD98CBBF34D4A14 /* Pods-PerfAnalysisRunner-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-PerfAnalysisRunner-Info.plist"; sourceTree = "<group>"; };
-		E91C0666900627251214AF01BA177AB3 /* PeerTalk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PeerTalk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E91C0666900627251214AF01BA177AB3 /* PeerTalk-macOS */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "PeerTalk-macOS"; path = PeerTalk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9C7339F756C91AED4716860B677D84F /* Pods-PerfAnalysis.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-PerfAnalysis.modulemap"; sourceTree = "<group>"; };
 		EB2E748CD07FF07D16B7F0BC0FC5419E /* FirebaseCrashlytics-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "FirebaseCrashlytics-dummy.m"; sourceTree = "<group>"; };
 		F139098532AEAE5D1A91CDC30123962D /* FIRCLSUtility.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FIRCLSUtility.h; sourceTree = "<group>"; };
@@ -281,11 +281,11 @@
 		58AE4143A23A8EC7582547948B065A2A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				86375444C196BA272DDBB8165BF64A15 /* FirebaseCrashlytics */,
-				4DEDA2F9D53A10BC7A94DDA79A13D0D7 /* PeerTalk-iOS */,
-				E91C0666900627251214AF01BA177AB3 /* PeerTalk.framework */,
-				01BAE90CD246134500888E3ADC64D4EF /* Pods-PerfAnalysis */,
-				5A5BDBD1FDBECFF7991CD05325D9A212 /* Pods_PerfAnalysisRunner.framework */,
+				86375444C196BA272DDBB8165BF64A15 /* FirebaseCrashlytics.framework */,
+				4DEDA2F9D53A10BC7A94DDA79A13D0D7 /* PeerTalk.framework */,
+				E91C0666900627251214AF01BA177AB3 /* PeerTalk-macOS */,
+				01BAE90CD246134500888E3ADC64D4EF /* Pods_PerfAnalysis.framework */,
+				5A5BDBD1FDBECFF7991CD05325D9A212 /* Pods-PerfAnalysisRunner */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -538,7 +538,7 @@
 			);
 			name = "Pods-PerfAnalysisRunner";
 			productName = Pods_PerfAnalysisRunner;
-			productReference = 5A5BDBD1FDBECFF7991CD05325D9A212 /* Pods_PerfAnalysisRunner.framework */;
+			productReference = 5A5BDBD1FDBECFF7991CD05325D9A212 /* Pods-PerfAnalysisRunner */;
 			productType = "com.apple.product-type.framework";
 		};
 		526C4398D095B3704EB933DADBC30093 /* FirebaseCrashlytics */ = {
@@ -556,7 +556,7 @@
 			);
 			name = FirebaseCrashlytics;
 			productName = FirebaseCrashlytics;
-			productReference = 86375444C196BA272DDBB8165BF64A15 /* FirebaseCrashlytics */;
+			productReference = 86375444C196BA272DDBB8165BF64A15 /* FirebaseCrashlytics.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		B43FE7765AC3839EF044E414D022FD3B /* Pods-PerfAnalysis */ = {
@@ -576,7 +576,7 @@
 			);
 			name = "Pods-PerfAnalysis";
 			productName = Pods_PerfAnalysis;
-			productReference = 01BAE90CD246134500888E3ADC64D4EF /* Pods-PerfAnalysis */;
+			productReference = 01BAE90CD246134500888E3ADC64D4EF /* Pods_PerfAnalysis.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		C2D0B1CE09ED651E9CC938C19CDE2FE1 /* PeerTalk-macOS */ = {
@@ -594,7 +594,7 @@
 			);
 			name = "PeerTalk-macOS";
 			productName = PeerTalk;
-			productReference = E91C0666900627251214AF01BA177AB3 /* PeerTalk.framework */;
+			productReference = E91C0666900627251214AF01BA177AB3 /* PeerTalk-macOS */;
 			productType = "com.apple.product-type.framework";
 		};
 		EED50C0F510BE3E98BCDB979D9CBAA74 /* PeerTalk-iOS */ = {
@@ -612,7 +612,7 @@
 			);
 			name = "PeerTalk-iOS";
 			productName = PeerTalk;
-			productReference = 4DEDA2F9D53A10BC7A94DDA79A13D0D7 /* PeerTalk-iOS */;
+			productReference = 4DEDA2F9D53A10BC7A94DDA79A13D0D7 /* PeerTalk.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -768,7 +768,7 @@
 			baseConfigurationReference = 26B7AB2CEA159D2D8840C22E627D22AF /* Pods-PerfAnalysisRunner.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -867,7 +867,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4F5AD80902194A1C04851B521078D95A /* PeerTalk-macOS.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -970,7 +970,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CA68B8C78A0F2DD791F8C0C982ABAE9B /* PeerTalk-iOS.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1007,7 +1006,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37B2FC204F078E0A0AA151E4BC911E5E /* FirebaseCrashlytics.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = arm64;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1041,7 +1039,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B5F09850E7077356A1EFC66AA3D76AD /* FirebaseCrashlytics.release.xcconfig */;
 			buildSettings = {
-				ARCHS = arm64;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1076,7 +1073,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3B5B57CBAE257AF71919679A11D73261 /* PeerTalk-iOS.release.xcconfig */;
 			buildSettings = {
-				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1114,7 +1110,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A8CA1E09FBA956CE84CAC75945BF7666 /* PeerTalk-macOS.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1151,7 +1147,7 @@
 			baseConfigurationReference = 1192EECF44F4A22DA6AE0BA957011601 /* Pods-PerfAnalysisRunner.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1188,7 +1184,6 @@
 			baseConfigurationReference = 48240A36DA268CA7EB3EE5C13FD97BBC /* Pods-PerfAnalysis.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1226,7 +1221,6 @@
 			baseConfigurationReference = CA85F32958162A494AFD4E69C5EDE8BC /* Pods-PerfAnalysis.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";

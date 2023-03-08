@@ -64,8 +64,6 @@
         }
     } else if (type == PTFrameTypeStop) {
         [EMGPerfAnalysis stopRecordingThread];
-    } else if (type == PTFrameTypePing && self.peerChannel) {
-        [self.peerChannel sendFrameOfType:PTFrameTypePong tag:tag withPayload:nil callback:nil];
     }
 }
 
@@ -85,6 +83,17 @@
     self.peerChannel = otherChannel;
     self.peerChannel.userInfo = address;
     NSLog(@"Connected to %@", address);
+}
+
+- (void) sendReportCreatedMessage {
+    NSData *emptyData = [[NSData alloc] init];
+    [self.peerChannel sendFrameOfType:PTFrameTypeReportCreated tag:PTFrameNoTag withPayload:emptyData callback:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Could not send message");
+        } else {
+            NSLog(@"Message sent");
+        }
+    }];
 }
 
 @end

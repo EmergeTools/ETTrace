@@ -498,6 +498,7 @@
 		F4BDB1E329B68B0B00996FDB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -536,6 +537,7 @@
 		F4BDB1E429B68B0B00996FDB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -729,6 +731,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2B02693057FEE85AD8F7A187 /* Pods-PerfAnalysis.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -758,6 +761,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 92A08BEC22631FE4409E22EB /* Pods-PerfAnalysis.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;

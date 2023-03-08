@@ -8,7 +8,7 @@
 import Foundation
 
 struct Address {
-    let addr: Int
+    let addr: UInt64
     let lib: LoadedLibrary?
 }
 
@@ -28,7 +28,7 @@ class Symbolicator {
     }
     
     func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[[String]]] {
-        var libToAddrs: [LoadedLibrary: [Int]] = [:]
+        var libToAddrs: [LoadedLibrary: [UInt64]] = [:]
         let stacks = stacksFromResults(stacks, loadedLibs)
         stacks.flatMap { $0 }.forEach { addr in
             if let lib = addr.lib {
@@ -37,7 +37,7 @@ class Symbolicator {
         }
         
         let stateLock = NSLock()
-        var libToAddrToSym: [String: [Int: String]] = [:]
+        var libToAddrToSym: [String: [UInt64: String]] = [:]
         let queue = DispatchQueue(label: "com.emerge.symbolication", attributes: .concurrent)
         let group = DispatchGroup()
         for (lib, addrs) in libToAddrs {
@@ -55,7 +55,7 @@ class Symbolicator {
         group.wait()
         
         var noLibCount = 0
-        var noSymMap: [String: Int] = [:]
+        var noSymMap: [String: UInt64] = [:]
         let result: [[[String]]] = stacks.map { stack in
             stack.map { addr in
                 if let lib = addr.lib {
@@ -95,8 +95,8 @@ class Symbolicator {
     
     private func stacksFromResults(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[Address]] {
         let sortedLibs = loadedLibs.sorted(by: { $0.loadAddress > $1.loadAddress } )
-        let firstTextSize = 50 * 1024 * 1024
-        var addrToAddress: [Int: Address] = [:]
+        let firstTextSize: UInt64 = 50 * 1024 * 1024
+        var addrToAddress: [UInt64: Address] = [:]
 
         let addrs: [[Address]] = stacks.map { stack in
             return stack.stack.map { addr in
@@ -128,10 +128,10 @@ class Symbolicator {
         return addrs
     }
     
-    private func addrToSymForBinary(_ binary: String, _ addrs: [Int]) -> [Int: String] {
+    private func addrToSymForBinary(_ binary: String, _ addrs: [UInt64]) -> [UInt64: String] {
         let addrsFile = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)!.path
         
-        let addition: Int = 0x1000000 // atos can fail when the load address is 0, so add extra
+        let addition: UInt64 = 0x1000000 // atos can fail when the load address is 0, so add extra
         let strs = addrs.map { String($0 + addition, radix: 16) }
         try! strs.joined(separator: "\n").write(toFile: addrsFile, atomically: true, encoding: .utf8)
         
@@ -141,7 +141,7 @@ class Symbolicator {
 
         let symsStr = try? safeShellWithOutput("/usr/bin/atos -l \(String(addition, radix: 16)) -arch \(arch!) -o \"\(binary)\" -f \(addrsFile)")
         
-        let syms = symsStr!.split(separator: "\n").enumerated().map { (idx, sym) -> (Int, String?) in
+        let syms = symsStr!.split(separator: "\n").enumerated().map { (idx, sym) -> (UInt64, String?) in
             if sym.starts(with: "0x") || sym == strs[idx] {
                 return (addrs[idx], nil)
             } else {
@@ -151,7 +151,7 @@ class Symbolicator {
             return sym != nil
         })
         
-        var result: [Int: String] = [:]
+        var result: [UInt64: String] = [:]
         for (addr, sym) in syms {
             result[addr] = sym
         }

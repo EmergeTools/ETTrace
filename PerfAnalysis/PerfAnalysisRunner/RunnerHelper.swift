@@ -18,6 +18,7 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     
     lazy var channel = PTChannel(protocol: nil, delegate: self)
     var server: HttpServer? = nil
+    var reportGenerated: Bool = false
     
     init(_ dsyms: String?, _ bundleId: String, _ launch: Bool, _ uuid: String?) {
         self.dsyms = dsyms
@@ -27,9 +28,14 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     }
     
     func channel(_ channel: PTChannel, didRecieveFrame type: UInt32, tag: UInt32, payload: Data?) {
+        if type == PTFrameTypeReportCreated {
+            reportGenerated = true
+        }
     }
     
     func channelDidEnd(_ channel: PTChannel, error: Error?) {
+        print("Device disconnected")
+        exit(1)
     }
     
     func start() async throws {
@@ -56,11 +62,12 @@ class RunnerHelper: NSObject, PTChannelDelegate {
 
         try await deviceManager.sendStopRecording(channel)
 
-        // Wait a little bit
-        usleep(500)
+        while(!reportGenerated) {
+            usleep(10)
+        }
 
         let localFolder = Bundle.main.bundlePath
-        let outFolder = "\(localFolder)/tmp/emerge-perf-analysis/"
+        let outFolder = "\(localFolder)/tmp/emerge-perf-analysis"
         try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)
 
         try deviceManager.copyFromDevice(bundleId: bundleId, source: "/Documents/emerge-output/output.json", destination: outFolder)

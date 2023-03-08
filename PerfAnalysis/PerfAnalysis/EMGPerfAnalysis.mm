@@ -179,6 +179,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     } else {
         NSLog(@"PerfAnalysis result written");
     }
+    [channelListener sendReportCreatedMessage];
 }
 
 + (void)load {

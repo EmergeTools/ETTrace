@@ -24,8 +24,7 @@ static const int PTNoFrameTag = 0;
 enum {
     PTFrameTypeStart = 101,
     PTFrameTypeStop = 102,
-    PTFrameTypePing = 103,
-    PTFrameTypePong = 104,
+    PTFrameTypeReportCreated = 103
 };
 
 typedef struct _PTStartFrame {
