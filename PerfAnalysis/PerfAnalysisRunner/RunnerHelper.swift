@@ -62,6 +62,7 @@ class RunnerHelper: NSObject, PTChannelDelegate {
 
         try await deviceManager.sendStopRecording(channel)
 
+        print("Waiting for report to be generated...");
         while(!reportGenerated) {
             usleep(10)
         }
