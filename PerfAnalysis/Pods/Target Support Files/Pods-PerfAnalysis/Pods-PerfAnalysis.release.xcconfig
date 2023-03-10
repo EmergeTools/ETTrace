@@ -1,8 +1,8 @@
 CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/FirebaseCrashlytics" "${PODS_CONFIGURATION_BUILD_DIR}/PeerTalk-iOS"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/FirebaseCrashlytics"
-LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/FirebaseCrashlytics"
-OTHER_LDFLAGS = $(inherited) -ObjC -l"FirebaseCrashlytics" -l"c++" -l"z" -framework "Security" -framework "SystemConfiguration"
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/FirebaseCrashlytics/FirebaseCrashlytics.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/PeerTalk-iOS/PeerTalk.framework/Headers"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"c++" -l"z" -framework "FirebaseCrashlytics" -framework "PeerTalk" -framework "Security" -framework "SystemConfiguration"
 PODS_BUILD_DIR = ${BUILD_DIR}
 PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
 PODS_PODFILE_DIR_PATH = ${SRCROOT}/.
