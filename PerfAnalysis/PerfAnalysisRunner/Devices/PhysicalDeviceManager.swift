@@ -17,14 +17,6 @@ enum ConnectionError: Error {
 class PhysicalDevicemanager: DeviceManager {
     var observer: NSObjectProtocol? = nil
     
-    func copyToDevice(bundleId: String, source: String, destination: String) throws {
-        try safeShell("/usr/local/bin/ios-deploy --bundle_id \(bundleId) --upload=\(source) --to=\(destination)")
-    }
-    
-    func copyFromDevice(bundleId: String, source: String, destination: String) throws {
-        try safeShell("/usr/local/bin/ios-deploy --bundle_id \(bundleId) --download=\(source) --to=\(destination)")
-    }
-    
     func connect(with channel: PTChannel) async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
             if let usbHub = PTUSBHub.shared() {

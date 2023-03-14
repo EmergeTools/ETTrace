@@ -10,8 +10,6 @@ import CommunicationFrame
 import PeerTalk
 
 protocol DeviceManager {
-    func copyToDevice(bundleId: String, source: String, destination: String) throws
-    func copyFromDevice(bundleId: String, source: String, destination: String) throws
     func connect(with channel: PTChannel) async throws -> Void
 }
 
@@ -34,6 +32,18 @@ extension DeviceManager {
     func sendStopRecording(_ channel: PTChannel) async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
             channel.sendFrame(type: UInt32(PTFrameTypeStop), tag: UInt32(PTNoFrameTag), payload: Data()) { error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+    }
+    
+    func requestResults(with channel: PTChannel) async throws -> Void {
+        return try await withCheckedThrowingContinuation { continuation in
+            channel.sendFrame(type: UInt32(PTFrameTypeRequestResults), tag: UInt32(PTNoFrameTag), payload: Data()) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {

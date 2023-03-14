@@ -13,6 +13,7 @@
 + (void)setupStackRecording;
 + (void)setupRunAtStartup;
 + (void)stopRecordingThread;
++ (NSURL *)outputPath;
 @end
 
 

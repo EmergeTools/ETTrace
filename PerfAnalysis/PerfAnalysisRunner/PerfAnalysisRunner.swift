@@ -19,11 +19,11 @@ struct PerfAnalysisRunner: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Relaunch app with profiling from startup.")
     var launch = false
 
-    @Option(name: [.customShort("i"), .long], help: "Simulator UUID") // -i
-    var uuid: String? = nil
+    @Flag(name: .shortAndLong, help: "Use simulator")
+    var useSimulator: Bool = false
 
     mutating func run() throws {
-        let helper = RunnerHelper(dsyms, bundleId, launch, uuid)
+        let helper = RunnerHelper(dsyms, bundleId, launch, useSimulator)
         Task {
             do {
                 try await helper.start()
