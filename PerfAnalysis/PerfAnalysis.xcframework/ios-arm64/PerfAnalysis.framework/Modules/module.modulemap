@@ -1,0 +1,6 @@
+framework module PerfAnalysis {
+  umbrella header "PerfAnalysis.h"
+
+  export *
+  module * { export * }
+}

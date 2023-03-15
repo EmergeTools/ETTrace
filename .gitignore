@@ -4,6 +4,6 @@
 **/*.xcodeproj/xcshareddata/
 PerfAnalysis-iphonesimulator.xcarchive/
 PerfAnalysis-iphoneos.xcarchive/
-PerfAnalysis.xcframework/
+./PerfAnalysis.xcframework/
 output.json
 output.folded
