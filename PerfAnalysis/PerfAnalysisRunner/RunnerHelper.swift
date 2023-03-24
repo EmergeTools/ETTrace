@@ -12,24 +12,43 @@ import Swifter
 
 class RunnerHelper: NSObject, PTChannelDelegate {
     let dsyms: String?
-    let bundleId: String
     let launch: Bool
-    let uuid: String?
+    let useSimulator: Bool
     
+    // MARK: Peertalk
     lazy var channel = PTChannel(protocol: nil, delegate: self)
     var server: HttpServer? = nil
     var reportGenerated: Bool = false
     
-    init(_ dsyms: String?, _ bundleId: String, _ launch: Bool, _ uuid: String?) {
+    // MARK: Results
+    var expectedDataLength: UInt64 = 0
+    var receivedData: Data = Data()
+    var resultsReceived: Bool = false
+    
+    init(_ dsyms: String?, _ launch: Bool, _ useSimulator: Bool) {
         self.dsyms = dsyms
-        self.bundleId = bundleId
         self.launch = launch
-        self.uuid = uuid
+        self.useSimulator = useSimulator
     }
     
     func channel(_ channel: PTChannel, didRecieveFrame type: UInt32, tag: UInt32, payload: Data?) {
         if type == PTFrameTypeReportCreated {
             reportGenerated = true
+        } else if type == PTFrameTypeResultsMetadata,
+                  let payload = payload {
+            let metadata = payload.withUnsafeBytes { buffer in
+                buffer.load(as: PTMetadataFrame.self)
+            }
+            expectedDataLength = UInt64(metadata.fileSize)
+            
+        } else if type == PTFrameTypeResultsData,
+                  let payload = payload {
+            receivedData.append(payload)
+        } else if type == PTFrameTypeResultsTransferComplete {
+            guard receivedData.count == expectedDataLength else {
+                fatalError("Received \(receivedData.count) bytes, expected \(expectedDataLength)")
+            }
+            resultsReceived = true
         }
     }
     
@@ -45,7 +64,7 @@ class RunnerHelper: NSObject, PTChannelDelegate {
 
         print("Connecting to device.")
 
-        let deviceManager: DeviceManager = uuid != nil ? SimulatorDeviceManager(deviceUuid: uuid!) : PhysicalDevicemanager()
+        let deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager() : PhysicalDevicemanager()
 
         try await deviceManager.connect(with: channel)
 
@@ -66,23 +85,25 @@ class RunnerHelper: NSObject, PTChannelDelegate {
         while(!reportGenerated) {
             usleep(10)
         }
-
-        let localFolder = Bundle.main.bundlePath
-        let outFolder = "\(localFolder)/tmp/emerge-perf-analysis"
-        try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)
-
-        try deviceManager.copyFromDevice(bundleId: bundleId, source: "/Documents/emerge-output/output.json", destination: outFolder)
         
-        let outputPath = "\(outFolder)/Documents/emerge-output/output.json"
-        if !FileManager.default.fileExists(atPath: outputPath) {
-            print("File not found")
-            exit(1)
+        print("Extracting results from device...")
+        try await deviceManager.requestResults(with: channel)
+        while(!resultsReceived) {
+            usleep(10)
         }
+        
+        let localFolder = Bundle.main.bundlePath
+        let outFolder = "\(localFolder)/tmp/emerge-perf-analysis/Documents/emerge-output/"
+        try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)
+        let outputPath = "\(outFolder)/output.json"
+        if FileManager.default.fileExists(atPath: outputPath) {
+            try FileManager.default.removeItem(atPath: outputPath)
+        }
+        FileManager.default.createFile(atPath: outputPath, contents: receivedData)
         
         print("Stopped recording, symbolicating...")
         
-        let jsonData = try String(contentsOfFile: outputPath).data(using: .utf8)
-        let responseData = try JSONDecoder().decode(ResponseModel.self, from: jsonData!)
+        let responseData = try JSONDecoder().decode(ResponseModel.self, from: receivedData)
         
         let isSimulator = responseData.isSimulator
         var arch = responseData.cpuType.lowercased()

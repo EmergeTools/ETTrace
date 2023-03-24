@@ -194,4 +194,10 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     [EMGPerfAnalysis startObserving];
 }
 
++ (NSURL *) outputPath {
+    NSURL *documentsURL = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask][0];
+    NSURL *emergeDirectoryURL = [documentsURL URLByAppendingPathComponent:@"emerge-output"];
+    return [emergeDirectoryURL URLByAppendingPathComponent:@"output.json"];
+}
+
 @end

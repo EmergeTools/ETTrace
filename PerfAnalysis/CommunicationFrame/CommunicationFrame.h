@@ -21,12 +21,23 @@ static const int PTPortNumber = 3116;
 
 static const int PTNoFrameTag = 0;
 
+// Use 1MB as max size to transfer
+static const int PTMaxChunkSize = 1024 * 1024;
+
 enum {
     PTFrameTypeStart = 101,
     PTFrameTypeStop = 102,
-    PTFrameTypeReportCreated = 103
+    PTFrameTypeReportCreated = 103,
+    PTFrameTypeRequestResults = 104,
+    PTFrameTypeResultsMetadata = 105,
+    PTFrameTypeResultsData = 106,
+    PTFrameTypeResultsTransferComplete = 107,
 };
 
 typedef struct _PTStartFrame {
     bool runAtStartup;
 } PTStartFrame;
+
+typedef struct _PTMetadataFrame {
+    uint64_t fileSize;
+} PTMetadataFrame;

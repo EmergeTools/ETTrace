@@ -43,12 +43,12 @@
     if (channel != self.peerChannel) {
         // A previous channel that has been canceled but not yet ended. Ignore.
         return NO;
-    } else if (type != PTFrameTypeStart && type != PTFrameTypeStop) {
+    } else if (type == PTFrameTypeStart || type == PTFrameTypeStop || type == PTFrameTypeRequestResults){
+        return YES;
+    } else {
         NSLog(@"Unexpected frame of type %u", type);
         [channel close];
         return NO;
-    } else {
-        return YES;
     }
 }
 
@@ -64,6 +64,8 @@
         }
     } else if (type == PTFrameTypeStop) {
         [EMGPerfAnalysis stopRecordingThread];
+    } else if (type == PTFrameTypeRequestResults) {
+        [self sendReportData];
     }
 }
 
@@ -94,6 +96,36 @@
             NSLog(@"Message sent");
         }
     }];
+}
+
+- (void) sendReportData {
+    NSURL *outURL = [EMGPerfAnalysis outputPath];
+    
+    NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingAtPath:outURL.path];
+    if (!fileHandle) {
+        NSLog(@"Error opening file");
+        return;
+    }
+    
+    // Sending metadata
+    PTMetadataFrame *frame = CFAllocatorAllocate(nil, sizeof(PTMetadataFrame), 0);
+    frame->fileSize = fileHandle.availableData.length;
+    dispatch_data_t dataFrame = dispatch_data_create((const void*)frame, sizeof(PTMetadataFrame), nil, ^{
+        CFAllocatorDeallocate(nil, frame);
+    });
+    [self.peerChannel sendFrameOfType:PTFrameTypeResultsMetadata tag:PTFrameNoTag withPayload:dataFrame callback:nil];
+    
+    [fileHandle seekToFileOffset:0];
+    while (YES) {
+        NSData *chunk = [fileHandle readDataOfLength:PTMaxChunkSize];
+        if (chunk.length == 0) {
+            break;
+        }
+        [self.peerChannel sendFrameOfType:PTFrameTypeResultsData tag:PTFrameNoTag withPayload:chunk callback:nil];
+    }
+    
+    // Confirm file completed
+    [self.peerChannel sendFrameOfType:PTFrameTypeResultsTransferComplete tag:PTFrameNoTag withPayload:nil callback:nil];
 }
 
 @end

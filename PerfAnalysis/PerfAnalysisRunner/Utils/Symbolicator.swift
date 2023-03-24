@@ -44,7 +44,7 @@ class Symbolicator {
             group.enter()
             queue.async {
                 if let dSym = self.dsymForLib(lib) {
-                    let addrToSym = self.addrToSymForBinary(dSym, addrs)
+                    let addrToSym = Self.addrToSymForBinary(dSym, addrs)
                     stateLock.lock()
                     libToAddrToSym[lib.path] = addrToSym
                     stateLock.unlock()
@@ -128,7 +128,7 @@ class Symbolicator {
         return addrs
     }
     
-    private func addrToSymForBinary(_ binary: String, _ addrs: [UInt64]) -> [UInt64: String] {
+    private static func addrToSymForBinary(_ binary: String, _ addrs: [UInt64]) -> [UInt64: String] {
         let addrsFile = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)!.path
         
         let addition: UInt64 = 0x1000000 // atos can fail when the load address is 0, so add extra
