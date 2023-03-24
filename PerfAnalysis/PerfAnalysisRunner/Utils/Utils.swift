@@ -28,11 +28,24 @@ func safeShellWithOutput(_ command: String) throws -> String {
     task.executableURL = URL(fileURLWithPath: "/bin/zsh")
     task.standardInput = nil
 
+    let group = DispatchGroup()
+    group.enter()
+    var result = String()
+    pipe.fileHandleForReading.readabilityHandler = { fh in
+        let data = fh.availableData
+        if data.isEmpty { // EOF on the pipe
+            pipe.fileHandleForReading.readabilityHandler = nil
+            group.leave()
+        } else {
+          if let newString = String(data: data, encoding: .utf8) {
+            result.append(newString)
+          }
+        }
+    }
+
     try task.run()
     task.waitUntilExit()
+    group.wait()
     
-    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    let output = String(data: data, encoding: .utf8)!
-    
-    return output
+    return result
 }

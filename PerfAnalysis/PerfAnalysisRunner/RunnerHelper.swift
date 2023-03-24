@@ -12,7 +12,6 @@ import Swifter
 
 class RunnerHelper: NSObject, PTChannelDelegate {
     let dsyms: String?
-    let bundleId: String
     let launch: Bool
     let useSimulator: Bool
     
@@ -26,9 +25,8 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     var receivedData: Data = Data()
     var resultsReceived: Bool = false
     
-    init(_ dsyms: String?, _ bundleId: String, _ launch: Bool, _ useSimulator: Bool) {
+    init(_ dsyms: String?, _ launch: Bool, _ useSimulator: Bool) {
         self.dsyms = dsyms
-        self.bundleId = bundleId
         self.launch = launch
         self.useSimulator = useSimulator
     }
