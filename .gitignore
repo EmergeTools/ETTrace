@@ -2,8 +2,8 @@
 **/*.xcodeproj/xcuserdata/
 **/*.xcworkspace/xcuserdata/
 **/*.xcodeproj/xcshareddata/
-PerfAnalysis-iphonesimulator.xcarchive/
-PerfAnalysis-iphoneos.xcarchive/
-PerfAnalysis.xcframework/
+ETTrace-iphonesimulator.xcarchive/
+ETTrace-iphoneos.xcarchive/
+ETTrace.xcframework/
 output.json
 output.folded
