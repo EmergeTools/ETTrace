@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		06DFEC467AAF471BAC43EB64 /* Pods_PerfAnalysisRunner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E53DCF9488A74F481CB2E029 /* Pods_PerfAnalysisRunner.framework */; };
-		7408A72075A9B73083D96471 /* Pods_PerfAnalysis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08BC54E6CE6A59AA031E6BE8 /* Pods_PerfAnalysis.framework */; };
+		5FC3BBBF4C1E01F2CE8FB1C6 /* Pods_ETTraceRunner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61427A7CF36874E9A87DFF7F /* Pods_ETTraceRunner.framework */; };
+		B8936976E036B5F8C74424D2 /* Pods_ETTrace.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB931BCD99ECB5262B41EE99 /* Pods_ETTrace.framework */; };
 		F4BDB1E229B68B0B00996FDB /* CommunicationFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = F4BDB1E129B68B0B00996FDB /* CommunicationFrame.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F4BDB1EE29B68D7900996FDB /* EMGChannelListener.h in Headers */ = {isa = PBXBuildFile; fileRef = F4BDB1EC29B68D7900996FDB /* EMGChannelListener.h */; };
 		F4BDB1EF29B68D7900996FDB /* EMGChannelListener.m in Sources */ = {isa = PBXBuildFile; fileRef = F4BDB1ED29B68D7900996FDB /* EMGChannelListener.m */; };
@@ -63,31 +63,35 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		08BC54E6CE6A59AA031E6BE8 /* Pods_PerfAnalysis.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PerfAnalysis.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FBF0AED1A96804F57717F27 /* Pods-ETTraceRunner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ETTraceRunner.debug.xcconfig"; path = "Target Support Files/Pods-ETTraceRunner/Pods-ETTraceRunner.debug.xcconfig"; sourceTree = "<group>"; };
+		26C10ACD7D67B0FE1AFD5254 /* Pods-ETTraceRunner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ETTraceRunner.release.xcconfig"; path = "Target Support Files/Pods-ETTraceRunner/Pods-ETTraceRunner.release.xcconfig"; sourceTree = "<group>"; };
 		2B02693057FEE85AD8F7A187 /* Pods-PerfAnalysis.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PerfAnalysis.debug.xcconfig"; path = "Target Support Files/Pods-PerfAnalysis/Pods-PerfAnalysis.debug.xcconfig"; sourceTree = "<group>"; };
 		3206ACCA71FAF70F8CA6EFB4 /* Pods-PerfAnalysisRunner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PerfAnalysisRunner.debug.xcconfig"; path = "Target Support Files/Pods-PerfAnalysisRunner/Pods-PerfAnalysisRunner.debug.xcconfig"; sourceTree = "<group>"; };
+		61427A7CF36874E9A87DFF7F /* Pods_ETTraceRunner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ETTraceRunner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DEFA371953DD70D035FA46D /* Pods-PerfAnalysisRunner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PerfAnalysisRunner.release.xcconfig"; path = "Target Support Files/Pods-PerfAnalysisRunner/Pods-PerfAnalysisRunner.release.xcconfig"; sourceTree = "<group>"; };
 		92A08BEC22631FE4409E22EB /* Pods-PerfAnalysis.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PerfAnalysis.release.xcconfig"; path = "Target Support Files/Pods-PerfAnalysis/Pods-PerfAnalysis.release.xcconfig"; sourceTree = "<group>"; };
-		E53DCF9488A74F481CB2E029 /* Pods_PerfAnalysisRunner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PerfAnalysisRunner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		92BA8E32F1513EFDC8771338 /* Pods-ETTrace.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ETTrace.release.xcconfig"; path = "Target Support Files/Pods-ETTrace/Pods-ETTrace.release.xcconfig"; sourceTree = "<group>"; };
+		BB931BCD99ECB5262B41EE99 /* Pods_ETTrace.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ETTrace.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BDB1DF29B68B0B00996FDB /* CommunicationFrame.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommunicationFrame.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BDB1E129B68B0B00996FDB /* CommunicationFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommunicationFrame.h; sourceTree = "<group>"; };
 		F4BDB1EC29B68D7900996FDB /* EMGChannelListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMGChannelListener.h; sourceTree = "<group>"; };
 		F4BDB1ED29B68D7900996FDB /* EMGChannelListener.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EMGChannelListener.m; sourceTree = "<group>"; };
 		F4BDB1F029B6909C00996FDB /* EMGPerfAnalysis_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMGPerfAnalysis_Private.h; sourceTree = "<group>"; };
-		F4BDB1F729B6932F00996FDB /* PerfAnalysisRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PerfAnalysisRunner; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4BDB1F729B6932F00996FDB /* ETTraceRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ETTraceRunner; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BDB1F929B6932F00996FDB /* PerfAnalysisRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerfAnalysisRunner.swift; sourceTree = "<group>"; };
 		F4BDB20B29B695A600996FDB /* SimulatorDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorDeviceManager.swift; sourceTree = "<group>"; };
 		F4BDB20E29B6965200996FDB /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		F4BDB21029B697D200996FDB /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
 		F4BDB21229B6981000996FDB /* PhysicalDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicalDeviceManager.swift; sourceTree = "<group>"; };
-		F4CB9D2829B6A8CF00F50446 /* PerfAnalysisRunner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PerfAnalysisRunner.entitlements; sourceTree = "<group>"; };
+		F4CB9D2829B6A8CF00F50446 /* ETTraceRunner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ETTraceRunner.entitlements; sourceTree = "<group>"; };
 		F4CB9D2F29B7C2E600F50446 /* FlameNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameNode.swift; sourceTree = "<group>"; };
 		F4CB9D3129B7C35B00F50446 /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		F4CB9D3429B7C49000F50446 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
 		F4CB9D3629B7C4BE00F50446 /* Symbolicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Symbolicator.swift; sourceTree = "<group>"; };
 		F4CB9D3829B7C50400F50446 /* FlamegraphGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlamegraphGenerator.swift; sourceTree = "<group>"; };
 		F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerHelper.swift; sourceTree = "<group>"; };
-		FA1A919E294373F600D70989 /* PerfAnalysis.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PerfAnalysis.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F99E9B15EA3CFAAF648C921D /* Pods-ETTrace.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ETTrace.debug.xcconfig"; path = "Target Support Files/Pods-ETTrace/Pods-ETTrace.debug.xcconfig"; sourceTree = "<group>"; };
+		FA1A919E294373F600D70989 /* ETTrace.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ETTrace.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1A91A1294373F600D70989 /* PerfAnalysis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PerfAnalysis.h; sourceTree = "<group>"; };
 		FA1A91A82943741600D70989 /* EMGPerfAnalysis.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EMGPerfAnalysis.mm; sourceTree = "<group>"; };
 		FA1A91AA2943744D00D70989 /* EMGWriteLibraries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMGWriteLibraries.h; sourceTree = "<group>"; };
@@ -108,7 +112,7 @@
 			files = (
 				F4CB9D2D29B7BBF000F50446 /* Swifter in Frameworks */,
 				F4BDB20929B6942100996FDB /* ArgumentParser in Frameworks */,
-				06DFEC467AAF471BAC43EB64 /* Pods_PerfAnalysisRunner.framework in Frameworks */,
+				5FC3BBBF4C1E01F2CE8FB1C6 /* Pods_ETTraceRunner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,7 +122,7 @@
 			files = (
 				F4CB9D2B29B7BA2400F50446 /* Swifter in Frameworks */,
 				F4BDB20529B693BB00996FDB /* ArgumentParser in Frameworks */,
-				7408A72075A9B73083D96471 /* Pods_PerfAnalysis.framework in Frameworks */,
+				B8936976E036B5F8C74424D2 /* Pods_ETTrace.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,8 +132,8 @@
 		88B083935BBF36B4FEC45A6F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				08BC54E6CE6A59AA031E6BE8 /* Pods_PerfAnalysis.framework */,
-				E53DCF9488A74F481CB2E029 /* Pods_PerfAnalysisRunner.framework */,
+				BB931BCD99ECB5262B41EE99 /* Pods_ETTrace.framework */,
+				61427A7CF36874E9A87DFF7F /* Pods_ETTraceRunner.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -141,6 +145,10 @@
 				92A08BEC22631FE4409E22EB /* Pods-PerfAnalysis.release.xcconfig */,
 				3206ACCA71FAF70F8CA6EFB4 /* Pods-PerfAnalysisRunner.debug.xcconfig */,
 				8DEFA371953DD70D035FA46D /* Pods-PerfAnalysisRunner.release.xcconfig */,
+				F99E9B15EA3CFAAF648C921D /* Pods-ETTrace.debug.xcconfig */,
+				92BA8E32F1513EFDC8771338 /* Pods-ETTrace.release.xcconfig */,
+				1FBF0AED1A96804F57717F27 /* Pods-ETTraceRunner.debug.xcconfig */,
+				26C10ACD7D67B0FE1AFD5254 /* Pods-ETTraceRunner.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -153,10 +161,10 @@
 			path = CommunicationFrame;
 			sourceTree = "<group>";
 		};
-		F4BDB1F829B6932F00996FDB /* PerfAnalysisRunner */ = {
+		F4BDB1F829B6932F00996FDB /* ETTraceRunner */ = {
 			isa = PBXGroup;
 			children = (
-				F4CB9D2829B6A8CF00F50446 /* PerfAnalysisRunner.entitlements */,
+				F4CB9D2829B6A8CF00F50446 /* ETTraceRunner.entitlements */,
 				F4CB9D3329B7C48300F50446 /* ResponseModels */,
 				F4BDB20D29B6964900996FDB /* Utils */,
 				F4BDB20A29B6959000996FDB /* Devices */,
@@ -164,7 +172,7 @@
 				F4BDB1F929B6932F00996FDB /* PerfAnalysisRunner.swift */,
 				F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */,
 			);
-			path = PerfAnalysisRunner;
+			path = ETTraceRunner;
 			sourceTree = "<group>";
 		};
 		F4BDB20A29B6959000996FDB /* Devices */ = {
@@ -207,9 +215,9 @@
 		FA1A9194294373F600D70989 = {
 			isa = PBXGroup;
 			children = (
-				FA1A91A0294373F600D70989 /* PerfAnalysis */,
+				FA1A91A0294373F600D70989 /* ETTrace */,
 				F4BDB1E029B68B0B00996FDB /* CommunicationFrame */,
-				F4BDB1F829B6932F00996FDB /* PerfAnalysisRunner */,
+				F4BDB1F829B6932F00996FDB /* ETTraceRunner */,
 				FA1A919F294373F600D70989 /* Products */,
 				F0EB7EFAD45DEFB62FC3CE49 /* Pods */,
 				88B083935BBF36B4FEC45A6F /* Frameworks */,
@@ -219,14 +227,14 @@
 		FA1A919F294373F600D70989 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FA1A919E294373F600D70989 /* PerfAnalysis.framework */,
+				FA1A919E294373F600D70989 /* ETTrace.framework */,
 				F4BDB1DF29B68B0B00996FDB /* CommunicationFrame.framework */,
-				F4BDB1F729B6932F00996FDB /* PerfAnalysisRunner */,
+				F4BDB1F729B6932F00996FDB /* ETTraceRunner */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		FA1A91A0294373F600D70989 /* PerfAnalysis */ = {
+		FA1A91A0294373F600D70989 /* ETTrace */ = {
 			isa = PBXGroup;
 			children = (
 				FA1A91A1294373F600D70989 /* PerfAnalysis.h */,
@@ -237,7 +245,7 @@
 				F4BDB1EC29B68D7900996FDB /* EMGChannelListener.h */,
 				F4BDB1ED29B68D7900996FDB /* EMGChannelListener.m */,
 			);
-			path = PerfAnalysis;
+			path = ETTrace;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -282,9 +290,9 @@
 			productReference = F4BDB1DF29B68B0B00996FDB /* CommunicationFrame.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		F4BDB1F629B6932F00996FDB /* PerfAnalysisRunner */ = {
+		F4BDB1F629B6932F00996FDB /* ETTraceRunner */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F4BDB1FB29B6932F00996FDB /* Build configuration list for PBXNativeTarget "PerfAnalysisRunner" */;
+			buildConfigurationList = F4BDB1FB29B6932F00996FDB /* Build configuration list for PBXNativeTarget "ETTraceRunner" */;
 			buildPhases = (
 				D00D689D560546078E0E1DD6 /* [CP] Check Pods Manifest.lock */,
 				F4BDB1F329B6932F00996FDB /* Sources */,
@@ -297,18 +305,18 @@
 				F4BDB20729B693CA00996FDB /* PBXTargetDependency */,
 				F4BDB1FF29B6933700996FDB /* PBXTargetDependency */,
 			);
-			name = PerfAnalysisRunner;
+			name = ETTraceRunner;
 			packageProductDependencies = (
 				F4BDB20829B6942100996FDB /* ArgumentParser */,
 				F4CB9D2C29B7BBF000F50446 /* Swifter */,
 			);
 			productName = PerfAnalysisRunner;
-			productReference = F4BDB1F729B6932F00996FDB /* PerfAnalysisRunner */;
+			productReference = F4BDB1F729B6932F00996FDB /* ETTraceRunner */;
 			productType = "com.apple.product-type.tool";
 		};
-		FA1A919D294373F600D70989 /* PerfAnalysis */ = {
+		FA1A919D294373F600D70989 /* ETTrace */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FA1A91A5294373F600D70989 /* Build configuration list for PBXNativeTarget "PerfAnalysis" */;
+			buildConfigurationList = FA1A91A5294373F600D70989 /* Build configuration list for PBXNativeTarget "ETTrace" */;
 			buildPhases = (
 				ED631DFE54EB91FF8D7FDE6D /* [CP] Check Pods Manifest.lock */,
 				FA1A9199294373F600D70989 /* Headers */,
@@ -321,13 +329,13 @@
 			dependencies = (
 				F4BDB1E729B68BCD00996FDB /* PBXTargetDependency */,
 			);
-			name = PerfAnalysis;
+			name = ETTrace;
 			packageProductDependencies = (
 				F4BDB20429B693BB00996FDB /* ArgumentParser */,
 				F4CB9D2A29B7BA2400F50446 /* Swifter */,
 			);
 			productName = PerfAnalysis;
-			productReference = FA1A919E294373F600D70989 /* PerfAnalysis.framework */;
+			productReference = FA1A919E294373F600D70989 /* ETTrace.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -351,7 +359,7 @@
 					};
 				};
 			};
-			buildConfigurationList = FA1A9198294373F600D70989 /* Build configuration list for PBXProject "PerfAnalysis" */;
+			buildConfigurationList = FA1A9198294373F600D70989 /* Build configuration list for PBXProject "ETTrace" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -368,9 +376,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FA1A919D294373F600D70989 /* PerfAnalysis */,
+				FA1A919D294373F600D70989 /* ETTrace */,
 				F4BDB1DE29B68B0B00996FDB /* CommunicationFrame */,
-				F4BDB1F629B6932F00996FDB /* PerfAnalysisRunner */,
+				F4BDB1F629B6932F00996FDB /* ETTraceRunner */,
 			);
 		};
 /* End PBXProject section */
@@ -408,7 +416,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PerfAnalysisRunner-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ETTraceRunner-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -430,7 +438,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PerfAnalysis-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ETTrace-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -575,15 +583,18 @@
 		};
 		F4BDB1FC29B6932F00996FDB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3206ACCA71FAF70F8CA6EFB4 /* Pods-PerfAnalysisRunner.debug.xcconfig */;
+			baseConfigurationReference = 1FBF0AED1A96804F57717F27 /* Pods-ETTraceRunner.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_ENTITLEMENTS = PerfAnalysisRunner/PerfAnalysisRunner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ETTraceRunner/ETTraceRunner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 62J2XHNK9T;
 				ENABLE_HARDENED_RUNTIME = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -593,15 +604,18 @@
 		};
 		F4BDB1FD29B6932F00996FDB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DEFA371953DD70D035FA46D /* Pods-PerfAnalysisRunner.release.xcconfig */;
+			baseConfigurationReference = 26C10ACD7D67B0FE1AFD5254 /* Pods-ETTraceRunner.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_ENTITLEMENTS = PerfAnalysisRunner/PerfAnalysisRunner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ETTraceRunner/ETTraceRunner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 62J2XHNK9T;
 				ENABLE_HARDENED_RUNTIME = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -729,7 +743,7 @@
 		};
 		FA1A91A6294373F600D70989 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2B02693057FEE85AD8F7A187 /* Pods-PerfAnalysis.debug.xcconfig */;
+			baseConfigurationReference = F99E9B15EA3CFAAF648C921D /* Pods-ETTrace.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
@@ -759,7 +773,7 @@
 		};
 		FA1A91A7294373F600D70989 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 92A08BEC22631FE4409E22EB /* Pods-PerfAnalysis.release.xcconfig */;
+			baseConfigurationReference = 92BA8E32F1513EFDC8771338 /* Pods-ETTrace.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
@@ -799,7 +813,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F4BDB1FB29B6932F00996FDB /* Build configuration list for PBXNativeTarget "PerfAnalysisRunner" */ = {
+		F4BDB1FB29B6932F00996FDB /* Build configuration list for PBXNativeTarget "ETTraceRunner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F4BDB1FC29B6932F00996FDB /* Debug */,
@@ -808,7 +822,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FA1A9198294373F600D70989 /* Build configuration list for PBXProject "PerfAnalysis" */ = {
+		FA1A9198294373F600D70989 /* Build configuration list for PBXProject "ETTrace" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FA1A91A3294373F600D70989 /* Debug */,
@@ -817,7 +831,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FA1A91A5294373F600D70989 /* Build configuration list for PBXNativeTarget "PerfAnalysis" */ = {
+		FA1A91A5294373F600D70989 /* Build configuration list for PBXNativeTarget "ETTrace" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FA1A91A6294373F600D70989 /* Debug */,

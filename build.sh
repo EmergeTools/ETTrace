@@ -1,18 +1,18 @@
 xcodebuild archive \
- -workspace ./PerfAnalysis/PerfAnalysis.xcworkspace \
- -scheme PerfAnalysis \
- -archivePath ./PerfAnalysis-iphonesimulator.xcarchive \
+ -workspace ./ETTrace/ETTrace.xcworkspace \
+ -scheme ETTrace \
+ -archivePath ./ETTrace-iphonesimulator.xcarchive \
  -sdk iphonesimulator \
  SKIP_INSTALL=NO
 
 xcodebuild archive \
- -workspace ./PerfAnalysis/PerfAnalysis.xcworkspace \
- -scheme PerfAnalysis \
- -archivePath ./PerfAnalysis-iphoneos.xcarchive \
+ -workspace ./ETTrace/ETTrace.xcworkspace \
+ -scheme ETTrace \
+ -archivePath ./ETTrace-iphoneos.xcarchive \
  -sdk iphoneos \
  SKIP_INSTALL=NO
 
 xcodebuild -create-xcframework \
- -framework ./PerfAnalysis-iphonesimulator.xcarchive/Products/Library/Frameworks/PerfAnalysis.framework \
- -framework ./PerfAnalysis-iphoneos.xcarchive/Products/Library/Frameworks/PerfAnalysis.framework \
- -output ./PerfAnalysis.xcframework
+ -framework ./ETTrace-iphonesimulator.xcarchive/Products/Library/Frameworks/ETTrace.framework \
+ -framework ./ETTrace-iphoneos.xcarchive/Products/Library/Frameworks/ETTrace.framework \
+ -output ./ETTrace.xcframework
