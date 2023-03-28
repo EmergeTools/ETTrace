@@ -58,7 +58,10 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     }
     
     func start() async throws {
-        print("Please open the app on the simulator / device.")
+        print("Please open the app on the \(useSimulator ? "simulator" : "device")")
+        if !useSimulator {
+            print("Re-run with `--use-simulator` to connect to the simulator.")
+        }
         print("Press any key when ready...")
         _ = readLine()
 
