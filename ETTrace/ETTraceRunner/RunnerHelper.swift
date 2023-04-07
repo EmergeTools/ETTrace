@@ -123,8 +123,8 @@ class RunnerHelper: NSObject, PTChannelDelegate {
         let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms) as NSDictionary
         
         let outJsonData = try JSONSerialization.data(withJSONObject: flamegraph, options: .withoutEscapingSlashes)
-        let jsonString = String(data: outJsonData, encoding: String.Encoding.ascii)
-        try jsonString?.write(toFile: "output.json", atomically: true, encoding: .utf8)
+        let jsonString = String(data: outJsonData, encoding: .utf8)!
+        try jsonString.write(toFile: "output.json", atomically: true, encoding: .utf8)
         
         try startLocalServer(outJsonData)
         let url = URL(string: "https://emergetools.com/flamegraph")!
