@@ -19,12 +19,14 @@ class Symbolicator {
     let dSymsDir: String?
     let osVersion: String
     let arch: String
+    let verbose: Bool
     
-    init(isSimulator: Bool, dSymsDir: String?, osVersion: String, arch: String) {
+    init(isSimulator: Bool, dSymsDir: String?, osVersion: String, arch: String, verbose: Bool) {
         self.isSimulator = isSimulator
         self.dSymsDir = dSymsDir
         self.osVersion = osVersion
         self.arch = arch
+        self.verbose = verbose
     }
     
     func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[[String]]] {
@@ -74,10 +76,12 @@ class Symbolicator {
         }
         let totalCount = stacks.flatMap { $0 }.count
         let noLibPercentage = (Double(noLibCount) / Double(totalCount) * 100.0)
-        print("\(noLibPercentage)% have no library")
-        for (key, value) in noSymMap {
-            let percentage = (Double(value) / Double(totalCount) * 100.0)
-            print("\(percentage)% from \(key) have library but no symbol")
+        if verbose {
+            print("\(noLibPercentage)% have no library")
+            for (key, value) in noSymMap {
+                let percentage = (Double(value) / Double(totalCount) * 100.0)
+                print("\(percentage)% from \(key) have library but no symbol")
+            }
         }
         return result
     }
@@ -115,7 +119,9 @@ class Symbolicator {
                 }
 
                 if lib == nil {
-                    print("\(addr) not contained within any frameworks")
+                    if verbose {
+                        print("\(addr) not contained within any frameworks")
+                    }
                     return Address(addr: addr, lib: nil)
                 }
 

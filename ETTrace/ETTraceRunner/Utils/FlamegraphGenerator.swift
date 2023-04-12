@@ -8,7 +8,7 @@
 import Foundation
 
 class FlamegraphGenerator {
-    static func generateFlamegraphs(stacks: [Stack], syms: [[Any]]) -> [String: Any] {
+    static func generateFlamegraphs(stacks: [Stack], syms: [[Any]], writeFolded: Bool) -> [String: Any] {
         let times = stacks.map { $0.time }
         var timeDiffs: [Double] = []
         let sampleInterval = 0.005
@@ -29,7 +29,9 @@ class FlamegraphGenerator {
         if unattributedTime > 0 {
             samples.append(Sample(time: unattributedTime, stack: [[nil, "<unattributed>"]]))
         }
-        try! samples.map { $0.description }.joined(separator: "\n").write(toFile: "output.folded", atomically: true, encoding: .utf8)
+        if writeFolded {
+            try! samples.map { $0.description }.joined(separator: "\n").write(toFile: "output.folded", atomically: true, encoding: .utf8)
+        }
         let node = FlameNode.fromSamples(samples)
         return node.toDictionary()
     }

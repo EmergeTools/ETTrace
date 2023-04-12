@@ -14,6 +14,7 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     let dsyms: String?
     let launch: Bool
     let useSimulator: Bool
+    let verbose: Bool
     
     // MARK: Peertalk
     lazy var channel = PTChannel(protocol: nil, delegate: self)
@@ -25,10 +26,11 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     var receivedData: Data = Data()
     var resultsReceived: Bool = false
     
-    init(_ dsyms: String?, _ launch: Bool, _ useSimulator: Bool) {
+    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool) {
         self.dsyms = dsyms
         self.launch = launch
-        self.useSimulator = useSimulator
+        self.useSimulator = simulator
+        self.verbose = verbose
     }
     
     func channel(_ channel: PTChannel, didRecieveFrame type: UInt32, tag: UInt32, payload: Data?) {
@@ -53,8 +55,12 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     }
     
     func channelDidEnd(_ channel: PTChannel, error: Error?) {
-        print("Device disconnected")
-        exit(1)
+      if !resultsReceived {
+          print("Disconnected before results received, exiting early")
+          exit(1)
+      } else if verbose {
+          print("Disconnected")
+      }
     }
     
     func start() async throws {
@@ -118,19 +124,24 @@ class RunnerHelper: NSObject, PTChannelDelegate {
         var osVersion = responseData.osBuild
         osVersion.removeAll(where: { !$0.isLetter && !$0.isNumber })
         
-        let symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch)
+        let symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
         let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
-        let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms) as NSDictionary
+        let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose) as NSDictionary
         
         let outJsonData = try JSONSerialization.data(withJSONObject: flamegraph, options: .withoutEscapingSlashes)
         let jsonString = String(data: outJsonData, encoding: .utf8)!
         try jsonString.write(toFile: "output.json", atomically: true, encoding: .utf8)
+        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("output.json")
         
         try startLocalServer(outJsonData)
         let url = URL(string: "https://emergetools.com/flamegraph")!
         NSWorkspace.shared.open(url)
-        
-        _ = readLine()
+
+        // Wait 4 seconds for results to be accessed from server, then exit
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            print("Results saved to \(outputUrl)")
+            exit(0)
+        }
     }
     
     func startLocalServer(_ data: Data) throws {
