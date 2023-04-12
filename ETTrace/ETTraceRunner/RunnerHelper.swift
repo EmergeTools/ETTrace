@@ -10,21 +10,13 @@ import PeerTalk
 import CommunicationFrame
 import Swifter
 
-class RunnerHelper: NSObject, PTChannelDelegate {
+class RunnerHelper {
     let dsyms: String?
     let launch: Bool
     let useSimulator: Bool
     let verbose: Bool
-    
-    // MARK: Peertalk
-    lazy var channel = PTChannel(protocol: nil, delegate: self)
+
     var server: HttpServer? = nil
-    var reportGenerated: Bool = false
-    
-    // MARK: Results
-    var expectedDataLength: UInt64 = 0
-    var receivedData: Data = Data()
-    var resultsReceived: Bool = false
     
     init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool) {
         self.dsyms = dsyms
@@ -33,51 +25,21 @@ class RunnerHelper: NSObject, PTChannelDelegate {
         self.verbose = verbose
     }
     
-    func channel(_ channel: PTChannel, didRecieveFrame type: UInt32, tag: UInt32, payload: Data?) {
-        if type == PTFrameTypeReportCreated {
-            reportGenerated = true
-        } else if type == PTFrameTypeResultsMetadata,
-                  let payload = payload {
-            let metadata = payload.withUnsafeBytes { buffer in
-                buffer.load(as: PTMetadataFrame.self)
-            }
-            expectedDataLength = UInt64(metadata.fileSize)
-            
-        } else if type == PTFrameTypeResultsData,
-                  let payload = payload {
-            receivedData.append(payload)
-        } else if type == PTFrameTypeResultsTransferComplete {
-            guard receivedData.count == expectedDataLength else {
-                fatalError("Received \(receivedData.count) bytes, expected \(expectedDataLength)")
-            }
-            resultsReceived = true
-        }
-    }
-    
-    func channelDidEnd(_ channel: PTChannel, error: Error?) {
-      if !resultsReceived {
-          print("Disconnected before results received, exiting early")
-          exit(1)
-      } else if verbose {
-          print("Disconnected")
-      }
-    }
-    
     func start() async throws {
         print("Please open the app on the \(useSimulator ? "simulator" : "device")")
         if !useSimulator {
-            print("Re-run with `--use-simulator` to connect to the simulator.")
+            print("Re-run with `--simulator` to connect to the simulator.")
         }
         print("Press any key when ready...")
         _ = readLine()
 
         print("Connecting to device.")
 
-        let deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager() : PhysicalDevicemanager()
+        let deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager(verbose: verbose) : PhysicalDevicemanager(verbose: verbose)
 
-        try await deviceManager.connect(with: channel)
+        try await deviceManager.connect()
 
-        try await deviceManager.sendStartRecording(launch, channel)
+        try await deviceManager.sendStartRecording(launch)
 
         if launch {
             print("Re-launch the app to start recording, then press any key to exit")
@@ -88,19 +50,10 @@ class RunnerHelper: NSObject, PTChannelDelegate {
         _ = readLine()
         print("            \r")
 
-        try await deviceManager.sendStopRecording(channel)
-
         print("Waiting for report to be generated...");
-        while(!reportGenerated) {
-            usleep(10)
-        }
-        
-        print("Extracting results from device...")
-        try await deviceManager.requestResults(with: channel)
-        while(!resultsReceived) {
-            usleep(10)
-        }
-        
+
+        let receivedData = try await deviceManager.getResults()
+
         let localFolder = Bundle.main.bundlePath
         let outFolder = "\(localFolder)/tmp/emerge-perf-analysis/Documents/emerge-output/"
         try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)

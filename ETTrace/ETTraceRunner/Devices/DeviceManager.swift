@@ -10,16 +10,18 @@ import CommunicationFrame
 import PeerTalk
 
 protocol DeviceManager {
-    func connect(with channel: PTChannel) async throws -> Void
+    var communicationChannel: CommunicationChannel { get }
+
+    func connect() async throws -> Void
 }
 
 extension DeviceManager {
-    func sendStartRecording(_ runAtStartup: Bool, _ channel: PTChannel) async throws -> Void {
+    func sendStartRecording(_ runAtStartup: Bool) async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
             var boolValue = runAtStartup ? 1 : 0
             let data = Data(bytes: &boolValue, count: 2)
             
-            channel.sendFrame(type: UInt32(PTFrameTypeStart), tag: UInt32(PTNoFrameTag), payload: data) { error in
+          communicationChannel.channel.sendFrame(type: UInt32(PTFrameTypeStart), tag: UInt32(PTNoFrameTag), payload: data) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
@@ -29,9 +31,9 @@ extension DeviceManager {
         }
     }
     
-    func sendStopRecording(_ channel: PTChannel) async throws -> Void {
+    private func sendStopRecording() async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
-            channel.sendFrame(type: UInt32(PTFrameTypeStop), tag: UInt32(PTNoFrameTag), payload: Data()) { error in
+          communicationChannel.channel.sendFrame(type: UInt32(PTFrameTypeStop), tag: UInt32(PTNoFrameTag), payload: Data()) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
@@ -40,16 +42,27 @@ extension DeviceManager {
             }
         }
     }
-    
-    func requestResults(with channel: PTChannel) async throws -> Void {
+  
+    private func sendRequestResults() async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            channel.sendFrame(type: UInt32(PTFrameTypeRequestResults), tag: UInt32(PTNoFrameTag), payload: Data()) { error in
+            communicationChannel.channel.sendFrame(type: UInt32(PTFrameTypeRequestResults), tag: UInt32(PTNoFrameTag), payload: Data()) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
+                    print("Extracting results from device...")
                     continuation.resume()
                 }
             }
         }
+    }
+    
+    func getResults() async throws -> Data {
+        try await sendStopRecording()
+      
+        await communicationChannel.waitForReportGenerated()
+      
+        try await sendRequestResults()
+
+        return await communicationChannel.waitForResultsReceived()
     }
 }
