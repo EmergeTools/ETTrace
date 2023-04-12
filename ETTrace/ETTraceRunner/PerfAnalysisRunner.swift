@@ -17,17 +17,18 @@ struct PerfAnalysisRunner: ParsableCommand {
     var launch = false
 
     @Flag(name: .shortAndLong, help: "Use simulator")
-    var useSimulator: Bool = false
+    var simulator: Bool = false
+  
+    @Flag(name: .shortAndLong, help: "Verbose logging")
+    var verbose: Bool = false
 
     mutating func run() throws {
-        let helper = RunnerHelper(dsyms, launch, useSimulator)
+        let helper = RunnerHelper(dsyms, launch, simulator, verbose)
         Task {
             do {
                 try await helper.start()
             } catch let error {
-                #if DEBUG
-                print("PerfAnalysis crashed: \(error)")
-                #endif
+                print("ETTrace error: \(error)")
             }
             PerfAnalysisRunner.exit()
         }
