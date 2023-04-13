@@ -35,7 +35,7 @@ class RunnerHelper {
 
         print("Connecting to device.")
 
-        let deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager(verbose: verbose) : PhysicalDevicemanager(verbose: verbose)
+        let deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager(verbose: verbose, relaunch: launch) : PhysicalDevicemanager(verbose: verbose, relaunch: launch)
 
         try await deviceManager.connect()
 
@@ -49,6 +49,10 @@ class RunnerHelper {
 
         _ = readLine()
         print("            \r")
+      
+      if launch {
+        try await deviceManager.connect()
+      }
 
         print("Waiting for report to be generated...");
 
@@ -76,12 +80,13 @@ class RunnerHelper {
         }
         var osVersion = responseData.osBuild
         osVersion.removeAll(where: { !$0.isLetter && !$0.isNumber })
-        
+
         let symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
         let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
-        let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose) as NSDictionary
-        
-        let outJsonData = try JSONSerialization.data(withJSONObject: flamegraph, options: .withoutEscapingSlashes)
+        let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
+
+        let outJsonData: Data = JSONWrapper.toData(flamegraph)
+
         let jsonString = String(data: outJsonData, encoding: .utf8)!
         try jsonString.write(toFile: "output.json", atomically: true, encoding: .utf8)
         let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("output.json")
@@ -91,10 +96,8 @@ class RunnerHelper {
         NSWorkspace.shared.open(url)
 
         // Wait 4 seconds for results to be accessed from server, then exit
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            print("Results saved to \(outputUrl)")
-            exit(0)
-        }
+        sleep(4)
+        print("Results saved to \(outputUrl)")
     }
     
     func startLocalServer(_ data: Data) throws {

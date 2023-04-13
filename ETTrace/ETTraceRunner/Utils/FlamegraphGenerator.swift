@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import ETModels
 
 class FlamegraphGenerator {
-    static func generateFlamegraphs(stacks: [Stack], syms: [[Any]], writeFolded: Bool) -> [String: Any] {
+    static func generateFlamegraphs(stacks: [Stack], syms: [[Any]], writeFolded: Bool) -> FlameNode {
         let times = stacks.map { $0.time }
         var timeDiffs: [Double] = []
         let sampleInterval = 0.005
@@ -33,7 +34,7 @@ class FlamegraphGenerator {
             try! samples.map { $0.description }.joined(separator: "\n").write(toFile: "output.folded", atomically: true, encoding: .utf8)
         }
         let node = FlameNode.fromSamples(samples)
-        return node.toDictionary()
+        return node
     }
     
     private static func partitions(_ array: [Double], size: Int, step: Int? = nil) -> [(Double, Double)] {

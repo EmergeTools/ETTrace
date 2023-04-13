@@ -7,11 +7,11 @@
 
 import Foundation
 
-class Sample {
-    let stack: [Any]
-    var time: Double
+public class Sample {
+    public let stack: [Any]
+    public var time: Double
     
-    init(time: Double, stack: [Any]) {
+    public init(time: Double, stack: [Any]) {
         self.time = time
         self.stack = stack
     }
@@ -20,7 +20,7 @@ class Sample {
 //        return Sample(time: self.time, stack: self.stack)
 //    }
     
-    var description: String {
+    public var description: String {
         let timeStr = String(format: "%.15f", self.time).replacingOccurrences(of: "0*$", with: "", options: .regularExpression)
         let stackStr = stack.map { s in
             if let array = s as? Array<Any> {

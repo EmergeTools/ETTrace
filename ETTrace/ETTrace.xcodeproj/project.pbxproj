@@ -22,8 +22,6 @@
 		F4BDB21329B6981000996FDB /* PhysicalDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BDB21229B6981000996FDB /* PhysicalDeviceManager.swift */; };
 		F4CB9D2B29B7BA2400F50446 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = F4CB9D2A29B7BA2400F50446 /* Swifter */; };
 		F4CB9D2D29B7BBF000F50446 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = F4CB9D2C29B7BBF000F50446 /* Swifter */; };
-		F4CB9D3029B7C2E600F50446 /* FlameNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D2F29B7C2E600F50446 /* FlameNode.swift */; };
-		F4CB9D3229B7C35B00F50446 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3129B7C35B00F50446 /* Sample.swift */; };
 		F4CB9D3529B7C49000F50446 /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3429B7C49000F50446 /* ResponseModel.swift */; };
 		F4CB9D3729B7C4BE00F50446 /* Symbolicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3629B7C4BE00F50446 /* Symbolicator.swift */; };
 		F4CB9D3929B7C50400F50446 /* FlamegraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3829B7C50400F50446 /* FlamegraphGenerator.swift */; };
@@ -32,6 +30,10 @@
 		FA1A91A2294373F600D70989 /* PerfAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = FA1A91A1294373F600D70989 /* PerfAnalysis.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FA1A91A92943741600D70989 /* EMGPerfAnalysis.mm in Sources */ = {isa = PBXBuildFile; fileRef = FA1A91A82943741600D70989 /* EMGPerfAnalysis.mm */; };
 		FA1A91AC2943748100D70989 /* EMGWriteLibraries.m in Sources */ = {isa = PBXBuildFile; fileRef = FA1A91AB2943748100D70989 /* EMGWriteLibraries.m */; };
+		FA5D8DA029E892FA006BEBF4 /* JSONWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = FA5D8D9F29E892FA006BEBF4 /* JSONWrapper.m */; };
+		FA5D8DD629E899CC006BEBF4 /* ETModels.h in Headers */ = {isa = PBXBuildFile; fileRef = FA5D8DD529E899CC006BEBF4 /* ETModels.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FA5D8DDA29E899D3006BEBF4 /* FlameNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA5D8DA829E89797006BEBF4 /* FlameNode.swift */; };
+		FA5D8DDB29E899D3006BEBF4 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3129B7C35B00F50446 /* Sample.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +50,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = F4BDB1DE29B68B0B00996FDB;
 			remoteInfo = CommunicationFrame;
+		};
+		FA5D8DDC29E899FE006BEBF4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA1A9195294373F600D70989 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA5D8DD229E899CB006BEBF4;
+			remoteInfo = ETModels;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -85,7 +94,6 @@
 		F4BDB21029B697D200996FDB /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
 		F4BDB21229B6981000996FDB /* PhysicalDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicalDeviceManager.swift; sourceTree = "<group>"; };
 		F4CB9D2829B6A8CF00F50446 /* ETTraceRunner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ETTraceRunner.entitlements; sourceTree = "<group>"; };
-		F4CB9D2F29B7C2E600F50446 /* FlameNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameNode.swift; sourceTree = "<group>"; };
 		F4CB9D3129B7C35B00F50446 /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		F4CB9D3429B7C49000F50446 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
 		F4CB9D3629B7C4BE00F50446 /* Symbolicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Symbolicator.swift; sourceTree = "<group>"; };
@@ -98,6 +106,12 @@
 		FA1A91A82943741600D70989 /* EMGPerfAnalysis.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EMGPerfAnalysis.mm; sourceTree = "<group>"; };
 		FA1A91AA2943744D00D70989 /* EMGWriteLibraries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMGWriteLibraries.h; sourceTree = "<group>"; };
 		FA1A91AB2943748100D70989 /* EMGWriteLibraries.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EMGWriteLibraries.m; sourceTree = "<group>"; };
+		FA5D8D9E29E892F9006BEBF4 /* ETTraceRunner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ETTraceRunner-Bridging-Header.h"; sourceTree = "<group>"; };
+		FA5D8D9F29E892FA006BEBF4 /* JSONWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JSONWrapper.m; sourceTree = "<group>"; };
+		FA5D8DA129E8933C006BEBF4 /* JSONWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSONWrapper.h; sourceTree = "<group>"; };
+		FA5D8DA829E89797006BEBF4 /* FlameNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameNode.swift; sourceTree = "<group>"; };
+		FA5D8DD329E899CC006BEBF4 /* ETModels.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ETModels.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA5D8DD529E899CC006BEBF4 /* ETModels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETModels.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +139,13 @@
 				F4CB9D2B29B7BA2400F50446 /* Swifter in Frameworks */,
 				F4BDB20529B693BB00996FDB /* ArgumentParser in Frameworks */,
 				B8936976E036B5F8C74424D2 /* Pods_ETTrace.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA5D8DD029E899CB006BEBF4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,9 +191,11 @@
 				F4CB9D3329B7C48300F50446 /* ResponseModels */,
 				F4BDB20D29B6964900996FDB /* Utils */,
 				F4BDB20A29B6959000996FDB /* Devices */,
-				F4CB9D2E29B7C2D400F50446 /* Models */,
 				F4BDB1F929B6932F00996FDB /* PerfAnalysisRunner.swift */,
 				F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */,
+				FA5D8D9F29E892FA006BEBF4 /* JSONWrapper.m */,
+				FA5D8DA129E8933C006BEBF4 /* JSONWrapper.h */,
+				FA5D8D9E29E892F9006BEBF4 /* ETTraceRunner-Bridging-Header.h */,
 			);
 			path = ETTraceRunner;
 			sourceTree = "<group>";
@@ -198,15 +221,6 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
-		F4CB9D2E29B7C2D400F50446 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				F4CB9D2F29B7C2E600F50446 /* FlameNode.swift */,
-				F4CB9D3129B7C35B00F50446 /* Sample.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		F4CB9D3329B7C48300F50446 /* ResponseModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -221,6 +235,7 @@
 				FA1A91A0294373F600D70989 /* ETTrace */,
 				F4BDB1E029B68B0B00996FDB /* CommunicationFrame */,
 				F4BDB1F829B6932F00996FDB /* ETTraceRunner */,
+				FA5D8DD429E899CC006BEBF4 /* ETModels */,
 				FA1A919F294373F600D70989 /* Products */,
 				F0EB7EFAD45DEFB62FC3CE49 /* Pods */,
 				88B083935BBF36B4FEC45A6F /* Frameworks */,
@@ -233,6 +248,7 @@
 				FA1A919E294373F600D70989 /* ETTrace.framework */,
 				F4BDB1DF29B68B0B00996FDB /* CommunicationFrame.framework */,
 				F4BDB1F729B6932F00996FDB /* ETTraceRunner */,
+				FA5D8DD329E899CC006BEBF4 /* ETModels.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -249,6 +265,16 @@
 				F4BDB1ED29B68D7900996FDB /* EMGChannelListener.m */,
 			);
 			path = ETTrace;
+			sourceTree = "<group>";
+		};
+		FA5D8DD429E899CC006BEBF4 /* ETModels */ = {
+			isa = PBXGroup;
+			children = (
+				F4CB9D3129B7C35B00F50446 /* Sample.swift */,
+				FA5D8DA829E89797006BEBF4 /* FlameNode.swift */,
+				FA5D8DD529E899CC006BEBF4 /* ETModels.h */,
+			);
+			path = ETModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -269,6 +295,14 @@
 				F4BDB1EE29B68D7900996FDB /* EMGChannelListener.h in Headers */,
 				F4BDB1F229B690B000996FDB /* EMGPerfAnalysis_Private.h in Headers */,
 				FA1A91A2294373F600D70989 /* PerfAnalysis.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA5D8DCE29E899CB006BEBF4 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA5D8DD629E899CC006BEBF4 /* ETModels.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +339,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				FA5D8DDD29E899FE006BEBF4 /* PBXTargetDependency */,
 				F4BDB20729B693CA00996FDB /* PBXTargetDependency */,
 				F4BDB1FF29B6933700996FDB /* PBXTargetDependency */,
 			);
@@ -341,6 +376,24 @@
 			productReference = FA1A919E294373F600D70989 /* ETTrace.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		FA5D8DD229E899CB006BEBF4 /* ETModels */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA5D8DD729E899CC006BEBF4 /* Build configuration list for PBXNativeTarget "ETModels" */;
+			buildPhases = (
+				FA5D8DCE29E899CB006BEBF4 /* Headers */,
+				FA5D8DCF29E899CB006BEBF4 /* Sources */,
+				FA5D8DD029E899CB006BEBF4 /* Frameworks */,
+				FA5D8DD129E899CB006BEBF4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ETModels;
+			productName = ETModels;
+			productReference = FA5D8DD329E899CC006BEBF4 /* ETModels.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -348,7 +401,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
+				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1410;
 				TargetAttributes = {
 					F4BDB1DE29B68B0B00996FDB = {
@@ -356,9 +409,13 @@
 					};
 					F4BDB1F629B6932F00996FDB = {
 						CreatedOnToolsVersion = 14.0.1;
+						LastSwiftMigration = 1430;
 					};
 					FA1A919D294373F600D70989 = {
 						CreatedOnToolsVersion = 14.1;
+					};
+					FA5D8DD229E899CB006BEBF4 = {
+						CreatedOnToolsVersion = 14.3;
 					};
 				};
 			};
@@ -382,6 +439,7 @@
 				FA1A919D294373F600D70989 /* ETTrace */,
 				F4BDB1DE29B68B0B00996FDB /* CommunicationFrame */,
 				F4BDB1F629B6932F00996FDB /* ETTraceRunner */,
+				FA5D8DD229E899CB006BEBF4 /* ETModels */,
 			);
 		};
 /* End PBXProject section */
@@ -395,6 +453,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA1A919C294373F600D70989 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA5D8DD129E899CB006BEBF4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -463,17 +528,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4BDB20C29B695A600996FDB /* SimulatorDeviceManager.swift in Sources */,
+				FA5D8DA029E892FA006BEBF4 /* JSONWrapper.m in Sources */,
 				F4BDB21129B697D200996FDB /* DeviceManager.swift in Sources */,
 				F4BDB1FA29B6932F00996FDB /* PerfAnalysisRunner.swift in Sources */,
 				F4BDB21329B6981000996FDB /* PhysicalDeviceManager.swift in Sources */,
 				F4BDB20F29B6965200996FDB /* Utils.swift in Sources */,
-				F4CB9D3229B7C35B00F50446 /* Sample.swift in Sources */,
 				F4CB9D3529B7C49000F50446 /* ResponseModel.swift in Sources */,
 				F4CB9D3729B7C4BE00F50446 /* Symbolicator.swift in Sources */,
 				FA172EC129E70EBF009D3BF8 /* CommunicationChannel.swift in Sources */,
 				F4CB9D3929B7C50400F50446 /* FlamegraphGenerator.swift in Sources */,
 				F4CB9D3F29B907DE00F50446 /* RunnerHelper.swift in Sources */,
-				F4CB9D3029B7C2E600F50446 /* FlameNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -484,6 +548,15 @@
 				FA1A91A92943741600D70989 /* EMGPerfAnalysis.mm in Sources */,
 				F4BDB1EF29B68D7900996FDB /* EMGChannelListener.m in Sources */,
 				FA1A91AC2943748100D70989 /* EMGWriteLibraries.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA5D8DCF29E899CB006BEBF4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA5D8DDA29E899D3006BEBF4 /* FlameNode.swift in Sources */,
+				FA5D8DDB29E899D3006BEBF4 /* Sample.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -503,6 +576,11 @@
 		F4BDB20729B693CA00996FDB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = F4BDB20629B693CA00996FDB /* ArgumentParser */;
+		};
+		FA5D8DDD29E899FE006BEBF4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA5D8DD229E899CB006BEBF4 /* ETModels */;
+			targetProxy = FA5D8DDC29E899FE006BEBF4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -590,6 +668,7 @@
 			baseConfigurationReference = 1FBF0AED1A96804F57717F27 /* Pods-ETTraceRunner.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ETTraceRunner/ETTraceRunner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
@@ -601,6 +680,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "ETTraceRunner/ETTraceRunner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -611,6 +691,7 @@
 			baseConfigurationReference = 26C10ACD7D67B0FE1AFD5254 /* Pods-ETTraceRunner.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ETTraceRunner/ETTraceRunner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
@@ -622,6 +703,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "ETTraceRunner/ETTraceRunner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 			};
@@ -805,6 +887,86 @@
 			};
 			name = Release;
 		};
+		FA5D8DD829E899CC006BEBF4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = J9H72XH8P9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.emerge.ETModels;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FA5D8DD929E899CC006BEBF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = J9H72XH8P9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.emerge.ETModels;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -840,6 +1002,15 @@
 			buildConfigurations = (
 				FA1A91A6294373F600D70989 /* Debug */,
 				FA1A91A7294373F600D70989 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA5D8DD729E899CC006BEBF4 /* Build configuration list for PBXNativeTarget "ETModels" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA5D8DD829E899CC006BEBF4 /* Debug */,
+				FA5D8DD929E899CC006BEBF4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
