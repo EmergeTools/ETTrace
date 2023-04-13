@@ -23,9 +23,11 @@ class CommunicationChannel: NSObject {
   private var reportedGeneratedContinuation: CheckedContinuation<Void, Never>?
 
   private let verbose: Bool
+  private var relaunch: Bool
   
-  init(verbose: Bool) {
+  init(verbose: Bool, relaunch: Bool) {
     self.verbose = verbose
+    self.relaunch = relaunch
   }
   
   func waitForReportGenerated() async {
@@ -88,6 +90,11 @@ extension CommunicationChannel: PTChannelDelegate {
   @objc
   func channelDidEnd(_ channel: PTChannel, error: Error?) {
     dispatchPrecondition(condition: .onQueue(.main))
+
+    guard !relaunch else {
+      relaunch = false
+      return
+    }
 
     if !resultsReceived {
         print("Disconnected before results received, exiting early")
