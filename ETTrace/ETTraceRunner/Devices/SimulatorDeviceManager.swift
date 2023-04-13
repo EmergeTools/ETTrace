@@ -10,9 +10,16 @@ import PeerTalk
 import CommunicationFrame
 
 struct SimulatorDeviceManager: DeviceManager {
-    func connect(with channel: PTChannel) async throws -> Void {
+
+    var communicationChannel: CommunicationChannel
+
+    init(verbose: Bool) {
+      communicationChannel = CommunicationChannel(verbose: verbose)
+    }
+    
+    func connect() async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
-            channel.connect(to: UInt16(PTPortNumber), IPv4Address: INADDR_LOOPBACK) { error, address in
+            communicationChannel.channel.connect(to: UInt16(PTPortNumber), IPv4Address: INADDR_LOOPBACK) { error, address in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {

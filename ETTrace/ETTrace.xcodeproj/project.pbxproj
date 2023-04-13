@@ -28,6 +28,7 @@
 		F4CB9D3729B7C4BE00F50446 /* Symbolicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3629B7C4BE00F50446 /* Symbolicator.swift */; };
 		F4CB9D3929B7C50400F50446 /* FlamegraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3829B7C50400F50446 /* FlamegraphGenerator.swift */; };
 		F4CB9D3F29B907DE00F50446 /* RunnerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */; };
+		FA172EC129E70EBF009D3BF8 /* CommunicationChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA172EC029E70EBF009D3BF8 /* CommunicationChannel.swift */; };
 		FA1A91A2294373F600D70989 /* PerfAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = FA1A91A1294373F600D70989 /* PerfAnalysis.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FA1A91A92943741600D70989 /* EMGPerfAnalysis.mm in Sources */ = {isa = PBXBuildFile; fileRef = FA1A91A82943741600D70989 /* EMGPerfAnalysis.mm */; };
 		FA1A91AC2943748100D70989 /* EMGWriteLibraries.m in Sources */ = {isa = PBXBuildFile; fileRef = FA1A91AB2943748100D70989 /* EMGWriteLibraries.m */; };
@@ -91,6 +92,7 @@
 		F4CB9D3829B7C50400F50446 /* FlamegraphGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlamegraphGenerator.swift; sourceTree = "<group>"; };
 		F4CB9D3E29B907DE00F50446 /* RunnerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerHelper.swift; sourceTree = "<group>"; };
 		F99E9B15EA3CFAAF648C921D /* Pods-ETTrace.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ETTrace.debug.xcconfig"; path = "Target Support Files/Pods-ETTrace/Pods-ETTrace.debug.xcconfig"; sourceTree = "<group>"; };
+		FA172EC029E70EBF009D3BF8 /* CommunicationChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunicationChannel.swift; sourceTree = "<group>"; };
 		FA1A919E294373F600D70989 /* ETTrace.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ETTrace.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1A91A1294373F600D70989 /* PerfAnalysis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PerfAnalysis.h; sourceTree = "<group>"; };
 		FA1A91A82943741600D70989 /* EMGPerfAnalysis.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EMGPerfAnalysis.mm; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				F4BDB21029B697D200996FDB /* DeviceManager.swift */,
+				FA172EC029E70EBF009D3BF8 /* CommunicationChannel.swift */,
 				F4BDB20B29B695A600996FDB /* SimulatorDeviceManager.swift */,
 				F4BDB21229B6981000996FDB /* PhysicalDeviceManager.swift */,
 			);
@@ -467,6 +470,7 @@
 				F4CB9D3229B7C35B00F50446 /* Sample.swift in Sources */,
 				F4CB9D3529B7C49000F50446 /* ResponseModel.swift in Sources */,
 				F4CB9D3729B7C4BE00F50446 /* Symbolicator.swift in Sources */,
+				FA172EC129E70EBF009D3BF8 /* CommunicationChannel.swift in Sources */,
 				F4CB9D3929B7C50400F50446 /* FlamegraphGenerator.swift in Sources */,
 				F4CB9D3F29B907DE00F50446 /* RunnerHelper.swift in Sources */,
 				F4CB9D3029B7C2E600F50446 /* FlameNode.swift in Sources */,
