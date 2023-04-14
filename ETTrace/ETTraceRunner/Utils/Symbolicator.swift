@@ -184,7 +184,8 @@ class Symbolicator {
     private func dsymForLib(_ lib: LoadedLibrary) -> String? {
         let libPath = lib.path
         
-        if !isSimulator && libPath.contains(".app/") {
+        if libPath.contains(".app/") {
+            // Look for matching dsyms
             if let dsymsDir = dSymsDir {
                 let libName = URL(fileURLWithPath: libPath).lastPathComponent
                 let folderExtension = libPath.contains(".framework") ? "framework" : "app"
@@ -193,6 +194,8 @@ class Symbolicator {
                     return "\(dsymsDir)/\(libName).\(folderExtension).dSYM/Contents/Resources/DWARF/\(dsym)"
                 }
             }
+
+            // Use spotlight to find dsyms
             let foundDsyms = try? safeShellWithOutput("/usr/bin/mdfind \"com_apple_xcode_dsym_uuids == \(lib.uuid)\"").components(separatedBy: .newlines)
             if let foundDsym = foundDsyms?.first {
                 let dwarfFiles = try? FileManager.default.contentsOfDirectory(atPath: "\(foundDsym)/Contents/Resources/DWARF/")
@@ -200,18 +203,24 @@ class Symbolicator {
                     return "\(foundDsym)/Contents/Resources/DWARF/\(dwarfFile)"
                 }
             }
+            // Try using the binary in the simulator to symbolicate
+            if isSimulator {
+              return libPath
+            }
             return nil
-        }
-        
-        if !isSimulator && !libPath.contains(".app") {
+        } else {
+          if !isSimulator {
+            // Get symbols from device support dir
             let searchFolder = "\(FileManager.default.homeDirectoryForCurrentUser.path)/Library/Developer/Xcode/iOS DeviceSupport"
             let directories = (try? FileManager.default.contentsOfDirectory(atPath: searchFolder)) ?? []
             
             for folder in directories where folder.contains(osVersion) && folder.hasSuffix(arch){
                 return "\(searchFolder)/\(folder)/Symbols\(libPath)"
             }
+            return nil
+          } else {
+            return libPath
+          }
         }
-        
-        return libPath
     }
 }
