@@ -10,5 +10,8 @@ Install the runner with `brew install emergetools/homebrew-tap/ettrace`
 
 ## Using
 
-Launch your app and run `ettrace` or `ettrace --use-simulator`. After profiling, the result will be displayed on https://emergetools.com/flamegraph
+Launch your app and run `ettrace` or `ettrace --simulator`. After profiling, the result will be displayed on https://emergetools.com/flamegraph
 
+## dSYMs
+
+You can point `ettrace` to a folder containing your dsyms with the `--dsyms` flag. If the dsyms are indexed by spotlight they will be automatically found and used.
