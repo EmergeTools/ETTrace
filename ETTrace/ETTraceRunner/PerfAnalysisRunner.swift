@@ -18,9 +18,12 @@ struct PerfAnalysisRunner: ParsableCommand {
 
     @Flag(name: .shortAndLong, help: "Use simulator")
     var useSimulator: Bool = false
+    
+    @Flag(name: .shortAndLong, help: "Extract memory data.")
+    var memory = false
 
     mutating func run() throws {
-        let helper = RunnerHelper(dsyms, launch, useSimulator)
+        let helper = RunnerHelper(dsyms, launch, useSimulator, memory)
         Task {
             do {
                 try await helper.start()

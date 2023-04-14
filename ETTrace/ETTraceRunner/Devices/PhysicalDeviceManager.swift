@@ -16,6 +16,7 @@ enum ConnectionError: Error {
 
 class PhysicalDevicemanager: DeviceManager {
     var observer: NSObjectProtocol? = nil
+    var isMemory: Bool = false
     
     func connect(with channel: PTChannel) async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in

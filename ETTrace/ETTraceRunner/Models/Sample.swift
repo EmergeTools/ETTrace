@@ -31,3 +31,23 @@ class Sample {
         return "\(stackStr) \(timeStr)"
     }
 }
+
+class MemorySample {
+    let stack: [Any]
+    var memory: UInt64
+    
+    init(memory: UInt64, stack: [Any]) {
+        self.memory = memory
+        self.stack = stack
+    }
+    
+    var description: String {
+        let stackStr = stack.map { s in
+            if let array = s as? Array<Any> {
+                return "\(array[1])" // Position 0 is library, 1 is method
+            }
+            return "\(s)"
+        }.joined(separator: ";")
+        return "\(stackStr) \(memory)"
+    }
+}

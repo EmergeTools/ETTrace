@@ -24,6 +24,7 @@ struct LibraryInfo: Decodable {
 struct Stack: Decodable {
     let stack: [UInt64]
     let time: Double
+    let allocatedMemory: UInt64?
 }
 
 struct LoadedLibrary: Decodable, Equatable, Hashable {

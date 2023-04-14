@@ -10,8 +10,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface EMGChannelListener : NSObject
++ (instancetype) sharedChannelListener;
 - (instancetype) init;
 - (void) sendReportCreatedMessage;
+- (void) sendReportCreatedMemoryMessage;
 @end
 
 NS_ASSUME_NONNULL_END

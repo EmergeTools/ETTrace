@@ -14,6 +14,7 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     let dsyms: String?
     let launch: Bool
     let useSimulator: Bool
+    let memory: Bool
     
     // MARK: Peertalk
     lazy var channel = PTChannel(protocol: nil, delegate: self)
@@ -25,14 +26,15 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     var receivedData: Data = Data()
     var resultsReceived: Bool = false
     
-    init(_ dsyms: String?, _ launch: Bool, _ useSimulator: Bool) {
+    init(_ dsyms: String?, _ launch: Bool, _ useSimulator: Bool, _ memory: Bool) {
         self.dsyms = dsyms
         self.launch = launch
         self.useSimulator = useSimulator
+        self.memory = memory
     }
     
     func channel(_ channel: PTChannel, didRecieveFrame type: UInt32, tag: UInt32, payload: Data?) {
-        if type == PTFrameTypeReportCreated {
+        if type == PTFrameTypeReportCreated || type == PTFrameTypeReportCreatedMemory {
             reportGenerated = true
         } else if type == PTFrameTypeResultsMetadata,
                   let payload = payload {
@@ -58,54 +60,56 @@ class RunnerHelper: NSObject, PTChannelDelegate {
     }
     
     func start() async throws {
-        print("Please open the app on the \(useSimulator ? "simulator" : "device")")
-        if !useSimulator {
-            print("Re-run with `--use-simulator` to connect to the simulator.")
-        }
-        print("Press any key when ready...")
-        _ = readLine()
-
-        print("Connecting to device.")
-
-        let deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager() : PhysicalDevicemanager()
-
-        try await deviceManager.connect(with: channel)
-
-        try await deviceManager.sendStartRecording(launch, channel)
-
-        if launch {
-            print("Re-launch the app to start recording, then press any key to exit")
-        } else {
-            print("Started recording, press any key to exit")
-        }
-
-        _ = readLine()
-        print("            \r")
-
-        try await deviceManager.sendStopRecording(channel)
-
-        print("Waiting for report to be generated...");
-        while(!reportGenerated) {
-            usleep(10)
-        }
-        
-        print("Extracting results from device...")
-        try await deviceManager.requestResults(with: channel)
-        while(!resultsReceived) {
-            usleep(10)
-        }
-        
+//        print("Please open the app on the \(useSimulator ? "simulator" : "device")")
+//        if !useSimulator {
+//            print("Re-run with `--use-simulator` to connect to the simulator.")
+//        }
+//        print("Press any key when ready...")
+//        _ = readLine()
+//
+//        print("Connecting to device.")
+//
+//        var deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager() : PhysicalDevicemanager()
+//        deviceManager.isMemory = memory
+//
+//        try await deviceManager.connect(with: channel)
+//
+//        try await deviceManager.sendStartRecording(launch, channel)
+//
+//        if launch {
+//            print("Re-launch the app to start recording, then press any key to exit")
+//        } else {
+//            print("Started recording, press any key to exit")
+//        }
+//
+//        _ = readLine()
+//        print("            \r")
+//
+//        try await deviceManager.sendStopRecording(channel)
+//
+//        print("Waiting for report to be generated...");
+//        while(!reportGenerated) {
+//            usleep(10)
+//        }
+//
+//        print("Extracting results from device...")
+//        try await deviceManager.requestResults(with: channel)
+//        while(!resultsReceived) {
+//            usleep(10)
+//        }
+//
         let localFolder = Bundle.main.bundlePath
         let outFolder = "\(localFolder)/tmp/emerge-perf-analysis/Documents/emerge-output/"
-        try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)
-        let outputPath = "\(outFolder)/output.json"
-        if FileManager.default.fileExists(atPath: outputPath) {
-            try FileManager.default.removeItem(atPath: outputPath)
-        }
-        FileManager.default.createFile(atPath: outputPath, contents: receivedData)
+//        try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)
+        let outputPath = memory ? "\(outFolder)/output_memory.json" : "\(outFolder)/output.json"
+//        if FileManager.default.fileExists(atPath: outputPath) {
+//            try FileManager.default.removeItem(atPath: outputPath)
+//        }
+//        FileManager.default.createFile(atPath: outputPath, contents: receivedData)
+//
+//        print("Stopped recording, symbolicating...")
         
-        print("Stopped recording, symbolicating...")
-        
+        let receivedData = try! Data(contentsOf: URL(fileURLWithPath:  outputPath))
         let responseData = try JSONDecoder().decode(ResponseModel.self, from: receivedData)
         
         let isSimulator = responseData.isSimulator
@@ -120,7 +124,7 @@ class RunnerHelper: NSObject, PTChannelDelegate {
         
         let symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch)
         let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
-        let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms) as NSDictionary
+        let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, isMemory: memory) as NSDictionary
         
         let outJsonData = try JSONSerialization.data(withJSONObject: flamegraph, options: .withoutEscapingSlashes)
         let jsonString = String(data: outJsonData, encoding: String.Encoding.ascii)

@@ -11,11 +11,11 @@
 #import <vector>
 #import <mutex>
 #import <mach/mach.h>
-#import <sys/sysctl.h>
 #import <mach-o/arch.h>
 #import "EMGChannelListener.h"
 
 #import "PerfAnalysis.h"
+#import "EMGCommonData.h"
 
 @implementation EMGPerfAnalysis
 
@@ -101,37 +101,8 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
             [[NSFileManager defaultManager] createDirectoryAtURL:emergeDirectoryURL withIntermediateDirectories:YES attributes:nil error:nil];
         }
         
-        channelListener = [[EMGChannelListener alloc] init];
+        channelListener = [EMGChannelListener sharedChannelListener];
     });
-}
-
-+ (BOOL)isRunningOnSimulator
-{
-#if TARGET_OS_SIMULATOR
-    return YES;
-#else
-    return NO;
-#endif
-}
-
-+ (NSString *)osBuild {
-    int mib[2] = {CTL_KERN, KERN_OSVERSION};
-    u_int namelen = sizeof(mib) / sizeof(mib[0]);
-    size_t bufferSize = 0;
-
-    NSString *osBuildVersion = nil;
-
-    // Get the size for the buffer
-    sysctl(mib, namelen, NULL, &bufferSize, NULL, 0);
-
-    u_char buildBuffer[bufferSize];
-    int result = sysctl(mib, namelen, buildBuffer, &bufferSize, NULL, 0);
-
-    if (result >= 0) {
-        osBuildVersion = [[NSString alloc] initWithBytes:buildBuffer length:bufferSize encoding:NSUTF8StringEncoding];
-    }
-
-    return osBuildVersion;
 }
 
 + (void)stopRecording {
@@ -157,8 +128,8 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     NSMutableDictionary *info = [@{
         @"stacks": stacks,
         @"libraryInfo": EMGLibrariesData(),
-        @"isSimulator": @([self isRunningOnSimulator]),
-        @"osBuild": [self osBuild],
+        @"isSimulator": @([EMGCommonData isRunningOnSimulator]),
+        @"osBuild": [EMGCommonData osBuild],
         @"cpuType": cpuType
     } mutableCopy];
     

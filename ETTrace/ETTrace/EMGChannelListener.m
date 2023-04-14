@@ -6,9 +6,10 @@
 //
 
 #import "EMGChannelListener.h"
-#import <PeerTalk/PTChannel.h>
+#import <PeerTalk/Peertalk.h>
 #import <CommunicationFrame/CommunicationFrame.h>
 #import "EMGPerfAnalysis_Private.h"
+#import "EMGMemoryAnalysis_Private.h"
 
 @interface EMGChannelListener () <PTChannelDelegate>
 @property (nonatomic, weak) PTChannel *serverChannel;
@@ -16,6 +17,15 @@
 @end
 
 @implementation EMGChannelListener
++ (instancetype) sharedChannelListener {
+    static EMGChannelListener *sharedChannelListener = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedChannelListener = [[self alloc] init];
+    });
+    return sharedChannelListener;
+}
+
 - (instancetype) init {
     self = [super init];
     if (self)
@@ -43,7 +53,8 @@
     if (channel != self.peerChannel) {
         // A previous channel that has been canceled but not yet ended. Ignore.
         return NO;
-    } else if (type == PTFrameTypeStart || type == PTFrameTypeStop || type == PTFrameTypeRequestResults){
+    } else if (type == PTFrameTypeStart || type == PTFrameTypeStop || type == PTFrameTypeRequestResults
+               || type == PTFrameTypeStartMemory || type == PTFrameTypeStopMemory || type == PTFrameTypeRequestResultsMemory){
         return YES;
     } else {
         NSLog(@"Unexpected frame of type %u", type);
@@ -66,6 +77,19 @@
         [EMGPerfAnalysis stopRecordingThread];
     } else if (type == PTFrameTypeRequestResults) {
         [self sendReportData];
+    } else if (type == PTFrameTypeStartMemory) {
+        PTStartFrame *startFrame = (PTStartFrame *)payload.bytes;
+        NSLog(@"Start received, with: %i", startFrame->runAtStartup);
+        BOOL runAtStartup = startFrame->runAtStartup;
+        if (runAtStartup) {
+//            [EMGPerfAnalysis setupRunAtStartup];
+        } else {
+            [EMGMemoryAnalysis setupMemoryRecording];
+        }
+    } else if (type == PTFrameTypeStopMemory) {
+        [EMGMemoryAnalysis stopRecordingThread];
+    } else if (type == PTFrameTypeRequestResultsMemory) {
+        [self sendReportDataMemory];
     }
 }
 
@@ -98,9 +122,30 @@
     }];
 }
 
+- (void) sendReportCreatedMemoryMessage {
+    NSData *emptyData = [[NSData alloc] init];
+    [self.peerChannel sendFrameOfType:PTFrameTypeReportCreatedMemory tag:PTFrameNoTag withPayload:emptyData callback:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Could not send message");
+        } else {
+            NSLog(@"Message sent");
+        }
+    }];
+}
+
 - (void) sendReportData {
     NSURL *outURL = [EMGPerfAnalysis outputPath];
     
+    [self sendFile: outURL];
+}
+
+- (void) sendReportDataMemory {
+    NSURL *outURL = [EMGMemoryAnalysis outputPath];
+    
+    [self sendFile: outURL];
+}
+
+- (void) sendFile:(NSURL *) outURL {
     NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingAtPath:outURL.path];
     if (!fileHandle) {
         NSLog(@"Error opening file");

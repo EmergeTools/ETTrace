@@ -25,13 +25,22 @@ static const int PTNoFrameTag = 0;
 static const int PTMaxChunkSize = 1024 * 1024;
 
 enum {
+    // Perf
     PTFrameTypeStart = 101,
     PTFrameTypeStop = 102,
     PTFrameTypeReportCreated = 103,
     PTFrameTypeRequestResults = 104,
+    
+    // Both
     PTFrameTypeResultsMetadata = 105,
     PTFrameTypeResultsData = 106,
     PTFrameTypeResultsTransferComplete = 107,
+    
+    // Memory
+    PTFrameTypeStartMemory = 108,
+    PTFrameTypeStopMemory = 109,
+    PTFrameTypeReportCreatedMemory = 110,
+    PTFrameTypeRequestResultsMemory = 111,
 };
 
 typedef struct _PTStartFrame {
