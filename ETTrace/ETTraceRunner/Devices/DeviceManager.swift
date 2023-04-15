@@ -11,6 +11,7 @@ import PeerTalk
 
 protocol DeviceManager {
     var communicationChannel: CommunicationChannel { get }
+    var verbose: Bool { get }
 
     func connect() async throws -> Void
 }
@@ -49,7 +50,9 @@ extension DeviceManager {
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
-                    print("Extracting results from device...")
+                    if verbose {
+                        print("Extracting results from device...")
+                    }
                     continuation.resume()
                 }
             }

@@ -23,7 +23,7 @@ class PhysicalDevicemanager: DeviceManager {
       self.verbose = verbose
     }
 
-    private let verbose: Bool
+    let verbose: Bool
     private var observer: NSObjectProtocol? = nil
     private var deviceID: NSNumber? = nil
   
