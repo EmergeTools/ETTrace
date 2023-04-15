@@ -13,8 +13,11 @@ struct SimulatorDeviceManager: DeviceManager {
 
     var communicationChannel: CommunicationChannel
 
+    let verbose: Bool
+
     init(verbose: Bool, relaunch: Bool) {
       communicationChannel = CommunicationChannel(verbose: verbose, relaunch: relaunch)
+      self.verbose = verbose
     }
     
     func connect() async throws -> Void {

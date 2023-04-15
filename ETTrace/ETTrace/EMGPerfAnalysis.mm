@@ -139,7 +139,6 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 }
 
 + (void)stopRecording {
-    NSLog(@"************** EMG done");
     sStacksLock.lock();
     NSMutableArray <NSDictionary <NSString *, id> *> *stacks = [NSMutableArray array];
     for (const auto &cStack : *sStacks) {
@@ -179,15 +178,15 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     NSURL *outputURL = [emergeDirectoryURL URLByAppendingPathComponent:@"output.json"];
     BOOL result = [data writeToURL:outputURL options:NSDataWritingAtomic error:&error];
     if (!result || error) {
-        NSLog(@"Error writing PerfAnalysis state %@", error);
+        NSLog(@"Error writing ETTrace state %@", error);
     } else {
-        NSLog(@"PerfAnalysis result written");
+        NSLog(@"ETTrace result written");
     }
     [channelListener sendReportCreatedMessage];
 }
 
 + (void)load {
-    printf("Starting perf analysis\n");
+    NSLog(@"Starting ETTrace");
     sMainMachThread = mach_thread_self();
     fileEventsQueue = dispatch_queue_create("com.emerge.file_queue", DISPATCH_QUEUE_SERIAL);
     EMGBeginCollectingLibraries();
