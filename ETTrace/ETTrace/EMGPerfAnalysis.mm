@@ -58,6 +58,10 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 
 + (void)setupStackRecording
 {
+    if (sStackRecordingThread != nil) {
+        return;
+    }
+
     // Make sure that +recordStack is always called on the same (non-main) thread.
     // This is because a Process keeps its own "current thread" variable which we need
     // to keep separate
@@ -187,7 +191,8 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     sMainMachThread = mach_thread_self();
     fileEventsQueue = dispatch_queue_create("com.emerge.file_queue", DISPATCH_QUEUE_SERIAL);
     EMGBeginCollectingLibraries();
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"runAtStartup"]) {
+    BOOL infoPlistRunAtStartup = ((NSNumber *) NSBundle.mainBundle.infoDictionary[@"ETTraceRunAtStartup"]).boolValue;
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"runAtStartup"] || infoPlistRunAtStartup) {
         [EMGPerfAnalysis setupStackRecording];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"runAtStartup"];
     }
