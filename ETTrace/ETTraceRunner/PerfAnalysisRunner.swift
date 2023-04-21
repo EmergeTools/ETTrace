@@ -23,6 +23,9 @@ struct PerfAnalysisRunner: ParsableCommand {
     var verbose: Bool = false
 
     mutating func run() throws {
+      if let dsym = dsyms, dsym.hasSuffix(".dSYM") {
+        PerfAnalysisRunner.exit(withError: ValidationError("The dsym argument should be set to a folder containing your dSYM files, not the dSYM itself"))
+      }
         let helper = RunnerHelper(dsyms, launch, simulator, verbose)
         Task {
             do {
