@@ -1,6 +1,6 @@
 # ETTrace 👽
 
-Locally measure performance of your app, without Xcode or Instruments.
+Locally measure performance of your app, without Xcode or Instruments. Read all about it in the [launch blog post](https://www.emergetools.com/blog/posts/ettrace-reliable-ios-profiling-with-flamecharts)
 
 ![Example Flamechart](./images/example_flamechart.png)
 
