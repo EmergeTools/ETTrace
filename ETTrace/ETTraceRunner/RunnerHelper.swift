@@ -30,7 +30,7 @@ class RunnerHelper {
         if !useSimulator {
             print("Re-run with `--simulator` to connect to the simulator.")
         }
-        print("Press any key when ready...")
+        print("Press return when ready...")
         _ = readLine()
 
         print("Connecting to device.")
@@ -42,9 +42,9 @@ class RunnerHelper {
         try await deviceManager.sendStartRecording(launch)
 
         if launch {
-            print("Re-launch the app to start recording, then press any key to exit")
+            print("Re-launch the app to start recording, then press return to exit")
         } else {
-            print("Started recording, press any key to exit")
+            print("Started recording, press return to exit")
         }
 
         _ = readLine()
@@ -68,9 +68,9 @@ class RunnerHelper {
         FileManager.default.createFile(atPath: outputPath, contents: receivedData)
         
         print("Stopped recording, symbolicating...")
-        
+
         let responseData = try JSONDecoder().decode(ResponseModel.self, from: receivedData)
-        
+
         let isSimulator = responseData.isSimulator
         var arch = responseData.cpuType.lowercased()
         if arch == "arm64e" {

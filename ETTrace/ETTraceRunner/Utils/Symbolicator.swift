@@ -30,19 +30,22 @@ class Symbolicator {
     }
     
     func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[[String]]] {
-        var libToAddrs: [LoadedLibrary: [UInt64]] = [:]
+        var libToAddrs: [LoadedLibrary: Set<UInt64>] = [:]
         let stacks = stacksFromResults(stacks, loadedLibs)
         stacks.flatMap { $0 }.forEach { addr in
             if let lib = addr.lib {
-                libToAddrs[lib, default: []].append(addr.addr)
+              libToAddrs[lib, default: []].insert(addr.addr)
             }
         }
         
         let stateLock = NSLock()
+        var libToCleanedPath = [String: (String, String)]()
         var libToAddrToSym: [String: [UInt64: String]] = [:]
-        let queue = DispatchQueue(label: "com.emerge.symbolication", attributes: .concurrent)
+        let queue = DispatchQueue(label: "com.emerge.symbolication", qos: .userInitiated, attributes: .concurrent)
         let group = DispatchGroup()
         for (lib, addrs) in libToAddrs {
+            let cleanedPath = cleanedUpPath(lib.path)
+            libToCleanedPath[lib.path] = (cleanedPath, URL(string: cleanedPath)?.lastPathComponent ?? "")
             group.enter()
             queue.async {
                 if let dSym = self.dsymForLib(lib) {
@@ -61,11 +64,11 @@ class Symbolicator {
         let result: [[[String]]] = stacks.map { stack in
             stack.map { addr in
                 if let lib = addr.lib {
-                    let libPath = cleanedUpPath(lib.path)
+                    let (libPath, lastPathComponent) = libToCleanedPath[lib.path]!
                     guard let addrToSym = libToAddrToSym[lib.path],
                           let sym = addrToSym[addr.addr] else {
                         noSymMap[libPath, default: 0] += 1
-                        return [libPath, URL(string: libPath)?.lastPathComponent ?? ""]
+                      return [libPath, lastPathComponent]
                     }
                     return [libPath, formatSymbol(sym)]
                 } else {
@@ -133,38 +136,40 @@ class Symbolicator {
 
         return addrs
     }
-    
-    private static func addrToSymForBinary(_ binary: String, _ addrs: [UInt64]) -> [UInt64: String] {
+
+    private static func addrToSymForBinary(_ binary: String, _ addrs: Set<UInt64>) -> [UInt64: String] {
+        let addrsArray = Array(addrs)
         let addrsFile = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)!.path
-        
+
         let addition: UInt64 = 0x1000000 // atos can fail when the load address is 0, so add extra
-        let strs = addrs.map { String($0 + addition, radix: 16) }
+        let strs = addrsArray.map { String($0 + addition, radix: 16) }
         try! strs.joined(separator: "\n").write(toFile: addrsFile, atomically: true, encoding: .utf8)
-        
+
         let arch = try? safeShellWithOutput("/usr/bin/file \"\(binary)\"").contains("arm64e") ? "arm64e" : "arm64"
-        
+
         try! strs.joined(separator: "\n").write(toFile: addrsFile, atomically: true, encoding: .utf8)
 
         let symsStr = try? safeShellWithOutput("/usr/bin/atos -l \(String(addition, radix: 16)) -arch \(arch!) -o \"\(binary)\" -f \(addrsFile)")
-        
+
         let syms = symsStr!.split(separator: "\n").enumerated().map { (idx, sym) -> (UInt64, String?) in
-            if sym.starts(with: "0x") || sym == strs[idx] {
-                return (addrs[idx], nil)
+            let trimmed = sym.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.count == 0 || trimmed.starts(with: "0x") || trimmed == strs[idx] {
+                return (addrsArray[idx], nil)
             } else {
-                return (addrs[idx], String(sym))
+                return (addrsArray[idx], trimmed)
             }
         }.filter({ (_, sym) in
             return sym != nil
         })
-        
+
         var result: [UInt64: String] = [:]
         for (addr, sym) in syms {
             result[addr] = sym
         }
-        
+
         return result
     }
-    
+
     private func formatSymbol(_ sym: String) -> String {
         if let cachedResult = formatSymbolCache[sym] {
             return cachedResult
