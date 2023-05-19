@@ -4,6 +4,6 @@
 **/*.xcodeproj/xcshareddata/
 ETTrace-iphonesimulator.xcarchive/
 ETTrace-iphoneos.xcarchive/
-ETTrace.xcframework/
+./ETTrace.xcframework/
 output.json
 output.folded
