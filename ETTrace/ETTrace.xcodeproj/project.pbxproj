@@ -20,8 +20,6 @@
 		F4BDB20F29B6965200996FDB /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BDB20E29B6965200996FDB /* Utils.swift */; };
 		F4BDB21129B697D200996FDB /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BDB21029B697D200996FDB /* DeviceManager.swift */; };
 		F4BDB21329B6981000996FDB /* PhysicalDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BDB21229B6981000996FDB /* PhysicalDeviceManager.swift */; };
-		F4CB9D2B29B7BA2400F50446 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = F4CB9D2A29B7BA2400F50446 /* Swifter */; };
-		F4CB9D2D29B7BBF000F50446 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = F4CB9D2C29B7BBF000F50446 /* Swifter */; };
 		F4CB9D3529B7C49000F50446 /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3429B7C49000F50446 /* ResponseModel.swift */; };
 		F4CB9D3729B7C4BE00F50446 /* Symbolicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3629B7C4BE00F50446 /* Symbolicator.swift */; };
 		F4CB9D3929B7C50400F50446 /* FlamegraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3829B7C50400F50446 /* FlamegraphGenerator.swift */; };
@@ -34,6 +32,8 @@
 		FA5D8DD629E899CC006BEBF4 /* ETModels.h in Headers */ = {isa = PBXBuildFile; fileRef = FA5D8DD529E899CC006BEBF4 /* ETModels.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FA5D8DDA29E899D3006BEBF4 /* FlameNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA5D8DA829E89797006BEBF4 /* FlameNode.swift */; };
 		FA5D8DDB29E899D3006BEBF4 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CB9D3129B7C35B00F50446 /* Sample.swift */; };
+		FACBF6F12A2CD90B00FDFA1E /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = FACBF6F02A2CD90B00FDFA1E /* Swifter */; };
+		FACBF6F32A2CDD8600FDFA1E /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = FACBF6F22A2CDD8600FDFA1E /* Swifter */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,7 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4CB9D2D29B7BBF000F50446 /* Swifter in Frameworks */,
+				FACBF6F32A2CDD8600FDFA1E /* Swifter in Frameworks */,
 				F4BDB20929B6942100996FDB /* ArgumentParser in Frameworks */,
 				5FC3BBBF4C1E01F2CE8FB1C6 /* Pods_ETTraceRunner.framework in Frameworks */,
 			);
@@ -136,7 +136,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4CB9D2B29B7BA2400F50446 /* Swifter in Frameworks */,
+				FACBF6F12A2CD90B00FDFA1E /* Swifter in Frameworks */,
 				F4BDB20529B693BB00996FDB /* ArgumentParser in Frameworks */,
 				B8936976E036B5F8C74424D2 /* Pods_ETTrace.framework in Frameworks */,
 			);
@@ -346,7 +346,7 @@
 			name = ETTraceRunner;
 			packageProductDependencies = (
 				F4BDB20829B6942100996FDB /* ArgumentParser */,
-				F4CB9D2C29B7BBF000F50446 /* Swifter */,
+				FACBF6F22A2CDD8600FDFA1E /* Swifter */,
 			);
 			productName = PerfAnalysisRunner;
 			productReference = F4BDB1F729B6932F00996FDB /* ETTraceRunner */;
@@ -370,7 +370,7 @@
 			name = ETTrace;
 			packageProductDependencies = (
 				F4BDB20429B693BB00996FDB /* ArgumentParser */,
-				F4CB9D2A29B7BA2400F50446 /* Swifter */,
+				FACBF6F02A2CD90B00FDFA1E /* Swifter */,
 			);
 			productName = PerfAnalysis;
 			productReference = FA1A919E294373F600D70989 /* ETTrace.framework */;
@@ -430,7 +430,7 @@
 			mainGroup = FA1A9194294373F600D70989;
 			packageReferences = (
 				F4BDB20329B693BB00996FDB /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
-				F4CB9D2929B7BA2400F50446 /* XCRemoteSwiftPackageReference "swifter" */,
+				FACBF6EF2A2CD90B00FDFA1E /* XCRemoteSwiftPackageReference "swifter" */,
 			);
 			productRefGroup = FA1A919F294373F600D70989 /* Products */;
 			projectDirPath = "";
@@ -1028,9 +1028,9 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		F4CB9D2929B7BA2400F50446 /* XCRemoteSwiftPackageReference "swifter" */ = {
+		FACBF6EF2A2CD90B00FDFA1E /* XCRemoteSwiftPackageReference "swifter" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:httpswift/swifter.git";
+			repositoryURL = "https://github.com/httpswift/swifter";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
@@ -1054,14 +1054,14 @@
 			package = F4BDB20329B693BB00996FDB /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
 		};
-		F4CB9D2A29B7BA2400F50446 /* Swifter */ = {
+		FACBF6F02A2CD90B00FDFA1E /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F4CB9D2929B7BA2400F50446 /* XCRemoteSwiftPackageReference "swifter" */;
+			package = FACBF6EF2A2CD90B00FDFA1E /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
 		};
-		F4CB9D2C29B7BBF000F50446 /* Swifter */ = {
+		FACBF6F22A2CDD8600FDFA1E /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F4CB9D2929B7BA2400F50446 /* XCRemoteSwiftPackageReference "swifter" */;
+			package = FACBF6EF2A2CD90B00FDFA1E /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
 		};
 /* End XCSwiftPackageProductDependency section */
