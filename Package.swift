@@ -36,7 +36,7 @@ let package = Package(
             dependencies: [],
             path: "Unwinding/Crashlytics",
             exclude: [
-                "Unwinding/Crashlytics/LICENSE",
+                "LICENSE",
                 "README.md"
             ],
             publicHeadersPath: "Public"
