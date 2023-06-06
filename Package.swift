@@ -8,12 +8,39 @@ let package = Package(
     products: [
         .library(
             name: "ETTrace",
-            targets: ["ETTrace"]),
+            type: .dynamic,
+            targets: ["ETTrace"]
+        ),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/EmergeTools/peertalk.git", branch: "feature/spm")
     ],
     targets: [
-        .binaryTarget(
+        .target(
             name: "ETTrace",
-            path: "./Prebuilt/ETTrace.xcframework"
+            dependencies: [
+                "Unwinding",
+                "CommunicationFrame",
+                .product(name: "Peertalk", package: "peertalk")
+            ],
+            path: "ETTrace/ETTrace",
+            publicHeadersPath: "Public"
         ),
+        .target(
+            name: "CommunicationFrame",
+            path: "ETTrace/CommunicationFrame",
+            publicHeadersPath: "Public"
+        ),
+        .target(
+            name: "Unwinding",
+            dependencies: [],
+            path: "Unwinding/Crashlytics",
+            exclude: [
+                "Unwinding/Crashlytics/LICENSE",
+                "README.md"
+            ],
+            publicHeadersPath: "Public"
+        ),
+        
     ]
 )

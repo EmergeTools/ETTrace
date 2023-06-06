@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "peertalk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/EmergeTools/peertalk.git",
+      "state" : {
+        "branch" : "feature/spm",
+        "revision" : "1b905a7abe36b1f7f32288552866f0ad9d8cd0b1"
+      }
+    }
+  ],
+  "version" : 2
+}

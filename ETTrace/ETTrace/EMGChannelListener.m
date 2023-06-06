@@ -6,9 +6,9 @@
 //
 
 #import "EMGChannelListener.h"
-#import <PeerTalk/PTChannel.h>
-#import <CommunicationFrame/CommunicationFrame.h>
 #import "EMGPerfAnalysis_Private.h"
+@import Peertalk;
+@import CommunicationFrame;
 
 @interface EMGChannelListener () <PTChannelDelegate>
 @property (nonatomic, weak) PTChannel *serverChannel;
