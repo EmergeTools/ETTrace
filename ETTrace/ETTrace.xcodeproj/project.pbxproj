@@ -98,9 +98,9 @@
 /* Begin PBXFileReference section */
 		F49161D12A2FC21F004A7415 /* ETTrace */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ETTrace; path = ..; sourceTree = "<group>"; };
 		F49161D32A2FC27C004A7415 /* PerfAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PerfAnalysis.h; sourceTree = "<group>"; };
-		F49161DB2A2FC528004A7415 /* DummyEmptyClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DummyEmptyClass.h; sourceTree = "<group>"; };
+		F49161DB2A2FC528004A7415 /* EMGDummyEmptyClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMGDummyEmptyClass.h; sourceTree = "<group>"; };
 		F49161DD2A2FC528004A7415 /* CommunicationFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommunicationFrame.h; sourceTree = "<group>"; };
-		F49161DE2A2FC528004A7415 /* DummyEmptyClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DummyEmptyClass.m; sourceTree = "<group>"; };
+		F49161DE2A2FC528004A7415 /* EMGDummyEmptyClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EMGDummyEmptyClass.m; sourceTree = "<group>"; };
 		F4BDB1DF29B68B0B00996FDB /* CommunicationFrame.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommunicationFrame.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BDB1EC29B68D7900996FDB /* EMGChannelListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMGChannelListener.h; sourceTree = "<group>"; };
 		F4BDB1ED29B68D7900996FDB /* EMGChannelListener.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EMGChannelListener.m; sourceTree = "<group>"; };
@@ -203,8 +203,8 @@
 			isa = PBXGroup;
 			children = (
 				F49161DC2A2FC528004A7415 /* Public */,
-				F49161DB2A2FC528004A7415 /* DummyEmptyClass.h */,
-				F49161DE2A2FC528004A7415 /* DummyEmptyClass.m */,
+				F49161DB2A2FC528004A7415 /* EMGDummyEmptyClass.h */,
+				F49161DE2A2FC528004A7415 /* EMGDummyEmptyClass.m */,
 			);
 			path = CommunicationFrame;
 			sourceTree = "<group>";

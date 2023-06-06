@@ -5,10 +5,10 @@
 //  Created by Itay Brenner on 2/6/23.
 //
 
-#import "DummyEmptyClass.h"
+#import "EMGDummyEmptyClass.h"
 
 // This class is required becasue SPM doesn't support header only targets
 
-@implementation DummyEmptyClass
+@implementation EMGDummyEmptyClass
 
 @end
