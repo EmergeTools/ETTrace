@@ -1019,7 +1019,7 @@
 		};
 		F4CB9D2929B7BA2400F50446 /* XCRemoteSwiftPackageReference "swifter" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:httpswift/swifter.git";
+			repositoryURL = "https://github.com/httpswift/swifter";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
