@@ -14,9 +14,9 @@
 
 #include <dispatch/dispatch.h>
 
-#include "Crashlytics/Crashlytics/Helpers/FIRCLSInternalLogging.h"
-#include "Crashlytics/Crashlytics/Components/FIRCLSGlobals.h"
-#include "Crashlytics/Crashlytics/Helpers/FIRCLSUtility.h"
+#include "FIRCLSInternalLogging.h"
+#include "../Components/FIRCLSGlobals.h"
+#include "../Helpers/FIRCLSUtility.h"
 
 void FIRCLSSDKFileLog(FIRCLSInternalLogLevel level, const char* format, ...) {
   va_list args;
