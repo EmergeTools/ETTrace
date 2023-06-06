@@ -5,8 +5,9 @@
 //  Created by Itay Brenner on 8/3/23.
 //
 
+import AppKit
 import Foundation
-import PeerTalk
+import Peertalk
 import CommunicationFrame
 import Swifter
 
