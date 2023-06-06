@@ -7,3 +7,4 @@ ETTrace-iphoneos.xcarchive/
 ./ETTrace.xcframework/
 output.json
 output.folded
+.swiftpm

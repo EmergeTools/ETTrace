@@ -1,12 +1,12 @@
 xcodebuild archive \
- -workspace ./ETTrace/ETTrace.xcworkspace \
+ -project ./ETTrace/ETTrace.xcodeproj \
  -scheme ETTrace \
  -archivePath ./ETTrace-iphonesimulator.xcarchive \
  -sdk iphonesimulator \
  SKIP_INSTALL=NO
 
 xcodebuild archive \
- -workspace ./ETTrace/ETTrace.xcworkspace \
+ -project ./ETTrace/ETTrace.xcodeproj \
  -scheme ETTrace \
  -archivePath ./ETTrace-iphoneos.xcarchive \
  -sdk iphoneos \
