@@ -51,8 +51,9 @@ let package = Package(
         .executableTarget(
             name: "ETTraceRunner",
             dependencies: [
-                "ETModels",
                 "CommunicationFrame",
+                "JSONWrapper",
+                "ETModels",
                 .product(name: "Peertalk", package: "peertalk"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Swifter", package: "swifter")
@@ -61,6 +62,14 @@ let package = Package(
             exclude: [
                 "ETTraceRunner.entitlements"
             ]
+        ),
+        .target(
+            name: "JSONWrapper",
+            dependencies: [
+                "ETModels"
+            ],
+            path: "ETTrace/JSONWrapper",
+            publicHeadersPath: "Public"
         ),
         .target(
             name: "ETModels",
