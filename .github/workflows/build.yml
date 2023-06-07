@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - feature/spm
 
 jobs:
   build:
@@ -15,8 +12,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Show destinations
+        run: xcodebuild -scheme ETTrace -showdestinations
       - name: Build ETTrace for iOS Simulator
-        run: xcodebuild build -scheme ETTrace -sdk iphonesimulator -destination 'platform=iOS Simulator'
+        run: xcodebuild build -scheme ETTrace -sdk iphonesimulator -destination 'name=Any iOS Simulator Device'
       - name: Build ETTrace for iOS
         run: xcodebuild build -scheme ETTrace -sdk iphoneos -destination 'platform=iOS'
       - name: Build ETTrace for macOS
