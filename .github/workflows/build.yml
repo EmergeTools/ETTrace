@@ -9,15 +9,15 @@ on:
       - feature/spm
 
 jobs:
-  test:
+  build:
     runs-on: macos-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Build ETTrace for iOS Simulator
-        run: xcodebuild build -scheme ETTrace -sdk iphonesimulator -destination 'ANY=A'
+        run: xcodebuild build -scheme ETTrace -sdk iphonesimulator -destination 'platform=iOS Simulator'
       - name: Build ETTrace for iOS
-        run: xcodebuild build -scheme ETTrace -sdk iphoneos -destination 'ANY=A'
+        run: xcodebuild build -scheme ETTrace -sdk iphoneos -destination 'platform=iOS'
       - name: Build ETTrace for macOS
-        run: xcodebuild build -scheme ETTraceRunner -sdk macosx -destination 'ANY=A' ONLY_ACTIVE_ARCH=NO
+        run: xcodebuild build -scheme ETTraceRunner -sdk macosx -destination 'platform=macOS' ONLY_ACTIVE_ARCH=NO
