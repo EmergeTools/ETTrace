@@ -14,7 +14,7 @@
 #import <sys/sysctl.h>
 #import <mach-o/arch.h>
 #import "EMGChannelListener.h"
-
+#import <QuartzCore/QuartzCore.h>
 #import "PerfAnalysis.h"
 
 @implementation EMGPerfAnalysis

@@ -86,7 +86,10 @@ class RunnerHelper {
         let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
         let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
 
-        let outJsonData: Data = JSONWrapper.toData(flamegraph)
+        guard let outJsonData = JSONWrapper.toData(flamegraph) else {
+            print("Could not parse data")
+            exit(-1)
+        }
 
         let jsonString = String(data: outJsonData, encoding: .utf8)!
         try jsonString.write(toFile: "output.json", atomically: true, encoding: .utf8)

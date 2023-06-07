@@ -6,7 +6,25 @@
       "location" : "https://github.com/EmergeTools/peertalk.git",
       "state" : {
         "branch" : "feature/spm",
-        "revision" : "1b905a7abe36b1f7f32288552866f0ad9d8cd0b1"
+        "revision" : "02b8bebff91cd3d7a5d89c0ddb4bbd873c62879d"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
+        "version" : "1.2.2"
+      }
+    },
+    {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/httpswift/swifter.git",
+      "state" : {
+        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
+        "version" : "1.5.0"
       }
     }
   ],

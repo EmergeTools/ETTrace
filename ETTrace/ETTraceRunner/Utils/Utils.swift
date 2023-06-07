@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AppKit
 
 func safeShell(_ command: String) throws {
     let task = Process()

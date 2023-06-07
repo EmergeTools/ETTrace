@@ -8,7 +8,6 @@
 import Foundation
 import ArgumentParser
 
-@main
 struct PerfAnalysisRunner: ParsableCommand {
     @Option(name: .shortAndLong, help: "Directory with dSYMs")
     var dsyms: String? = nil
