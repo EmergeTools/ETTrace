@@ -1,0 +1,7 @@
+version: 1
+builder:
+  configs:
+  - platform: ios
+    scheme: ETTrace
+  - platform: macos
+    scheme: ETTraceRunner
