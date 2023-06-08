@@ -6,7 +6,9 @@ Locally measure performance of your app, without Xcode or Instruments. Read all 
 
 ## Building and Installing
 
-Run `./build.sh` to build the xcframework `ETTrace.xcframework`. Link the xcframework to your app.
+You can add ETTrace as a Swift package, select the "ETTrace" library as the product to add, not "ETTraceRunner".
+
+Alternatively, run `./build.sh` to build the xcframework `ETTrace.xcframework`. Link the xcframework to your app.
 
 Install the runner with `brew install emergetools/homebrew-tap/ettrace`
 
