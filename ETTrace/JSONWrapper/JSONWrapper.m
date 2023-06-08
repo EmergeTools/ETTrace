@@ -7,10 +7,13 @@
 
 #import <Foundation/Foundation.h>
 #import "JSONWrapper.h"
+@import ETModels;
 
 @implementation JSONWrapper
 
-+ (NSDictionary *)toDictionary:(FlameNode *)node {
++ (NSDictionary *)toDictionary:(NSObject *)anyObject {
+  FlameNode *node = (FlameNode *)anyObject;
+    
   NSObject *children;
   if (node.children.count == 1) {
     children = [JSONWrapper toDictionary:node.children[0]];
@@ -30,7 +33,9 @@
   };
 }
 
-+ (NSData *)toData:(FlameNode *)input {
++ (NSData *)toData:(NSObject *)anyInput {
+  FlameNode *input = (FlameNode *)anyInput;
+    
   return [NSJSONSerialization dataWithJSONObject:[JSONWrapper toDictionary:input] options:NSJSONWritingWithoutEscapingSlashes error:nil];
 }
 

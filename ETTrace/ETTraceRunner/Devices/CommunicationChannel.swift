@@ -7,7 +7,7 @@
 
 import Foundation
 import CommunicationFrame
-import PeerTalk
+import Peertalk
 
 class CommunicationChannel: NSObject {
   

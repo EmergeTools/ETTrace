@@ -1,0 +1,22 @@
+name: Pull Request Build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Show destinations
+        run: xcodebuild -scheme ETTrace -showdestinations
+      - name: Build ETTrace for iOS Simulator
+        run: xcodebuild build -scheme ETTrace -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CLANG_CXX_LANGUAGE_STANDARD=c++17
+      - name: Build ETTrace for iOS
+        run: xcodebuild build -scheme ETTrace -sdk iphoneos -destination 'generic/platform=iOS' CLANG_CXX_LANGUAGE_STANDARD=c++17
+      - name: Build ETTrace for macOS
+        run: xcodebuild build -scheme ETTraceRunner -sdk macosx -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO

@@ -7,7 +7,7 @@
 
 import Foundation
 import CommunicationFrame
-import PeerTalk
+import Peertalk
 
 protocol DeviceManager {
     var communicationChannel: CommunicationChannel { get }

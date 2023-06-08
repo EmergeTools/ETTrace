@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Crashlytics/Crashlytics/Helpers/FIRCLSInternalLogging.h"
+#include "../Helpers/FIRCLSInternalLogging.h"
 #include <dispatch/dispatch.h>
 
 __BEGIN_DECLS

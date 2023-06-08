@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "peertalk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/EmergeTools/peertalk.git",
+      "state" : {
+        "branch" : "feature/spm",
+        "revision" : "02b8bebff91cd3d7a5d89c0ddb4bbd873c62879d"
+      }
+    },
+    {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",
@@ -12,7 +21,7 @@
     {
       "identity" : "swifter",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:httpswift/swifter.git",
+      "location" : "https://github.com/httpswift/swifter.git",
       "state" : {
         "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
         "version" : "1.5.0"

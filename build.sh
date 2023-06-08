@@ -1,16 +1,22 @@
 xcodebuild archive \
- -workspace ./ETTrace/ETTrace.xcworkspace \
  -scheme ETTrace \
  -archivePath ./ETTrace-iphonesimulator.xcarchive \
  -sdk iphonesimulator \
- SKIP_INSTALL=NO
+ -destination 'generic/platform=iOS Simulator' \
+ BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+ INSTALL_PATH='Library/Frameworks' \
+ SKIP_INSTALL=NO \
+ CLANG_CXX_LANGUAGE_STANDARD=c++17
 
 xcodebuild archive \
- -workspace ./ETTrace/ETTrace.xcworkspace \
  -scheme ETTrace \
  -archivePath ./ETTrace-iphoneos.xcarchive \
  -sdk iphoneos \
- SKIP_INSTALL=NO
+ -destination 'generic/platform=iOS' \
+ BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+ INSTALL_PATH='Library/Frameworks' \
+ SKIP_INSTALL=NO \
+ CLANG_CXX_LANGUAGE_STANDARD=c++17
 
 xcodebuild -create-xcframework \
  -framework ./ETTrace-iphonesimulator.xcarchive/Products/Library/Frameworks/ETTrace.framework \

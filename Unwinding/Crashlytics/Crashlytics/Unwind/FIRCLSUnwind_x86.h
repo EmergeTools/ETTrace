@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "Crashlytics/Crashlytics/Helpers/FIRCLSFeatures.h"
+#include "../Helpers/FIRCLSFeatures.h"
 
 // Add some abstraction to compact unwinding, because compact
 // unwinding is nearly identical between 32 and 64 bit

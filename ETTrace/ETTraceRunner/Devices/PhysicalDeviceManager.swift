@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import PeerTalk
+import Peertalk
 import CommunicationFrame
 
 enum ConnectionError: Error {

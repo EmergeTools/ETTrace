@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Crashlytics/Crashlytics/Helpers/FIRCLSDefines.h"
-#include "Crashlytics/Crashlytics/Helpers/FIRCLSThreadState.h"
-#include "Crashlytics/Crashlytics/Unwind/FIRCLSUnwind.h"
-#include "Crashlytics/Crashlytics/Helpers/FIRCLSUtility.h"
+#include "../Helpers/FIRCLSDefines.h"
+#include "../Helpers/FIRCLSThreadState.h"
+#include "../Unwind/FIRCLSUnwind.h"
+#include "../Helpers/FIRCLSUtility.h"
 
 #include <mach/mach.h>
 #include <stdbool.h>
