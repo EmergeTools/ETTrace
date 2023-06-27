@@ -11,6 +11,7 @@ import Peertalk
 import CommunicationFrame
 import Swifter
 import JSONWrapper
+import ETModels
 
 class RunnerHelper {
     let dsyms: String?
@@ -52,9 +53,9 @@ class RunnerHelper {
         _ = readLine()
         print("            \r")
       
-      if launch {
-        try await deviceManager.connect()
-      }
+        if launch {
+            try await deviceManager.connect()
+        }
 
         print("Waiting for report to be generated...");
 
@@ -85,7 +86,12 @@ class RunnerHelper {
 
         let symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
         let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
-        let flamegraph = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
+        let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
+        
+        let flamegraph = Flamegraph(osBuild: responseData.osBuild,
+                                    device: responseData.device,
+                                    isSimulator: responseData.isSimulator,
+                                    nodes: flamegraphNodes)
 
         let outJsonData: Data = JSONWrapper.toData(flamegraph)
 

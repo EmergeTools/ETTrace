@@ -13,7 +13,6 @@
 @interface JSONWrapper : NSObject
 
 // Use NSObject here because we cannot import Swift packages from the public header to avoid circular dependencies
-+ (NSDictionary *)toDictionary:(NSObject *)dictionary;
 + (NSData *)toData:(NSObject *)input;
 
 @end

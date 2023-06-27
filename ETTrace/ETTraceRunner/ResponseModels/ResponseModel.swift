@@ -13,6 +13,7 @@ struct ResponseModel: Decodable {
     let isSimulator: Bool
     let libraryInfo: LibraryInfo
     let cpuType: String
+    let device: String?
 }
 
 struct LibraryInfo: Decodable {

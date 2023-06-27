@@ -13,6 +13,7 @@
 #import <mach/mach.h>
 #import <sys/sysctl.h>
 #import <mach-o/arch.h>
+#import <sys/utsname.h>
 #import "EMGChannelListener.h"
 #import <QuartzCore/QuartzCore.h>
 #import "PerfAnalysis.h"
@@ -135,7 +136,17 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         osBuildVersion = [[NSString alloc] initWithBytes:buildBuffer length:bufferSize encoding:NSUTF8StringEncoding];
     }
 
-    return osBuildVersion;
+    NSCharacterSet *nonAlphanumericStrings = [[NSCharacterSet alphanumericCharacterSet] invertedSet];
+
+    // Remove final NULL character
+    return [osBuildVersion stringByTrimmingCharactersInSet:nonAlphanumericStrings];
+}
+
++ (NSString *)deviceName {
+    struct utsname systemInfo;
+    uname(&systemInfo);
+
+    return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
 }
 
 + (void)stopRecording {
@@ -162,7 +173,8 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         @"libraryInfo": EMGLibrariesData(),
         @"isSimulator": @([self isRunningOnSimulator]),
         @"osBuild": [self osBuild],
-        @"cpuType": cpuType
+        @"cpuType": cpuType,
+        @"device": [self deviceName],
     } mutableCopy];
     
     NSError *error = nil;

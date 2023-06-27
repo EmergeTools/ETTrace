@@ -9,15 +9,19 @@ import Foundation
 
 @objc
 public class FlameNode: NSObject {
-  @objc
+    @objc
     public let name: String
-  @objc
+    
+    @objc
     public let start: Double
-  @objc
+    
+    @objc
     public var duration: Double
-  @objc
+    
+    @objc
     public var children: [FlameNode]
-  @objc
+    
+    @objc
     public let library: String?
     
     public init(name: String, start: Double, duration: Double, library: String?) {
