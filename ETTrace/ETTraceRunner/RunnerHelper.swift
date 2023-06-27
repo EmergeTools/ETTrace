@@ -88,10 +88,15 @@ class RunnerHelper {
         let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
         let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
         
+        let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
+            partialResult[library.path] = library.loadAddress
+        }
+        
         let flamegraph = Flamegraph(osBuild: responseData.osBuild,
                                     device: responseData.device,
                                     isSimulator: responseData.isSimulator,
-                                    nodes: flamegraphNodes)
+                                    nodes: flamegraphNodes,
+                                    libraries: libraries)
 
         let outJsonData: Data = JSONWrapper.toData(flamegraph)
 
