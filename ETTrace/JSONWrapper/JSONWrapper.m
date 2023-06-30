@@ -31,11 +31,26 @@
   };
 }
 
++ (NSArray *)eventsToArray:(NSArray<FlamegraphEvent *> *)events {
+    NSMutableArray *result = [NSMutableArray array];
+    
+    for (FlamegraphEvent *event in events) {
+        [result addObject:@{
+            @"name": event.name,
+            @"type": [event.type uppercaseString],
+            @"time": @(event.time),
+        }];
+    }
+    
+    return result;
+}
+
 + (NSDictionary *)flamegraphToDictionary:(Flamegraph *)flamegraph {
     NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithDictionary:@{
         @"osBuild": flamegraph.osBuild,
         @"isSimulator": @(flamegraph.isSimulator),
-        @"nodes": [self flameNodeToDictionary:flamegraph.nodes]
+        @"nodes": [self flameNodeToDictionary:flamegraph.nodes],
+        @"events": [self eventsToArray:flamegraph.events]
     }];
     if (flamegraph.device != nil) {
         [result setObject:flamegraph.device forKey:@"device"];

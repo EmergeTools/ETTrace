@@ -16,10 +16,6 @@ public class Sample {
         self.stack = stack
     }
     
-//    func createCopy() -> Sample {
-//        return Sample(time: self.time, stack: self.stack)
-//    }
-    
     public var description: String {
         let timeStr = String(format: "%.15f", self.time).replacingOccurrences(of: "0*$", with: "", options: .regularExpression)
         let stackStr = stack.map { s in

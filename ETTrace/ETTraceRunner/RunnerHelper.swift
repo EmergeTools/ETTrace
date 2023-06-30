@@ -88,10 +88,20 @@ class RunnerHelper {
         let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
         let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
         
+        let startTime = responseData.stacks.sorted { s1, s2 in
+            s1.time < s2.time
+        }.first!.time
+        let events = responseData.events.map { event in
+            return FlamegraphEvent(name: event.span,
+                                   type: event.type.rawValue,
+                                   time: event.time-startTime)
+        }
+        
         let flamegraph = Flamegraph(osBuild: responseData.osBuild,
                                     device: responseData.device,
                                     isSimulator: responseData.isSimulator,
-                                    nodes: flamegraphNodes)
+                                    nodes: flamegraphNodes,
+                                    events: events)
 
         let outJsonData: Data = JSONWrapper.toData(flamegraph)
 
