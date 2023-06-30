@@ -18,6 +18,9 @@
 #import <QuartzCore/QuartzCore.h>
 #import "PerfAnalysis.h"
 
+NSString *const kEMGSpanStarted = @"EmergeMetricStarted";
+NSString *const kEMGSpanEnded = @"EmergeMetricEnded";
+
 @implementation EMGPerfAnalysis
 
 static thread_t sMainMachThread = {0};
@@ -34,6 +37,7 @@ static std::mutex sStacksLock;
 static dispatch_queue_t fileEventsQueue;
 
 static EMGChannelListener *channelListener;
+static NSMutableArray <NSDictionary *> *sSpanTimes;
 
 extern "C" {
 void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesCapacity, uint64_t *framesWritten);
@@ -62,6 +66,8 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     if (sStackRecordingThread != nil) {
         return;
     }
+    
+    sSpanTimes = [NSMutableArray array];
 
     // Make sure that +recordStack is always called on the same (non-main) thread.
     // This is because a Process keeps its own "current thread" variable which we need
@@ -108,6 +114,38 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         
         channelListener = [[EMGChannelListener alloc] init];
     });
+    
+    [[NSNotificationCenter defaultCenter] addObserverForName:kEMGSpanStarted
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification * _Nonnull notification) {
+        if (sStackRecordingThread == nil) {
+            return;
+        }
+        
+        NSString *span = notification.userInfo[@"metric"];
+        [sSpanTimes addObject:@{
+            @"span": span,
+            @"type": @"start",
+            @"time": @(CACurrentMediaTime())
+        }];
+    }];
+
+    [[NSNotificationCenter defaultCenter] addObserverForName:kEMGSpanEnded
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification * _Nonnull notification) {
+        if (sStackRecordingThread == nil) {
+            return;
+        }
+        
+        NSString *span = notification.userInfo[@"metric"];
+        [sSpanTimes addObject:@{
+            @"span": span,
+            @"type": @"stop",
+            @"time": @(CACurrentMediaTime())
+        }];
+    }];
 }
 
 + (BOOL)isRunningOnSimulator
@@ -175,6 +213,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         @"osBuild": [self osBuild],
         @"cpuType": cpuType,
         @"device": [self deviceName],
+        @"events": sSpanTimes,
     } mutableCopy];
     
     NSError *error = nil;
