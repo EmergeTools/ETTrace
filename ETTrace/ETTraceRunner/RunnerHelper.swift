@@ -97,11 +97,16 @@ class RunnerHelper {
                                    type: event.type.rawValue,
                                    time: event.time-startTime)
         } ?? []
+
+        let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
+            partialResult[library.path] = library.loadAddress
+        }
         
         let flamegraph = Flamegraph(osBuild: responseData.osBuild,
                                     device: responseData.device,
                                     isSimulator: responseData.isSimulator,
                                     nodes: flamegraphNodes,
+                                    libraries: libraries,
                                     events: events)
 
         let outJsonData: Data = JSONWrapper.toData(flamegraph)

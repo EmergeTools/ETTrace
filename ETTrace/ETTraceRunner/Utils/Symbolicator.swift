@@ -29,7 +29,7 @@ class Symbolicator {
         self.verbose = verbose
     }
     
-    func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[[String]]] {
+    func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[(String?, String, UInt64?)]] {
         var libToAddrs: [LoadedLibrary: Set<UInt64>] = [:]
         let stacks = stacksFromResults(stacks, loadedLibs)
         stacks.flatMap { $0 }.forEach { addr in
@@ -61,19 +61,19 @@ class Symbolicator {
         
         var noLibCount = 0
         var noSymMap: [String: UInt64] = [:]
-        let result: [[[String]]] = stacks.map { stack in
+        let result: [[(String?, String, UInt64?)]] = stacks.map { stack in
             stack.map { addr in
                 if let lib = addr.lib {
                     let (libPath, lastPathComponent) = libToCleanedPath[lib.path]!
                     guard let addrToSym = libToAddrToSym[lib.path],
                           let sym = addrToSym[addr.addr] else {
                         noSymMap[libPath, default: 0] += 1
-                      return [libPath, lastPathComponent]
+                      return (libPath, lastPathComponent, addr.addr)
                     }
-                    return [libPath, formatSymbol(sym)]
+                    return (libPath, formatSymbol(sym), nil)
                 } else {
                     noLibCount += 1
-                    return ["<unknown>", "<unknown>"]
+                    return ("<unknown>", "<unknown>", nil)
                 }
             }
         }
