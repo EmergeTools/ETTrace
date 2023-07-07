@@ -42,7 +42,8 @@
         @"osBuild": flamegraph.osBuild,
         @"isSimulator": @(flamegraph.isSimulator),
         @"nodes": [self flameNodeToDictionary:flamegraph.nodes],
-        @"libraries": flamegraph.libraries
+        @"libraries": flamegraph.libraries,
+        @"events": [self eventsToArray:flamegraph.events]
     }];
     if (flamegraph.device != nil) {
         [result setObject:flamegraph.device forKey:@"device"];
@@ -61,19 +62,6 @@
         }];
     }
     
-    return result;
-}
-
-+ (NSDictionary *)flamegraphToDictionary:(Flamegraph *)flamegraph {
-    NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithDictionary:@{
-        @"osBuild": flamegraph.osBuild,
-        @"isSimulator": @(flamegraph.isSimulator),
-        @"nodes": [self flameNodeToDictionary:flamegraph.nodes],
-        @"events": [self eventsToArray:flamegraph.events]
-    }];
-    if (flamegraph.device != nil) {
-        [result setObject:flamegraph.device forKey:@"device"];
-    }
     return result;
 }
 
