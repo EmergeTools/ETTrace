@@ -21,10 +21,18 @@ public class Flamegraph: NSObject {
     @objc
     public var nodes: FlameNode
     
-    public init(osBuild: String, device: String?, isSimulator: Bool, nodes: FlameNode) {
+    @objc
+    public var libraries: [String:UInt64]
+    
+    public init(osBuild: String,
+                device: String?,
+                isSimulator: Bool,
+                nodes: FlameNode,
+                libraries: [String:UInt64]) {
         self.osBuild = osBuild
         self.device = device
         self.isSimulator = isSimulator
         self.nodes = nodes
+        self.libraries = libraries
     }
 }

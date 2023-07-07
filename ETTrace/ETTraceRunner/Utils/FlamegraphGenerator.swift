@@ -28,7 +28,8 @@ class FlamegraphGenerator {
             return Sample(time: timeDiff, stack: stackSyms)
         }
         if unattributedTime > 0 {
-            samples.append(Sample(time: unattributedTime, stack: [[nil, "<unattributed>"]]))
+            let stack = (nil as String?, "<unattributed>", nil as UInt64?)
+            samples.append(Sample(time: unattributedTime, stack: [stack]))
         }
         if writeFolded {
             try! samples.map { $0.description }.joined(separator: "\n").write(toFile: "output.folded", atomically: true, encoding: .utf8)
