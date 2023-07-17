@@ -33,9 +33,9 @@ Use the flag `--launch` to start recording on app launch. When you first connect
 
 ETTrace spawns a new thread which captures a stacktrace of the main thread periodically. This is sampling based profiling. The sampling thread starts either when ettrace.framework is loaded (+load method), or when the CLI sends a message to the application. These control messages and the sampled data are communicated using PeerTalk.
 
-## Adding events to the flamegraph
+## Adding events to the flamechart
 
-ETTrace supports displaying events in the flamegraph from version v1.0. You can use them to track user flows in your code, you can easily add them by posting a notification in your code:
+ETTrace supports displaying events in the flamechart from version v1.0. You can use them to track user flows in your code, you can easily add them by posting a notification in your code:
 ```swift
 NotificationCenter.default.post(name: Notification.Name(rawValue: "EmergeMetricStarted" | "EmergeMetricEnded"), 
                                 object: nil,
@@ -63,5 +63,5 @@ NotificationCenter.default.post(name: Notification.Name(rawValue: "EmergeMetricE
 ])
 ```
 
-In the flamegraph we would be able to see this flow as follows:
-![Eents Flamechart](images/events_flamegraph.png)
+In the flamechart we would be able to see this flow as follows:
+![Eents Flamechart](images/events_flamechart.png)
