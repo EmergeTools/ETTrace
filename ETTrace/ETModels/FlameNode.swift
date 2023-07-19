@@ -70,10 +70,10 @@ public class FlameNode: NSObject {
       }
     }
     
-    public static func fromSamples(_ samples: [Sample], timeNormalizer: ((Double) -> Double)? = nil) -> FlameNode {
+    public static func fromSamples(_ samples: [Sample]) -> FlameNode {
         let root = FlameNode(name: "<root>", start: 0, duration: 0, library: nil, address: nil)
         for sample in samples {
-            let sampleDuration = timeNormalizer?(sample.time) ?? sample.time
+            let sampleDuration = sample.time
             root.add(stack: sample.stack, duration: sampleDuration)
         }
         return root

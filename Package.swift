@@ -76,5 +76,6 @@ let package = Package(
             dependencies: [],
             path: "ETTrace/ETModels"
         ),
-    ]
+    ],
+    cxxLanguageStandard: .cxx17
 )

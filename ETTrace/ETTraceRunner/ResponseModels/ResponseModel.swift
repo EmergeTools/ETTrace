@@ -14,6 +14,7 @@ struct ResponseModel: Decodable {
     let libraryInfo: LibraryInfo
     let cpuType: String
     let device: String?
+    let events: [Event]?
 }
 
 struct LibraryInfo: Decodable {
@@ -31,4 +32,15 @@ struct LoadedLibrary: Decodable, Equatable, Hashable {
     let path: String
     let loadAddress: UInt64
     let uuid: String
+}
+
+struct Event: Decodable {
+    let span: String
+    let type: EventType
+    let time: Double
+}
+
+enum EventType: String, Decodable {
+    case start
+    case stop
 }

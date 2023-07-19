@@ -42,11 +42,26 @@
         @"osBuild": flamegraph.osBuild,
         @"isSimulator": @(flamegraph.isSimulator),
         @"nodes": [self flameNodeToDictionary:flamegraph.nodes],
-        @"libraries": flamegraph.libraries
+        @"libraries": flamegraph.libraries,
+        @"events": [self eventsToArray:flamegraph.events]
     }];
     if (flamegraph.device != nil) {
         [result setObject:flamegraph.device forKey:@"device"];
     }
+    return result;
+}
+
++ (NSArray *)eventsToArray:(NSArray<FlamegraphEvent *> *)events {
+    NSMutableArray *result = [NSMutableArray array];
+    
+    for (FlamegraphEvent *event in events) {
+        [result addObject:@{
+            @"name": event.name,
+            @"type": [event.type uppercaseString],
+            @"time": @(event.time),
+        }];
+    }
+    
     return result;
 }
 
