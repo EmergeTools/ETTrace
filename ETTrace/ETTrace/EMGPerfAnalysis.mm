@@ -17,6 +17,7 @@
 #import "EMGChannelListener.h"
 #import <QuartzCore/QuartzCore.h>
 #import "PerfAnalysis.h"
+#include <map>
 
 NSString *const kEMGSpanStarted = @"EmergeMetricStarted";
 NSString *const kEMGSpanEnded = @"EmergeMetricEnded";
@@ -24,6 +25,8 @@ NSString *const kEMGSpanEnded = @"EmergeMetricEnded";
 @implementation EMGPerfAnalysis
 
 static thread_t sMainMachThread = {0};
+static thread_t sETTraceThread = {0};
+
 static const int kMaxFramesPerStack = 512;
 static NSThread *sStackRecordingThread = nil;
 typedef struct {
@@ -33,6 +36,8 @@ typedef struct {
 } Stack;
 static std::vector<Stack> *sStacks;
 static std::mutex sStacksLock;
+
+static std::map<unsigned int, std::vector<Stack> *> *sThreadsMap;
 
 static dispatch_queue_t fileEventsQueue;
 
@@ -62,6 +67,67 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     sStacksLock.unlock();
 }
 
++ (void)recordStackForAllThreads
+{
+    thread_act_array_t threads;
+    mach_msg_type_number_t thread_count;
+    if (task_threads(mach_task_self(), &threads, &thread_count) != KERN_SUCCESS) {
+        thread_count = 0;
+    }
+    
+    // Suspend all threads but ETTrace's
+    for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
+        if (threads[i] != sETTraceThread)
+            thread_suspend(threads[i]);
+    }
+    
+    CFTimeInterval time = CACurrentMediaTime();
+    for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
+        if (threads[i] == sETTraceThread)
+            continue;
+        
+        Stack stack;
+        stack.time = time;
+        FIRCLSWriteThreadStack(threads[i], stack.frames, kMaxFramesPerStack, &(stack.frameCount));
+        
+        std::vector<Stack> *threadStack;
+        sStacksLock.lock();
+        if (sThreadsMap->find(threads[i]) == sThreadsMap->end()) {
+            threadStack = new std::vector<Stack>;
+            threadStack->reserve(400);
+            sThreadsMap->insert(std::pair<unsigned int, std::vector<Stack> *>(threads[i], threadStack));
+        } else {
+            threadStack = sThreadsMap->at(threads[i]);
+        }
+
+        try {
+            threadStack->emplace_back(stack);
+        } catch (const std::length_error& le) {
+            fflush(stdout);
+            fflush(stderr);
+            throw le;
+        }
+        sStacksLock.unlock();
+        
+//        // Get thread Name
+//        char name[256];
+//        pthread_t pt = pthread_from_mach_thread_np(threads[i]);
+//        if (pt) {
+//            name[0] = '\0';
+//            int rc = pthread_getname_np(pt, name, sizeof name);
+//            NSLog(@"mach thread %i %u: getname returned %d: %s", i, threads[i], rc, name);
+//        } else {
+//            // Couldn't get pthread, can't find name
+//            NSLog(@"mach thread %i %u: no pthread found", i, threads[i]);
+//        }
+    }
+    
+    for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
+        if (threads[i] != sETTraceThread)
+            thread_resume(threads[i]);
+    }
+}
+
 + (void)setupStackRecording:(BOOL) recordAllThreads
 {
     if (sStackRecordingThread != nil) {
@@ -79,6 +145,23 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     // usleep is guaranteed to sleep more than that, in practice ~5ms. We could use a
     // dispatch_timer, which at least tries to compensate for drift etc., but the
     // timer's queue could theoretically end up run on the main thread
+    sRecordAllThreads = recordAllThreads;
+    
+    if (recordAllThreads) {
+        sThreadsMap = new std::map<unsigned int, std::vector<Stack> *>;
+        
+        sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
+            if (!sETTraceThread) {
+                sETTraceThread = mach_thread_self();
+            }
+            
+            NSThread *thread = [NSThread currentThread];
+            while (!thread.cancelled) {
+                [self recordStackForAllThreads];
+                usleep(4500);
+            }
+        }];
+    } else {
     sStacks = new std::vector<Stack>;
     sStacks->reserve(400);
     sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
@@ -88,6 +171,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
             usleep(4500);
         }
     }];
+    }
     sStackRecordingThread.qualityOfService = NSQualityOfServiceUserInteractive;
     [sStackRecordingThread start];
 }
