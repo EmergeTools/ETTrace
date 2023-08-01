@@ -21,6 +21,7 @@ class RunnerHelper {
     let multiThread: Bool
 
     var server: HttpServer? = nil
+    var symbolicator: Symbolicator!
     
     init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ multiThread: Bool) {
         self.dsyms = dsyms
@@ -85,12 +86,41 @@ class RunnerHelper {
         }
         var osVersion = responseData.osBuild
         osVersion.removeAll(where: { !$0.isLetter && !$0.isNumber })
-
-        let symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
-        let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
-        let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
         
-        let startTime = responseData.stacks.sorted { s1, s2 in
+        symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
+        var outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        if let threads = responseData.threads {
+            for (thread, stacks) in threads {
+                let outJsonData = createFlamegraphForStacks(stacks, responseData)
+                
+                let saveUrl = outputUrl.appendingPathComponent("output_\(thread).json")
+                
+                let jsonString = String(data: outJsonData, encoding: .utf8)!
+                try jsonString.write(to: saveUrl, atomically: true, encoding: .utf8)
+            }
+        } else {
+            let outJsonData = createFlamegraphForStacks(responseData.stacks, responseData)
+            try startLocalServer(outJsonData)
+            
+            outputUrl = outputUrl.appendingPathComponent("output.json")
+            
+            let jsonString = String(data: outJsonData, encoding: .utf8)!
+            try jsonString.write(to: outputUrl, atomically: true, encoding: .utf8)
+        }
+        
+        let url = URL(string: "https://emergetools.com/flamegraph")!
+        NSWorkspace.shared.open(url)
+
+        // Wait 4 seconds for results to be accessed from server, then exit
+        sleep(4)
+        print("Results saved to \(outputUrl)")
+    }
+    
+    private func createFlamegraphForStacks(_ stacks: [Stack], _ responseData: ResponseModel) -> Data {
+        let syms = symbolicator.symbolicate(stacks, responseData.libraryInfo.loadedLibraries)
+        let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: stacks, syms: syms, writeFolded: verbose)
+        
+        let startTime = stacks.sorted { s1, s2 in
             s1.time < s2.time
         }.first!.time
         
@@ -111,19 +141,7 @@ class RunnerHelper {
                                     libraries: libraries,
                                     events: events)
 
-        let outJsonData: Data = JSONWrapper.toData(flamegraph)
-
-        let jsonString = String(data: outJsonData, encoding: .utf8)!
-        try jsonString.write(toFile: "output.json", atomically: true, encoding: .utf8)
-        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("output.json")
-        
-        try startLocalServer(outJsonData)
-        let url = URL(string: "https://emergetools.com/flamegraph")!
-        NSWorkspace.shared.open(url)
-
-        // Wait 4 seconds for results to be accessed from server, then exit
-        sleep(4)
-        print("Results saved to \(outputUrl)")
+        return JSONWrapper.toData(flamegraph)
     }
     
     func startLocalServer(_ data: Data) throws {
