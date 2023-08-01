@@ -38,6 +38,7 @@ static dispatch_queue_t fileEventsQueue;
 
 static EMGChannelListener *channelListener;
 static NSMutableArray <NSDictionary *> *sSpanTimes;
+static BOOL sRecordAllThreads = false;
 
 extern "C" {
 void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesCapacity, uint64_t *framesWritten);
@@ -61,7 +62,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     sStacksLock.unlock();
 }
 
-+ (void)setupStackRecording
++ (void)setupStackRecording:(BOOL) recordAllThreads
 {
     if (sStackRecordingThread != nil) {
         return;
@@ -99,8 +100,9 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     });
 }
 
-+ (void)setupRunAtStartup {
++ (void)setupRunAtStartup:(BOOL) recordAllThreads {
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"runAtStartup"];
+    [[NSUserDefaults standardUserDefaults] setBool:recordAllThreads forKey:@"recordAllThreads"];
     exit(0);
 }
 
@@ -243,8 +245,10 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     EMGBeginCollectingLibraries();
     BOOL infoPlistRunAtStartup = ((NSNumber *) NSBundle.mainBundle.infoDictionary[@"ETTraceRunAtStartup"]).boolValue;
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"runAtStartup"] || infoPlistRunAtStartup) {
-        [EMGPerfAnalysis setupStackRecording];
+        sRecordAllThreads = [[NSUserDefaults standardUserDefaults] boolForKey:@"recordAllThreads"];
+        [EMGPerfAnalysis setupStackRecording:sRecordAllThreads];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"runAtStartup"];
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"recordAllThreads"];
     }
     [EMGPerfAnalysis startObserving];
 }

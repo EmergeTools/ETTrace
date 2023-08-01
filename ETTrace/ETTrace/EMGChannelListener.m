@@ -43,7 +43,8 @@
     if (channel != self.peerChannel) {
         // A previous channel that has been canceled but not yet ended. Ignore.
         return NO;
-    } else if (type == PTFrameTypeStart || type == PTFrameTypeStop || type == PTFrameTypeRequestResults){
+    } else if (type == PTFrameTypeStart || type == PTFrameTypeStop ||
+               type == PTFrameTypeRequestResults || type == PTFrameTypeStartMultiThread){
         return YES;
     } else {
         NSLog(@"Unexpected frame of type %u", type);
@@ -53,14 +54,15 @@
 }
 
 - (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(uint32_t)type tag:(uint32_t)tag payload:(NSData *)payload {
-    if (type == PTFrameTypeStart) {
+    if (type == PTFrameTypeStart || type == PTFrameTypeStartMultiThread) {
         PTStartFrame *startFrame = (PTStartFrame *)payload.bytes;
         NSLog(@"Start received, with: %i", startFrame->runAtStartup);
         BOOL runAtStartup = startFrame->runAtStartup;
+        BOOL recordAllThreads = type == PTFrameTypeStartMultiThread;
         if (runAtStartup) {
-            [EMGPerfAnalysis setupRunAtStartup];
+            [EMGPerfAnalysis setupRunAtStartup:recordAllThreads];
         } else {
-            [EMGPerfAnalysis setupStackRecording];
+            [EMGPerfAnalysis setupStackRecording:recordAllThreads];
         }
     } else if (type == PTFrameTypeStop) {
         [EMGPerfAnalysis stopRecordingThread];
