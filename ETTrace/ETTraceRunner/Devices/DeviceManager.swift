@@ -17,12 +17,13 @@ protocol DeviceManager {
 }
 
 extension DeviceManager {
-    func sendStartRecording(_ runAtStartup: Bool) async throws -> Void {
+    func sendStartRecording(_ runAtStartup: Bool, _ multiThread: Bool) async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
             var boolValue = runAtStartup ? 1 : 0
             let data = Data(bytes: &boolValue, count: 2)
             
-          communicationChannel.channel.sendFrame(type: UInt32(PTFrameTypeStart), tag: UInt32(PTNoFrameTag), payload: data) { error in
+            let type = multiThread ? PTFrameTypeStartMultiThread : PTFrameTypeStart
+            communicationChannel.channel.sendFrame(type: UInt32(type), tag: UInt32(PTNoFrameTag), payload: data) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {

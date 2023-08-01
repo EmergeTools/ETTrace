@@ -20,12 +20,15 @@ struct PerfAnalysisRunner: ParsableCommand {
   
     @Flag(name: .shortAndLong, help: "Verbose logging")
     var verbose: Bool = false
+    
+    @Flag(name: .shortAndLong, help: "Record all threads")
+    var multiThread: Bool = false
 
     mutating func run() throws {
       if let dsym = dsyms, dsym.hasSuffix(".dSYM") {
         PerfAnalysisRunner.exit(withError: ValidationError("The dsym argument should be set to a folder containing your dSYM files, not the dSYM itself"))
       }
-        let helper = RunnerHelper(dsyms, launch, simulator, verbose)
+        let helper = RunnerHelper(dsyms, launch, simulator, verbose, multiThread)
         Task {
             do {
                 try await helper.start()

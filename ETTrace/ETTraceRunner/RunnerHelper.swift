@@ -18,14 +18,16 @@ class RunnerHelper {
     let launch: Bool
     let useSimulator: Bool
     let verbose: Bool
+    let multiThread: Bool
 
     var server: HttpServer? = nil
     
-    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool) {
+    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ multiThread: Bool) {
         self.dsyms = dsyms
         self.launch = launch
         self.useSimulator = simulator
         self.verbose = verbose
+        self.multiThread = multiThread
     }
     
     func start() async throws {
@@ -42,7 +44,7 @@ class RunnerHelper {
 
         try await deviceManager.connect()
 
-        try await deviceManager.sendStartRecording(launch)
+       try await deviceManager.sendStartRecording(launch, multiThread)
 
         if launch {
             print("Re-launch the app to start recording, then press return to exit")
