@@ -162,15 +162,15 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
             }
         }];
     } else {
-    sStacks = new std::vector<Stack>;
-    sStacks->reserve(400);
-    sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
-        NSThread *thread = [NSThread currentThread];
-        while (!thread.cancelled) {
-            [self recordStack];
-            usleep(4500);
-        }
-    }];
+        sStacks = new std::vector<Stack>;
+        sStacks->reserve(400);
+        sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
+            NSThread *thread = [NSThread currentThread];
+            while (!thread.cancelled) {
+                [self recordStack];
+                usleep(4500);
+            }
+        }];
     }
     sStackRecordingThread.qualityOfService = NSQualityOfServiceUserInteractive;
     [sStackRecordingThread start];
@@ -276,19 +276,42 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 + (void)stopRecording {
     sStacksLock.lock();
     NSMutableArray <NSDictionary <NSString *, id> *> *stacks = [NSMutableArray array];
-    for (const auto &cStack : *sStacks) {
-        NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
-        // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
-        for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
-            [stack addObject:@((NSUInteger)cStack.frames[j])];
+    NSMutableDictionary <NSString *, NSMutableArray<NSDictionary <NSString *, id> *> *> *threads = [NSMutableDictionary dictionary];
+    if (sRecordAllThreads) {
+        std::map<unsigned int, std::vector<Stack> *>::iterator it;
+        for (it = sThreadsMap->begin(); it != sThreadsMap->end(); it++) {
+            NSMutableArray <NSDictionary <NSString *, id> *> *threadStacks = [NSMutableArray array];
+            for (const auto &cStack : *it->second) {
+                NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
+                // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
+                for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
+                    [stack addObject:@((NSUInteger)cStack.frames[j])];
+                }
+                NSDictionary *stackDictionary = @{
+                    @"stack": [stack copy],
+                    @"time": @(cStack.time)
+                };
+                [threadStacks addObject:stackDictionary];
+            }
+            threads[[[NSNumber numberWithUnsignedInt:it->first] stringValue]] = threadStacks;
         }
-        NSDictionary *stackDictionary = @{
-            @"stack": [stack copy],
-            @"time": @(cStack.time)
-        };
-        [stacks addObject:stackDictionary];
+        sThreadsMap->empty();
+    } else {
+        for (const auto &cStack : *sStacks) {
+            NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
+            // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
+            for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
+                [stack addObject:@((NSUInteger)cStack.frames[j])];
+            }
+            NSDictionary *stackDictionary = @{
+                @"stack": [stack copy],
+                @"time": @(cStack.time)
+            };
+            [stacks addObject:stackDictionary];
+        }
+        sStacks->clear();
     }
-    sStacks->clear();
+    
     sStacksLock.unlock();
     const NXArchInfo *archInfo = NXGetLocalArchInfo();
     NSString *cpuType = [NSString stringWithUTF8String:archInfo->description];
@@ -300,6 +323,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         @"cpuType": cpuType,
         @"device": [self deviceName],
         @"events": sSpanTimes,
+        @"threads": threads
     } mutableCopy];
     
     NSError *error = nil;

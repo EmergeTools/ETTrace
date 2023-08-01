@@ -15,6 +15,7 @@ struct ResponseModel: Decodable {
     let cpuType: String
     let device: String?
     let events: [Event]?
+    let threads: [String: [Stack]]?
 }
 
 struct LibraryInfo: Decodable {
