@@ -81,14 +81,16 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     
     // Suspend all threads but ETTrace's
     for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
-        if (threads[i] != sETTraceThread)
+        if (threads[i] != sETTraceThread) {
             thread_suspend(threads[i]);
+        }
     }
     
     CFTimeInterval time = CACurrentMediaTime();
     for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
-        if (threads[i] == sETTraceThread)
+        if (threads[i] == sETTraceThread) {
             continue;
+        }
         
         Stack stack;
         stack.time = time;
