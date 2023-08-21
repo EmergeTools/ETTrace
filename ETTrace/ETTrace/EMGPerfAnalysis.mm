@@ -37,7 +37,11 @@ typedef struct {
 static std::vector<Stack> *sStacks;
 static std::mutex sStacksLock;
 
-static std::map<unsigned int, std::vector<Stack> *> *sThreadsMap;
+typedef struct {
+    std::vector<Stack> *stacks;
+    char name[256];
+} Thread;
+static std::map<unsigned int, Thread *> *sThreadsMap;
 
 static dispatch_queue_t fileEventsQueue;
 
@@ -93,11 +97,30 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         std::vector<Stack> *threadStack;
         sStacksLock.lock();
         if (sThreadsMap->find(threads[i]) == sThreadsMap->end()) {
+            Thread *thread = new Thread;
+            
+            if(threads[i] == sMainMachThread) {
+                strcpy(thread->name,"Main Thread");
+            } else {
+                // Get thread Name
+                char name[256];
+                pthread_t pt = pthread_from_mach_thread_np(threads[i]);
+                if (pt) {
+                    name[0] = '\0';
+                    int rc = pthread_getname_np(pt, name, sizeof name);
+                    strcpy(thread->name, name);
+                }
+            }
+            
+            // Create stacks vector
             threadStack = new std::vector<Stack>;
             threadStack->reserve(400);
-            sThreadsMap->insert(std::pair<unsigned int, std::vector<Stack> *>(threads[i], threadStack));
+            thread->stacks = threadStack;
+            
+            // Add to hash map
+            sThreadsMap->insert(std::pair<unsigned int, Thread *>(threads[i], thread));
         } else {
-            threadStack = sThreadsMap->at(threads[i]);
+            threadStack = sThreadsMap->at(threads[i])->stacks;
         }
 
         try {
@@ -108,18 +131,6 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
             throw le;
         }
         sStacksLock.unlock();
-        
-//        // Get thread Name
-//        char name[256];
-//        pthread_t pt = pthread_from_mach_thread_np(threads[i]);
-//        if (pt) {
-//            name[0] = '\0';
-//            int rc = pthread_getname_np(pt, name, sizeof name);
-//            NSLog(@"mach thread %i %u: getname returned %d: %s", i, threads[i], rc, name);
-//        } else {
-//            // Couldn't get pthread, can't find name
-//            NSLog(@"mach thread %i %u: no pthread found", i, threads[i]);
-//        }
     }
     
     for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
@@ -148,7 +159,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     sRecordAllThreads = recordAllThreads;
     
     if (recordAllThreads) {
-        sThreadsMap = new std::map<unsigned int, std::vector<Stack> *>;
+        sThreadsMap = new std::map<unsigned int, Thread *>;
         
         sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
             if (!sETTraceThread) {
@@ -276,12 +287,13 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 + (void)stopRecording {
     sStacksLock.lock();
     NSMutableArray <NSDictionary <NSString *, id> *> *stacks = [NSMutableArray array];
-    NSMutableDictionary <NSString *, NSMutableArray<NSDictionary <NSString *, id> *> *> *threads = [NSMutableDictionary dictionary];
+    NSMutableDictionary <NSString *, NSDictionary<NSString *, id> *> *threads = [NSMutableDictionary dictionary];
     if (sRecordAllThreads) {
-        std::map<unsigned int, std::vector<Stack> *>::iterator it;
+        std::map<unsigned int, Thread *>::iterator it;
         for (it = sThreadsMap->begin(); it != sThreadsMap->end(); it++) {
             NSMutableArray <NSDictionary <NSString *, id> *> *threadStacks = [NSMutableArray array];
-            for (const auto &cStack : *it->second) {
+            Thread thread = *it->second;
+            for (const auto &cStack : *thread.stacks) {
                 NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
                 // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
                 for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
@@ -293,7 +305,11 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
                 };
                 [threadStacks addObject:stackDictionary];
             }
-            threads[[[NSNumber numberWithUnsignedInt:it->first] stringValue]] = threadStacks;
+            NSString *threadId = [[NSNumber numberWithUnsignedInt:it->first] stringValue];
+            threads[threadId] = @{
+                @"name": [NSString stringWithFormat:@"%s", thread.name],
+                @"stacks": threadStacks
+            };
         }
         sThreadsMap->empty();
     } else {
@@ -323,7 +339,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         @"cpuType": cpuType,
         @"device": [self deviceName],
         @"events": sSpanTimes,
-        @"threads": threads
+        @"threads": threads,
     } mutableCopy];
     
     NSError *error = nil;
