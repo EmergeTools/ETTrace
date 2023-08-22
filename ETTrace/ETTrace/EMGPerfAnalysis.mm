@@ -52,6 +52,30 @@ extern "C" {
 void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesCapacity, uint64_t *framesWritten);
 }
 
++ (Thread *) createThread:(thread_t) threadId
+{
+    Thread *thread = new Thread;
+    
+    if(threadId == sMainMachThread) {
+        strcpy(thread->name,"Main Thread");
+    } else {
+        // Get thread Name
+        char name[256];
+        pthread_t pt = pthread_from_mach_thread_np(threadId);
+        if (pt) {
+            name[0] = '\0';
+            int rc = pthread_getname_np(pt, name, sizeof name);
+            strcpy(thread->name, name);
+        }
+    }
+    
+    // Create stacks vector
+    thread->stacks = new std::vector<Stack>;
+    thread->stacks->reserve(400);
+    
+    return thread;
+}
+
 + (void)recordStackForAllThreads
 {
     thread_act_array_t threads;
@@ -83,28 +107,11 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         std::vector<Stack> *threadStack;
         sThreadsLock.lock();
         if (sThreadsMap->find(threads[i]) == sThreadsMap->end()) {
-            Thread *thread = new Thread;
-            
-            if(threads[i] == sMainMachThread) {
-                strcpy(thread->name,"Main Thread");
-            } else {
-                // Get thread Name
-                char name[256];
-                pthread_t pt = pthread_from_mach_thread_np(threads[i]);
-                if (pt) {
-                    name[0] = '\0';
-                    int rc = pthread_getname_np(pt, name, sizeof name);
-                    strcpy(thread->name, name);
-                }
-            }
-            
-            // Create stacks vector
-            threadStack = new std::vector<Stack>;
-            threadStack->reserve(400);
-            thread->stacks = threadStack;
-            
+            Thread *thread = [self createThread:threads[i]];
             // Add to hash map
             sThreadsMap->insert(std::pair<unsigned int, Thread *>(threads[i], thread));
+            
+            threadStack = thread->stacks;
         } else {
             threadStack = sThreadsMap->at(threads[i])->stacks;
         }
