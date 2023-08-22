@@ -37,7 +37,7 @@
     return result;
 }
 
-+ (NSArray *)multithreadNodeToArray:(NSArray <ThreadNode *> *)threadsArray {
++ (NSArray *)threadNodeToArray:(NSArray <ThreadNode *> *)threadsArray {
     NSMutableArray *result = [[NSMutableArray alloc] init];
     
     for (ThreadNode *thread in threadsArray) {
@@ -55,19 +55,10 @@
         @"osBuild": flamegraph.osBuild,
         @"isSimulator": @(flamegraph.isSimulator),
         @"libraries": flamegraph.libraries,
-        @"events": [self eventsToArray:flamegraph.events]
+        @"events": [self eventsToArray:flamegraph.events],
+        @"device": flamegraph.device,
+        @"threadNodes": [self threadNodeToArray:flamegraph.threadNodes]
     }];
-    if (flamegraph.device != nil) {
-        [result setObject:flamegraph.device forKey:@"device"];
-    }
-    if (flamegraph.threadName != nil) {
-        [result setObject:flamegraph.threadName forKey:@"threadName"];
-    }
-    if (flamegraph.multithreadNodes != nil) {
-        [result setObject:[self multithreadNodeToArray:flamegraph.multithreadNodes] forKey:@"multithreadNodes"];
-    } else {
-        [result setObject:[self flameNodeToDictionary:flamegraph.nodes] forKey:@"nodes"];
-    }
     return result;
 }
 

@@ -34,14 +34,13 @@ typedef struct {
     uint64_t frameCount;
     uintptr_t frames[kMaxFramesPerStack];
 } Stack;
-static std::vector<Stack> *sStacks;
-static std::mutex sStacksLock;
 
 typedef struct {
     std::vector<Stack> *stacks;
     char name[256];
 } Thread;
 static std::map<unsigned int, Thread *> *sThreadsMap;
+static std::mutex sThreadsLock;
 
 static dispatch_queue_t fileEventsQueue;
 
@@ -53,30 +52,15 @@ extern "C" {
 void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesCapacity, uint64_t *framesWritten);
 }
 
-+ (void)recordStack
-{
-    Stack stack;
-    thread_suspend(sMainMachThread);
-    stack.time = CACurrentMediaTime();
-    FIRCLSWriteThreadStack(sMainMachThread, stack.frames, kMaxFramesPerStack, &(stack.frameCount));
-    thread_resume(sMainMachThread);
-    sStacksLock.lock();
-    try {
-      sStacks->emplace_back(stack);
-    } catch (const std::length_error& le) {
-      fflush(stdout);
-      fflush(stderr);
-      throw le;
-    }
-    sStacksLock.unlock();
-}
-
 + (void)recordStackForAllThreads
 {
     thread_act_array_t threads;
     mach_msg_type_number_t thread_count;
-    if (task_threads(mach_task_self(), &threads, &thread_count) != KERN_SUCCESS) {
+    if (sRecordAllThreads && task_threads(mach_task_self(), &threads, &thread_count) != KERN_SUCCESS) {
         thread_count = 0;
+    } else {
+        threads = &sMainMachThread;
+        thread_count = 1;
     }
     
     // Suspend all threads but ETTrace's
@@ -97,7 +81,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         FIRCLSWriteThreadStack(threads[i], stack.frames, kMaxFramesPerStack, &(stack.frameCount));
         
         std::vector<Stack> *threadStack;
-        sStacksLock.lock();
+        sThreadsLock.lock();
         if (sThreadsMap->find(threads[i]) == sThreadsMap->end()) {
             Thread *thread = new Thread;
             
@@ -132,7 +116,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
             fflush(stderr);
             throw le;
         }
-        sStacksLock.unlock();
+        sThreadsLock.unlock();
     }
     
     for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
@@ -160,31 +144,19 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     // timer's queue could theoretically end up run on the main thread
     sRecordAllThreads = recordAllThreads;
     
-    if (recordAllThreads) {
-        sThreadsMap = new std::map<unsigned int, Thread *>;
+    sThreadsMap = new std::map<unsigned int, Thread *>;
+    
+    sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
+        if (!sETTraceThread) {
+            sETTraceThread = mach_thread_self();
+        }
         
-        sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
-            if (!sETTraceThread) {
-                sETTraceThread = mach_thread_self();
-            }
-            
-            NSThread *thread = [NSThread currentThread];
-            while (!thread.cancelled) {
-                [self recordStackForAllThreads];
-                usleep(4500);
-            }
-        }];
-    } else {
-        sStacks = new std::vector<Stack>;
-        sStacks->reserve(400);
-        sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
-            NSThread *thread = [NSThread currentThread];
-            while (!thread.cancelled) {
-                [self recordStack];
-                usleep(4500);
-            }
-        }];
-    }
+        NSThread *thread = [NSThread currentThread];
+        while (!thread.cancelled) {
+            [self recordStackForAllThreads];
+            usleep(4500);
+        }
+    }];
     sStackRecordingThread.qualityOfService = NSQualityOfServiceUserInteractive;
     [sStackRecordingThread start];
 }
@@ -287,35 +259,14 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 }
 
 + (void)stopRecording {
-    sStacksLock.lock();
-    NSMutableArray <NSDictionary <NSString *, id> *> *stacks = [NSMutableArray array];
+    sThreadsLock.lock();
     NSMutableDictionary <NSString *, NSDictionary<NSString *, id> *> *threads = [NSMutableDictionary dictionary];
-    if (sRecordAllThreads) {
-        std::map<unsigned int, Thread *>::iterator it;
-        for (it = sThreadsMap->begin(); it != sThreadsMap->end(); it++) {
-            NSMutableArray <NSDictionary <NSString *, id> *> *threadStacks = [NSMutableArray array];
-            Thread thread = *it->second;
-            for (const auto &cStack : *thread.stacks) {
-                NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
-                // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
-                for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
-                    [stack addObject:@((NSUInteger)cStack.frames[j])];
-                }
-                NSDictionary *stackDictionary = @{
-                    @"stack": [stack copy],
-                    @"time": @(cStack.time)
-                };
-                [threadStacks addObject:stackDictionary];
-            }
-            NSString *threadId = [[NSNumber numberWithUnsignedInt:it->first] stringValue];
-            threads[threadId] = @{
-                @"name": [NSString stringWithFormat:@"%s", thread.name],
-                @"stacks": threadStacks
-            };
-        }
-        sThreadsMap->empty();
-    } else {
-        for (const auto &cStack : *sStacks) {
+
+    std::map<unsigned int, Thread *>::iterator it;
+    for (it = sThreadsMap->begin(); it != sThreadsMap->end(); it++) {
+        NSMutableArray <NSDictionary <NSString *, id> *> *threadStacks = [NSMutableArray array];
+        Thread thread = *it->second;
+        for (const auto &cStack : *thread.stacks) {
             NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
             // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
             for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
@@ -325,16 +276,20 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
                 @"stack": [stack copy],
                 @"time": @(cStack.time)
             };
-            [stacks addObject:stackDictionary];
+            [threadStacks addObject:stackDictionary];
         }
-        sStacks->clear();
+        NSString *threadId = [[NSNumber numberWithUnsignedInt:it->first] stringValue];
+        threads[threadId] = @{
+            @"name": [NSString stringWithFormat:@"%s", thread.name],
+            @"stacks": threadStacks
+        };
     }
-    
-    sStacksLock.unlock();
+    sThreadsMap->empty();
+    sThreadsLock.unlock();
+        
     const NXArchInfo *archInfo = NXGetLocalArchInfo();
     NSString *cpuType = [NSString stringWithUTF8String:archInfo->description];
     NSMutableDictionary *info = [@{
-        @"stacks": stacks,
         @"libraryInfo": EMGLibrariesData(),
         @"isSimulator": @([self isRunningOnSimulator]),
         @"osBuild": [self osBuild],

@@ -9,24 +9,18 @@ import Foundation
 
 struct ResponseModel: Decodable {
     let osBuild: String
-    let stacks: [Stack]
     let isSimulator: Bool
     let libraryInfo: LibraryInfo
     let cpuType: String
-    let device: String?
-    let events: [Event]?
-    let threads: [String: Thread]?
+    let device: String
+    let events: [Event]
+    let threads: [String: Thread]
 }
 
 struct LibraryInfo: Decodable {
     let relativeTime: Double
     let mainThreadId: Int
     let loadedLibraries: [LoadedLibrary]
-}
-
-struct Stack: Decodable {
-    let stack: [UInt64]
-    let time: Double
 }
 
 struct LoadedLibrary: Decodable, Equatable, Hashable {
@@ -41,12 +35,17 @@ struct Event: Decodable {
     let time: Double
 }
 
+enum EventType: String, Decodable {
+    case start
+    case stop
+}
+
 struct Thread: Decodable {
     let name: String
     let stacks: [Stack]
 }
 
-enum EventType: String, Decodable {
-    case start
-    case stop
+struct Stack: Decodable {
+    let stack: [UInt64]
+    let time: Double
 }

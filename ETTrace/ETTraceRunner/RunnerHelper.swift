@@ -88,40 +88,35 @@ class RunnerHelper {
         osVersion.removeAll(where: { !$0.isLetter && !$0.isNumber })
         
         symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
-        var outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        if let threads = responseData.threads {
-            var allThreads:[Flamegraph] = []
-            for (threadId, thread) in threads {
-                let flamegraph = createFlamegraphForThread(thread, responseData)
-                allThreads.append(flamegraph)
-                
-                try saveFlamegraph(flamegraph, outputUrl, threadId)
-            }
+        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        
+        var allThreads:[Flamegraph] = []
+        for (threadId, thread) in responseData.threads {
+            let flamegraph = createFlamegraphForThread(thread, responseData)
+            allThreads.append(flamegraph)
             
-            // Write a merged JSON with all flamegraphs
-            guard let firstFlamegraph = allThreads.first else {
-                fatalError("No flamegraphs generated")
-            }
-            let threadNodes = allThreads.map {
-                ThreadNode(nodes: $0.nodes!, threadName: $0.threadName)
-            }
-            let mergedFlamegraph = Flamegraph(osBuild: firstFlamegraph.osBuild,
-                                              device: firstFlamegraph.device,
-                                              isSimulator: isSimulator,
-                                              nodes: nil,
-                                              libraries: firstFlamegraph.libraries,
-                                              events: firstFlamegraph.events,
-                                              multithreadNodes: threadNodes)
-            try saveFlamegraph(mergedFlamegraph, outputUrl)
-        } else {
-            let outJsonData = createFlamegraphForStacks(responseData.stacks, responseData)
-            try startLocalServer(outJsonData)
-            
-            outputUrl = outputUrl.appendingPathComponent("output.json")
-            
-            let jsonString = String(data: outJsonData, encoding: .utf8)!
-            try jsonString.write(to: outputUrl, atomically: true, encoding: .utf8)
+            let outJsonData = JSONWrapper.toData(flamegraph)!
+            try saveFlamegraph(outJsonData, outputUrl, threadId)
         }
+        
+        // Write a merged JSON with all flamegraphs
+        guard let firstFlamegraph = allThreads.first else {
+            fatalError("No flamegraphs generated")
+        }
+        let threadNodes = allThreads.map {
+            let thread = $0.threadNodes.first!
+            return ThreadNode(nodes: thread.nodes,
+                              threadName: thread.threadName)
+        }
+        let mergedFlamegraph = Flamegraph(osBuild: firstFlamegraph.osBuild,
+                                          device: firstFlamegraph.device,
+                                          isSimulator: isSimulator,
+                                          libraries: firstFlamegraph.libraries,
+                                          events: firstFlamegraph.events,
+                                          threadNodes: threadNodes)
+        let outJsonData = JSONWrapper.toData(mergedFlamegraph)!
+        try startLocalServer(outJsonData)
+        try saveFlamegraph(outJsonData, outputUrl)
         
         let url = URL(string: "https://emergetools.com/flamegraph")!
         NSWorkspace.shared.open(url)
@@ -131,48 +126,21 @@ class RunnerHelper {
         print("Results saved to \(outputUrl)")
     }
     
-    private func createFlamegraphForStacks(_ stacks: [Stack], _ responseData: ResponseModel) -> Data {
-        let syms = symbolicator.symbolicate(stacks, responseData.libraryInfo.loadedLibraries)
-        let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: stacks, syms: syms, writeFolded: verbose)
-        
-        let startTime = stacks.sorted { s1, s2 in
-            s1.time < s2.time
-        }.first!.time
-        
-        let events = responseData.events?.map { event in
-            return FlamegraphEvent(name: event.span,
-                                   type: event.type.rawValue,
-                                   time: event.time-startTime)
-        } ?? []
-
-        let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
-            partialResult[library.path] = library.loadAddress
-        }
-        
-        let flamegraph = Flamegraph(osBuild: responseData.osBuild,
-                                    device: responseData.device,
-                                    isSimulator: responseData.isSimulator,
-                                    nodes: flamegraphNodes,
-                                    libraries: libraries,
-                                    events: events)
-
-        return JSONWrapper.toData(flamegraph)
-    }
-    
     private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel) -> Flamegraph {
         let stacks = thread.stacks
         let syms = symbolicator.symbolicate(stacks, responseData.libraryInfo.loadedLibraries)
         let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: stacks, syms: syms, writeFolded: verbose)
+        let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
         
         let startTime = stacks.sorted { s1, s2 in
             s1.time < s2.time
         }.first!.time
         
-        let events = responseData.events?.map { event in
+        let events = responseData.events.map { event in
             return FlamegraphEvent(name: event.span,
                                    type: event.type.rawValue,
                                    time: event.time-startTime)
-        } ?? []
+        }
 
         let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
             partialResult[library.path] = library.loadAddress
@@ -181,10 +149,9 @@ class RunnerHelper {
         return Flamegraph(osBuild: responseData.osBuild,
                           device: responseData.device,
                           isSimulator: responseData.isSimulator,
-                          nodes: flamegraphNodes,
                           libraries: libraries,
                           events: events,
-                          threadName: thread.name)
+                          threadNodes: [threadNode])
     }
     
     func startLocalServer(_ data: Data) throws {
@@ -214,15 +181,13 @@ class RunnerHelper {
         try server?.start(37577)
     }
     
-    private func saveFlamegraph(_ flamegraph: Flamegraph, _ outputUrl: URL, _ threadId: String? = nil) throws {
-        let outJsonData = JSONWrapper.toData(flamegraph)
-        
+    private func saveFlamegraph(_ outJsonData: Data, _ outputUrl: URL, _ threadId: String? = nil) throws {
         var saveUrl = outputUrl.appendingPathComponent("output.json")
         if let threadId = threadId {
             saveUrl = outputUrl.appendingPathComponent("output_\(threadId).json")
         }
         
-        let jsonString = String(data: outJsonData!, encoding: .utf8)!
+        let jsonString = String(data: outJsonData, encoding: .utf8)!
         try jsonString.write(to: saveUrl, atomically: true, encoding: .utf8)
     }
 }
