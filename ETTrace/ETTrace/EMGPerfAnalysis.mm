@@ -258,30 +258,34 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
 }
 
++ (NSArray <NSDictionary <NSString *, id> *> *) arrayFromStacks: (std::vector<Stack>)stacks {
+    NSMutableArray <NSDictionary <NSString *, id> *> *threadStacks = [NSMutableArray array];
+    for (const auto &cStack : stacks) {
+        NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
+        // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
+        for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
+            [stack addObject:@((NSUInteger)cStack.frames[j])];
+        }
+        NSDictionary *stackDictionary = @{
+            @"stack": [stack copy],
+            @"time": @(cStack.time)
+        };
+        [threadStacks addObject:stackDictionary];
+    }
+    return threadStacks;
+}
+
 + (void)stopRecording {
     sThreadsLock.lock();
     NSMutableDictionary <NSString *, NSDictionary<NSString *, id> *> *threads = [NSMutableDictionary dictionary];
 
     std::map<unsigned int, Thread *>::iterator it;
     for (it = sThreadsMap->begin(); it != sThreadsMap->end(); it++) {
-        NSMutableArray <NSDictionary <NSString *, id> *> *threadStacks = [NSMutableArray array];
         Thread thread = *it->second;
-        for (const auto &cStack : *thread.stacks) {
-            NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
-            // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
-            for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
-                [stack addObject:@((NSUInteger)cStack.frames[j])];
-            }
-            NSDictionary *stackDictionary = @{
-                @"stack": [stack copy],
-                @"time": @(cStack.time)
-            };
-            [threadStacks addObject:stackDictionary];
-        }
         NSString *threadId = [[NSNumber numberWithUnsignedInt:it->first] stringValue];
         threads[threadId] = @{
             @"name": [NSString stringWithFormat:@"%s", thread.name],
-            @"stacks": threadStacks
+            @"stacks": [self arrayFromStacks: *thread.stacks]
         };
     }
     sThreadsMap->empty();
