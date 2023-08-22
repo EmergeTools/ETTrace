@@ -80,8 +80,10 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 {
     thread_act_array_t threads;
     mach_msg_type_number_t thread_count;
-    if (sRecordAllThreads && task_threads(mach_task_self(), &threads, &thread_count) != KERN_SUCCESS) {
-        thread_count = 0;
+    if (sRecordAllThreads) {
+        if (task_threads(mach_task_self(), &threads, &thread_count) != KERN_SUCCESS) {
+            thread_count = 0;
+        }
     } else {
         threads = &sMainMachThread;
         thread_count = 1;
