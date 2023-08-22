@@ -57,8 +57,15 @@
         @"libraries": flamegraph.libraries,
         @"events": [self eventsToArray:flamegraph.events],
         @"device": flamegraph.device,
-        @"threadNodes": [self threadNodeToArray:flamegraph.threadNodes]
+        
     }];
+    // Save as threadNodes if we have multiple threads
+    if (flamegraph.threadNodes.count > 1) {
+        [result setObject:[self threadNodeToArray:flamegraph.threadNodes] forKey:@"threadNodes"];
+    } else {
+        ThreadNode *thread = flamegraph.threadNodes.firstObject;
+        [result setObject:[self flameNodeToDictionary:thread.nodes] forKey:@"nodes"];
+    }
     return result;
 }
 
