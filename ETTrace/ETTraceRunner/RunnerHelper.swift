@@ -107,21 +107,8 @@ class RunnerHelper {
         }
         
         guard mainThreadFlamegraph != nil else {
-            fatalError("No flamegraphs generated")
+            fatalError("No main thread flamegraphs generated")
         }
-        let threadNodes = allThreads.map {
-            let thread = $0.threadNodes.first!
-            return ThreadNode(nodes: thread.nodes,
-                              threadName: thread.threadName)
-        }
-        let mergedFlamegraph = Flamegraph(osBuild: mainThreadFlamegraph.osBuild,
-                                          device: mainThreadFlamegraph.device,
-                                          isSimulator: isSimulator,
-                                          libraries: mainThreadFlamegraph.libraries,
-                                          events: mainThreadFlamegraph.events,
-                                          threadNodes: threadNodes)
-        let outJsonData = JSONWrapper.toData(mergedFlamegraph)!
-        try saveFlamegraph(outJsonData, outputUrl)
         
         // Serve Main Thread
         try startLocalServer(mainThreadData)
