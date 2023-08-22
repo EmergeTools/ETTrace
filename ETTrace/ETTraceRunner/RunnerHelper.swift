@@ -91,16 +91,22 @@ class RunnerHelper {
         let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
         
         var allThreads:[Flamegraph] = []
+        var mainThreadFlamegraph: Flamegraph!
+        var mainThreadData: Data!
         for (threadId, thread) in responseData.threads {
             let flamegraph = createFlamegraphForThread(thread, responseData)
             allThreads.append(flamegraph)
             
             let outJsonData = JSONWrapper.toData(flamegraph)!
+            
+            if thread.name == "Main Thread" {
+                mainThreadFlamegraph = flamegraph
+                mainThreadData = outJsonData
+            }
             try saveFlamegraph(outJsonData, outputUrl, threadId)
         }
         
-        // Write a merged JSON with all flamegraphs
-        guard let firstFlamegraph = allThreads.first else {
+        guard mainThreadFlamegraph != nil else {
             fatalError("No flamegraphs generated")
         }
         let threadNodes = allThreads.map {
@@ -108,15 +114,17 @@ class RunnerHelper {
             return ThreadNode(nodes: thread.nodes,
                               threadName: thread.threadName)
         }
-        let mergedFlamegraph = Flamegraph(osBuild: firstFlamegraph.osBuild,
-                                          device: firstFlamegraph.device,
+        let mergedFlamegraph = Flamegraph(osBuild: mainThreadFlamegraph.osBuild,
+                                          device: mainThreadFlamegraph.device,
                                           isSimulator: isSimulator,
-                                          libraries: firstFlamegraph.libraries,
-                                          events: firstFlamegraph.events,
+                                          libraries: mainThreadFlamegraph.libraries,
+                                          events: mainThreadFlamegraph.events,
                                           threadNodes: threadNodes)
         let outJsonData = JSONWrapper.toData(mergedFlamegraph)!
-        try startLocalServer(outJsonData)
         try saveFlamegraph(outJsonData, outputUrl)
+        
+        // Serve Main Thread
+        try startLocalServer(mainThreadData)
         
         let url = URL(string: "https://emergetools.com/flamegraph")!
         NSWorkspace.shared.open(url)
