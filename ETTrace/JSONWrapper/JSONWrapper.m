@@ -37,19 +37,6 @@
     return result;
 }
 
-+ (NSArray *)threadNodeToArray:(NSArray <ThreadNode *> *)threadsArray {
-    NSMutableArray *result = [[NSMutableArray alloc] init];
-    
-    for (ThreadNode *thread in threadsArray) {
-        [result addObject:@{
-            @"threadName": thread.threadName,
-            @"nodes": [self flameNodeToDictionary:thread.nodes],
-        }];
-    }
-
-    return result;
-}
-
 + (NSDictionary *)flamegraphToDictionary:(Flamegraph *)flamegraph {
     NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithDictionary:@{
         @"osBuild": flamegraph.osBuild,
@@ -57,15 +44,11 @@
         @"libraries": flamegraph.libraries,
         @"events": [self eventsToArray:flamegraph.events],
         @"device": flamegraph.device,
-        
     }];
-    // Save as threadNodes if we have multiple threads
-    if (flamegraph.threadNodes.count > 1) {
-        [result setObject:[self threadNodeToArray:flamegraph.threadNodes] forKey:@"threadNodes"];
-    } else {
-        ThreadNode *thread = flamegraph.threadNodes.firstObject;
-        [result setObject:[self flameNodeToDictionary:thread.nodes] forKey:@"nodes"];
-    }
+
+    ThreadNode *thread = flamegraph.threadNodes.firstObject;
+    [result setObject:[self flameNodeToDictionary:thread.nodes] forKey:@"nodes"];
+
     return result;
 }
 
