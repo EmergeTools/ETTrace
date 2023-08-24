@@ -15,6 +15,14 @@ Alternatively, run `./build.sh` to build the xcframework `ETTrace.xcframework`. 
 
 Install the runner with `brew install emergetools/homebrew-tap/ettrace`
 
+## Testimonials
+
+Our users love ETTrace and find it essential in their iOS development process. Here’s what some of them have to say:
+
+- **Keith Smiley, Principal Engineer @ Lyft**: "With ETTrace I can pinpoint exactly what is taking time in my app, and quickly find opportunities to improve it. It’s my go-to tool for in-depth performance analysis."
+
+- **Bruno Rocha, Software Engineer @ Spotify**: "ETTrace is my favorite tool for diagnosing iOS performance, the flamechart view makes it easy to find bottlenecks and speed up app launch."
+
 ## Using
 
 Launch your app and run `ettrace` or `ettrace --simulator`. After profiling, the result will be displayed on https://emergetools.com/flamegraph
