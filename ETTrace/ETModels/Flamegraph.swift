@@ -13,13 +13,10 @@ public class Flamegraph: NSObject {
     public let osBuild: String
     
     @objc
-    public let device: String?
+    public let device: String
     
     @objc
     public let isSimulator: Bool
-    
-    @objc
-    public var nodes: FlameNode
     
     @objc
     public var events: [FlamegraphEvent]
@@ -27,17 +24,20 @@ public class Flamegraph: NSObject {
     @objc
     public var libraries: [String:UInt64]
     
+    @objc
+    public var threadNodes: [ThreadNode]
+    
     public init(osBuild: String,
-                device: String?,
+                device: String,
                 isSimulator: Bool,
-                nodes: FlameNode,
                 libraries: [String:UInt64],
-                events: [FlamegraphEvent]) {
+                events: [FlamegraphEvent],
+                threadNodes: [ThreadNode]) {
         self.osBuild = osBuild
         self.device = device
         self.isSimulator = isSimulator
-        self.nodes = nodes
         self.events = events
         self.libraries = libraries
+        self.threadNodes = threadNodes
     }
 }

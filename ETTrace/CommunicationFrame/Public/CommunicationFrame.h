@@ -32,6 +32,7 @@ enum {
     PTFrameTypeResultsMetadata = 105,
     PTFrameTypeResultsData = 106,
     PTFrameTypeResultsTransferComplete = 107,
+    PTFrameTypeStartMultiThread = 108,
 };
 
 typedef struct _PTStartFrame {

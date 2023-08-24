@@ -18,14 +18,17 @@ class RunnerHelper {
     let launch: Bool
     let useSimulator: Bool
     let verbose: Bool
+    let multiThread: Bool
 
     var server: HttpServer? = nil
+    var symbolicator: Symbolicator!
     
-    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool) {
+    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ multiThread: Bool) {
         self.dsyms = dsyms
         self.launch = launch
         self.useSimulator = simulator
         self.verbose = verbose
+        self.multiThread = multiThread
     }
     
     func start() async throws {
@@ -42,7 +45,7 @@ class RunnerHelper {
 
         try await deviceManager.connect()
 
-        try await deviceManager.sendStartRecording(launch)
+       try await deviceManager.sendStartRecording(launch, multiThread)
 
         if launch {
             print("Re-launch the app to start recording, then press return to exit")
@@ -83,45 +86,67 @@ class RunnerHelper {
         }
         var osVersion = responseData.osBuild
         osVersion.removeAll(where: { !$0.isLetter && !$0.isNumber })
-
-        let symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
-        let syms = symbolicator.symbolicate(responseData.stacks, responseData.libraryInfo.loadedLibraries)
-        let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: responseData.stacks, syms: syms, writeFolded: verbose)
         
-        let startTime = responseData.stacks.sorted { s1, s2 in
-            s1.time < s2.time
-        }.first!.time
+        symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
+        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
         
-        let events = responseData.events?.map { event in
-            return FlamegraphEvent(name: event.span,
-                                   type: event.type.rawValue,
-                                   time: event.time-startTime)
-        } ?? []
-
-        let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
-            partialResult[library.path] = library.loadAddress
+        var allThreads:[Flamegraph] = []
+        var mainThreadFlamegraph: Flamegraph!
+        var mainThreadData: Data!
+        for (threadId, thread) in responseData.threads {
+            let flamegraph = createFlamegraphForThread(thread, responseData)
+            allThreads.append(flamegraph)
+            
+            let outJsonData = JSONWrapper.toData(flamegraph)!
+            
+            if thread.name == "Main Thread" {
+                mainThreadFlamegraph = flamegraph
+                mainThreadData = outJsonData
+            }
+            try saveFlamegraph(outJsonData, outputUrl, threadId)
         }
         
-        let flamegraph = Flamegraph(osBuild: responseData.osBuild,
-                                    device: responseData.device,
-                                    isSimulator: responseData.isSimulator,
-                                    nodes: flamegraphNodes,
-                                    libraries: libraries,
-                                    events: events)
-
-        let outJsonData: Data = JSONWrapper.toData(flamegraph)
-
-        let jsonString = String(data: outJsonData, encoding: .utf8)!
-        try jsonString.write(toFile: "output.json", atomically: true, encoding: .utf8)
-        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("output.json")
+        guard mainThreadFlamegraph != nil else {
+            fatalError("No main thread flamegraphs generated")
+        }
         
-        try startLocalServer(outJsonData)
+        // Serve Main Thread
+        try startLocalServer(mainThreadData)
+        
         let url = URL(string: "https://emergetools.com/flamegraph")!
         NSWorkspace.shared.open(url)
 
         // Wait 4 seconds for results to be accessed from server, then exit
         sleep(4)
         print("Results saved to \(outputUrl)")
+    }
+    
+    private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel) -> Flamegraph {
+        let stacks = thread.stacks
+        let syms = symbolicator.symbolicate(stacks, responseData.libraryInfo.loadedLibraries)
+        let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: stacks, syms: syms, writeFolded: verbose)
+        let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
+        
+        let startTime = stacks.sorted { s1, s2 in
+            s1.time < s2.time
+        }.first!.time
+        
+        let events = responseData.events.map { event in
+            return FlamegraphEvent(name: event.span,
+                                   type: event.type.rawValue,
+                                   time: event.time-startTime)
+        }
+
+        let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
+            partialResult[library.path] = library.loadAddress
+        }
+        
+        return Flamegraph(osBuild: responseData.osBuild,
+                          device: responseData.device,
+                          isSimulator: responseData.isSimulator,
+                          libraries: libraries,
+                          events: events,
+                          threadNodes: [threadNode])
     }
     
     func startLocalServer(_ data: Data) throws {
@@ -149,5 +174,15 @@ class RunnerHelper {
             })
         }
         try server?.start(37577)
+    }
+    
+    private func saveFlamegraph(_ outJsonData: Data, _ outputUrl: URL, _ threadId: String? = nil) throws {
+        var saveUrl = outputUrl.appendingPathComponent("output.json")
+        if let threadId = threadId {
+            saveUrl = outputUrl.appendingPathComponent("output_\(threadId).json")
+        }
+        
+        let jsonString = String(data: outJsonData, encoding: .utf8)!
+        try jsonString.write(to: saveUrl, atomically: true, encoding: .utf8)
     }
 }

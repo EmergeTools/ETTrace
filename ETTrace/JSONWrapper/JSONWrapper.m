@@ -41,13 +41,14 @@
     NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithDictionary:@{
         @"osBuild": flamegraph.osBuild,
         @"isSimulator": @(flamegraph.isSimulator),
-        @"nodes": [self flameNodeToDictionary:flamegraph.nodes],
         @"libraries": flamegraph.libraries,
-        @"events": [self eventsToArray:flamegraph.events]
+        @"events": [self eventsToArray:flamegraph.events],
+        @"device": flamegraph.device,
     }];
-    if (flamegraph.device != nil) {
-        [result setObject:flamegraph.device forKey:@"device"];
-    }
+
+    ThreadNode *thread = flamegraph.threadNodes.firstObject;
+    [result setObject:[self flameNodeToDictionary:thread.nodes] forKey:@"nodes"];
+
     return result;
 }
 
