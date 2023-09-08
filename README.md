@@ -72,7 +72,7 @@ NotificationCenter.default.post(name: Notification.Name(rawValue: "EmergeMetricE
 ```
 
 In the flamechart we would be able to see this flow as follows:
-![Eents Flamechart](images/events_flamechart.png)
+![Events Flamechart](images/events_flamechart.png)
 
 ## Profiling background threads
 
