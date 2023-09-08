@@ -72,4 +72,8 @@ NotificationCenter.default.post(name: Notification.Name(rawValue: "EmergeMetricE
 ```
 
 In the flamechart we would be able to see this flow as follows:
-![Eents Flamechart](images/events_flamechart.png)
+![Events Flamechart](images/events_flamechart.png)
+
+## Profiling background threads
+
+Use the flag `--multi-thread` (`-m`) to record all threads. This will provide a output.json file for every thread recorded, which you can drag into ETTrace.
