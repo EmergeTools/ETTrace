@@ -1,5 +1,5 @@
 //
-//  main.swift
+//  ETTrace.swift
 //  PerfAnalysisRunner
 //
 //  Created by Itay Brenner on 6/3/23.
@@ -8,7 +8,7 @@
 import Foundation
 import ArgumentParser
 
-struct PerfAnalysisRunner: ParsableCommand {
+struct ETTrace: ParsableCommand {
     @Option(name: .shortAndLong, help: "Directory with dSYMs")
     var dsyms: String? = nil
     
@@ -26,7 +26,7 @@ struct PerfAnalysisRunner: ParsableCommand {
 
     mutating func run() throws {
       if let dsym = dsyms, dsym.hasSuffix(".dSYM") {
-        PerfAnalysisRunner.exit(withError: ValidationError("The dsym argument should be set to a folder containing your dSYM files, not the dSYM itself"))
+        ETTrace.exit(withError: ValidationError("The dsym argument should be set to a folder containing your dSYM files, not the dSYM itself"))
       }
         let helper = RunnerHelper(dsyms, launch, simulator, verbose, multiThread)
         Task {
@@ -35,7 +35,7 @@ struct PerfAnalysisRunner: ParsableCommand {
             } catch let error {
                 print("ETTrace error: \(error)")
             }
-            PerfAnalysisRunner.exit()
+          ETTrace.exit()
         }
         
         RunLoop.main.run()
