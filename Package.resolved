@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/EmergeTools/peertalk.git",
       "state" : {
-        "branch" : "feature/spm",
-        "revision" : "02b8bebff91cd3d7a5d89c0ddb4bbd873c62879d"
+        "revision" : "02b8bebff91cd3d7a5d89c0ddb4bbd873c62879d",
+        "version" : "1.0.0"
       }
     },
     {
