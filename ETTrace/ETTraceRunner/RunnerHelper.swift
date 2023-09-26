@@ -12,7 +12,6 @@ import CommunicationFrame
 import Swifter
 import JSONWrapper
 import ETModels
-import Dispatch
 
 typealias FlamegraphTuple = (String, Thread, Flamegraph)
 
