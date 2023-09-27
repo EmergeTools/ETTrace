@@ -26,7 +26,10 @@
 }
 
 - (void) setupChannel {
-    PTChannel *channel = [PTChannel channelWithDelegate:self];
+    dispatch_queue_t peertalk_queue = dispatch_queue_create("emg_queue", DISPATCH_QUEUE_SERIAL);
+    PTProtocol *protocol = [[PTProtocol alloc] initWithDispatchQueue:peertalk_queue];
+    PTChannel *channel = [[PTChannel alloc] initWithProtocol:protocol delegate:self];
+    
     [channel listenOnPort:PTPortNumber IPv4Address:INADDR_LOOPBACK callback:^(NSError *error) {
     if (error) {
         NSLog(@"Failed to listen on 127.0.0.1:%d: %@", PTPortNumber, error);
