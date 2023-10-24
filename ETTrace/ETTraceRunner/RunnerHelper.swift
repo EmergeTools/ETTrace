@@ -13,6 +13,8 @@ import Swifter
 import JSONWrapper
 import ETModels
 
+typealias FlamegraphTuple = (String, Thread, Flamegraph)
+
 class RunnerHelper {
     let dsyms: String?
     let launch: Bool
@@ -90,15 +92,25 @@ class RunnerHelper {
         symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
         let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
         
-        var allThreads:[Flamegraph] = []
+        let flamegraphs = await withTaskGroup(of: FlamegraphTuple.self, returning: [FlamegraphTuple].self) { taskGroup in
+            for (threadId, thread) in responseData.threads {
+                taskGroup.addTask {
+                    (threadId, thread, await self.createFlamegraphForThread(thread, responseData))
+                }
+            }
+            
+            var tuples = [FlamegraphTuple]()
+            for await result in taskGroup {
+                tuples.append(result)
+            }
+            return tuples
+        }
+        
         var mainThreadFlamegraph: Flamegraph!
         var mainThreadData: Data!
-        for (threadId, thread) in responseData.threads {
-            let flamegraph = createFlamegraphForThread(thread, responseData)
-            allThreads.append(flamegraph)
-            
+        
+        for (threadId, thread, flamegraph) in flamegraphs {
             let outJsonData = JSONWrapper.toData(flamegraph)!
-            
             if thread.name == "Main Thread" {
                 mainThreadFlamegraph = flamegraph
                 mainThreadData = outJsonData
@@ -121,9 +133,9 @@ class RunnerHelper {
         print("Results saved to \(outputUrl)")
     }
     
-    private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel) -> Flamegraph {
+    private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel) async -> Flamegraph {
         let stacks = thread.stacks
-        let syms = symbolicator.symbolicate(stacks, responseData.libraryInfo.loadedLibraries)
+        let syms = await symbolicator.symbolicate(stacks, responseData.libraryInfo.loadedLibraries)
         let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: stacks, syms: syms, writeFolded: verbose)
         let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
         

@@ -12,14 +12,27 @@ struct Address {
     let lib: LoadedLibrary?
 }
 
-class Symbolicator {
+// Actor to help concurrency access
+fileprivate actor SymbolicatorHepler {
+    var libToAddrToSym: [String: [UInt64: String]] = [:]
     var formatSymbolCache: [String: String] = [:]
     
+    func setValue(_ lib: String, addrToSym: [UInt64: String]) {
+        libToAddrToSym[lib] = addrToSym
+    }
+    
+    func setCacheValue(_ sym: String, _ result: String) {
+        formatSymbolCache[sym] = result
+    }
+}
+
+class Symbolicator {
     let isSimulator: Bool
     let dSymsDir: String?
     let osVersion: String
     let arch: String
     let verbose: Bool
+    private var helper: SymbolicatorHepler = SymbolicatorHepler()
     
     init(isSimulator: Bool, dSymsDir: String?, osVersion: String, arch: String, verbose: Bool) {
         self.isSimulator = isSimulator
@@ -29,7 +42,7 @@ class Symbolicator {
         self.verbose = verbose
     }
     
-    func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[(String?, String, UInt64?)]] {
+    func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) async -> [[(String?, String, UInt64?)]] {
         var libToAddrs: [LoadedLibrary: Set<UInt64>] = [:]
         let stacks = stacksFromResults(stacks, loadedLibs)
         stacks.flatMap { $0 }.forEach { addr in
@@ -38,39 +51,34 @@ class Symbolicator {
             }
         }
         
-        let stateLock = NSLock()
         var libToCleanedPath = [String: (String, String)]()
-        var libToAddrToSym: [String: [UInt64: String]] = [:]
-        let queue = DispatchQueue(label: "com.emerge.symbolication", qos: .userInitiated, attributes: .concurrent)
-        let group = DispatchGroup()
-        for (lib, addrs) in libToAddrs {
-            let cleanedPath = cleanedUpPath(lib.path)
-            libToCleanedPath[lib.path] = (cleanedPath, URL(string: cleanedPath)?.lastPathComponent ?? "")
-            group.enter()
-            queue.async {
+        
+        await withTaskGroup(of: Void
+            .self) { [unowned self] taskGroup in
+            for (lib, addrs) in libToAddrs {
+                let cleanedPath = cleanedUpPath(lib.path)
+                libToCleanedPath[lib.path] = (cleanedPath, URL(string: cleanedPath)?.lastPathComponent ?? "")
+                
                 if let dSym = self.dsymForLib(lib) {
-                    let addrToSym = Self.addrToSymForBinary(dSym, addrs)
-                    stateLock.lock()
-                    libToAddrToSym[lib.path] = addrToSym
-                    stateLock.unlock()
+                    taskGroup.addTask {
+                        await self.recordAddresToSym(dSym, addrs, lib.path)
+                    }
                 }
-                group.leave()
             }
         }
-        group.wait()
         
         var noLibCount = 0
         var noSymMap: [String: UInt64] = [:]
-        let result: [[(String?, String, UInt64?)]] = stacks.map { stack in
-            stack.map { addr in
+        let result: [[(String?, String, UInt64?)]] = await stacks.asyncMap { stack in
+            await stack.asyncMap { addr in
                 if let lib = addr.lib {
                     let (libPath, lastPathComponent) = libToCleanedPath[lib.path]!
-                    guard let addrToSym = libToAddrToSym[lib.path],
+                    guard let addrToSym = await helper.libToAddrToSym[lib.path],
                           let sym = addrToSym[addr.addr] else {
                         noSymMap[libPath, default: 0] += 1
                       return (libPath, lastPathComponent, addr.addr)
                     }
-                    return (libPath, formatSymbol(sym), nil)
+                    return (libPath, await formatSymbol(sym), nil)
                 } else {
                     noLibCount += 1
                     return ("<unknown>", "<unknown>", nil)
@@ -87,6 +95,11 @@ class Symbolicator {
             }
         }
         return result
+    }
+    
+    private func recordAddresToSym(_ dSym: String, _ addrs: Set<UInt64>, _ lib: String) async {
+        let addrToSym = self.addrToSymForBinary(dSym, addrs)
+        await helper.setValue(lib, addrToSym: addrToSym)
     }
     
     private func cleanedUpPath(_ path: String) -> String {
@@ -137,7 +150,7 @@ class Symbolicator {
         return addrs
     }
 
-    private static func addrToSymForBinary(_ binary: String, _ addrs: Set<UInt64>) -> [UInt64: String] {
+    private func addrToSymForBinary(_ binary: String, _ addrs: Set<UInt64>) -> [UInt64: String] {
         let addrsArray = Array(addrs)
         let addrsFile = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)!.path
 
@@ -170,8 +183,8 @@ class Symbolicator {
         return result
     }
 
-    private func formatSymbol(_ sym: String) -> String {
-        if let cachedResult = formatSymbolCache[sym] {
+    private func formatSymbol(_ sym: String) async -> String {
+        if let cachedResult = await helper.formatSymbolCache[sym] {
             return cachedResult
         }
         let result = sym.replacingOccurrences(of: ":\\d+\\)", with: ")", options: .regularExpression) // static AppDelegate.$main() (in emergeTest) (AppDelegate.swift:10)
@@ -182,7 +195,7 @@ class Symbolicator {
             .replacingOccurrences(of: "^__\\d+\\+", with: "", options: .regularExpression)
             .replacingOccurrences(of: "^__\\d+\\-", with: "", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        formatSymbolCache[sym] = result
+        await helper.setCacheValue(sym, result)
         return result
     }
     
