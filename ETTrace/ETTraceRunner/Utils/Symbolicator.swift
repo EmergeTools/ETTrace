@@ -8,9 +8,12 @@
 import Foundation
 
 struct Address {
-    let addr: UInt64
+    let originalAddress: UInt64
+    let offset: UInt64?
     let lib: LoadedLibrary?
 }
+
+typealias SymbolicationResult = [UInt64: (String, String, Bool)]
 
 class Symbolicator {
     var formatSymbolCache: [String: String] = [:]
@@ -28,13 +31,14 @@ class Symbolicator {
         self.arch = arch
         self.verbose = verbose
     }
-    
-    func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> [[(String?, String, UInt64?)]] {
+
+    // Return value is map of address to (lib, symbol, isMissing)
+    func symbolicate(_ stacks: [Stack], _ loadedLibs: [LoadedLibrary]) -> SymbolicationResult {
         var libToAddrs: [LoadedLibrary: Set<UInt64>] = [:]
         let stacks = stacksFromResults(stacks, loadedLibs)
         stacks.flatMap { $0 }.forEach { addr in
-            if let lib = addr.lib {
-              libToAddrs[lib, default: []].insert(addr.addr)
+            if let lib = addr.lib, let offset = addr.offset {
+              libToAddrs[lib, default: []].insert(offset)
             }
         }
         
@@ -61,19 +65,20 @@ class Symbolicator {
         
         var noLibCount = 0
         var noSymMap: [String: UInt64] = [:]
-        let result: [[(String?, String, UInt64?)]] = stacks.map { stack in
-            stack.map { addr in
-                if let lib = addr.lib {
+        var result: SymbolicationResult = [:]
+        stacks.forEach { stack in
+            stack.forEach { addr in
+                if let lib = addr.lib, let offset = addr.offset {
                     let (libPath, lastPathComponent) = libToCleanedPath[lib.path]!
                     guard let addrToSym = libToAddrToSym[lib.path],
-                          let sym = addrToSym[addr.addr] else {
+                          let sym = addrToSym[offset] else {
                         noSymMap[libPath, default: 0] += 1
-                      return (libPath, lastPathComponent, addr.addr)
+                      result[addr.originalAddress] = (libPath, lastPathComponent, true)
+                      return
                     }
-                    return (libPath, formatSymbol(sym), nil)
+                    result[addr.originalAddress] = (libPath, formatSymbol(sym), false)
                 } else {
                     noLibCount += 1
-                    return ("<unknown>", "<unknown>", nil)
                 }
             }
         }
@@ -125,10 +130,10 @@ class Symbolicator {
                     if verbose {
                         print("\(addr) not contained within any frameworks")
                     }
-                    return Address(addr: addr, lib: nil)
+                    return Address(originalAddress: addr, offset: nil, lib: nil)
                 }
 
-                let address = Address(addr: addr - lib!.loadAddress, lib: lib)
+                let address = Address(originalAddress: addr, offset: addr - lib!.loadAddress, lib: lib)
                 addrToAddress[addr] = address
                 return address
             }

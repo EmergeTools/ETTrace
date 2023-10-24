@@ -9,7 +9,7 @@ import Foundation
 import ETModels
 
 class FlamegraphGenerator {
-    static func generateFlamegraphs(stacks: [Stack], syms: [[(String?, String, UInt64?)]], writeFolded: Bool) -> FlameNode {
+    static func generateFlamegraphs(stacks: [Stack], syms: SymbolicationResult, writeFolded: Bool) -> FlameNode {
         let times = stacks.map { $0.time }
         var timeDiffs: [Double] = []
         let sampleInterval = 0.005
@@ -24,7 +24,16 @@ class FlamegraphGenerator {
             }
         }
         timeDiffs.append(sampleInterval) // Assume last stack was the usual amount of time
-        var samples = zip(syms, timeDiffs).map { (stackSyms, timeDiff) -> Sample in
+        var samples = zip(stacks, timeDiffs).map { (stack, timeDiff) -> Sample in
+            let stackSyms: [(String?, String, UInt64?)] = stack.stack.map { address in
+              guard let sym = syms[address] else {
+                return ("<unknown>", "<unknown>", nil)
+              }
+              if sym.2 {
+                return (sym.0, sym.1, address)
+              }
+              return (sym.0, sym.1, nil)
+            }
             return Sample(time: timeDiff, stack: stackSyms)
         }
         if unattributedTime > 0 {

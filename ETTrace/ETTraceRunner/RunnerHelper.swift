@@ -89,12 +89,15 @@ class RunnerHelper {
         
         symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
         let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        
+
+        let allStacks = responseData.threads.values.map { $0.stacks }.flatMap { $0 }
+        let syms = symbolicator.symbolicate(allStacks, responseData.libraryInfo.loadedLibraries)
+
         var allThreads:[Flamegraph] = []
         var mainThreadFlamegraph: Flamegraph!
         var mainThreadData: Data!
         for (threadId, thread) in responseData.threads {
-            let flamegraph = createFlamegraphForThread(thread, responseData)
+            let flamegraph = createFlamegraphForThread(thread, responseData, syms)
             allThreads.append(flamegraph)
             
             let outJsonData = JSONWrapper.toData(flamegraph)!
@@ -121,9 +124,8 @@ class RunnerHelper {
         print("Results saved to \(outputUrl)")
     }
     
-    private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel) -> Flamegraph {
+    private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel, _ syms: SymbolicationResult) -> Flamegraph {
         let stacks = thread.stacks
-        let syms = symbolicator.symbolicate(stacks, responseData.libraryInfo.loadedLibraries)
         let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: stacks, syms: syms, writeFolded: verbose)
         let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
         
