@@ -8,10 +8,10 @@
 import Foundation
 
 public class Sample {
-    public let stack: [Any]
+    public let stack: [(String?, String, UInt64?)]
     public var time: Double
     
-    public init(time: Double, stack: [Any]) {
+    public init(time: Double, stack: [(String?, String, UInt64?)]) {
         self.time = time
         self.stack = stack
     }
@@ -19,9 +19,6 @@ public class Sample {
     public var description: String {
         let timeStr = String(format: "%.15f", self.time).replacingOccurrences(of: "0*$", with: "", options: .regularExpression)
         let stackStr = stack.map { s in
-            if let array = s as? Array<Any> {
-                return "\(array[0])"
-            }
             return "\(s)"
         }.joined(separator: ";")
         return "\(stackStr) \(timeStr)"
