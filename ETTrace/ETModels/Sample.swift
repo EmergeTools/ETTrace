@@ -19,7 +19,7 @@ public class Sample {
     public var description: String {
         let timeStr = String(format: "%.15f", self.time).replacingOccurrences(of: "0*$", with: "", options: .regularExpression)
         let stackStr = stack.map { s in
-            return "\(s)"
+            return "\(s.1)"
         }.joined(separator: ";")
         return "\(stackStr) \(timeStr)"
     }
