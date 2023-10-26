@@ -46,8 +46,14 @@
         @"device": flamegraph.device,
     }];
 
-    ThreadNode *thread = flamegraph.threadNodes.firstObject;
-    [result setObject:[self flameNodeToDictionary:thread.nodes] forKey:@"nodes"];
+    NSMutableArray *threads = [NSMutableArray array];
+    for (ThreadNode *node in flamegraph.threadNodes) {
+      [threads addObject:@{
+        @"name": node.threadName,
+        @"nodes": [self flameNodeToDictionary:node.nodes]
+      }];
+    }
+    [result setObject:threads forKey:@"threads"];
 
     return result;
 }

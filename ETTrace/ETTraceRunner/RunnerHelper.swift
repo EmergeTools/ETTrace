@@ -112,7 +112,20 @@ class RunnerHelper {
         guard mainThreadFlamegraph != nil else {
             fatalError("No main thread flamegraphs generated")
         }
-        
+
+    let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
+        partialResult[library.path] = library.loadAddress
+    }
+
+    let allFlamegraph = Flamegraph(osBuild: responseData.osBuild,
+                      device: responseData.device,
+                      isSimulator: responseData.isSimulator,
+                      libraries: libraries,
+                      events: [],
+                      threadNodes: allThreads.map { $0.threadNodes.first! })
+    let outJsonData = JSONWrapper.toData(allFlamegraph)!
+    try! saveFlamegraph(outJsonData, outputUrl)
+
         // Serve Main Thread
         try startLocalServer(mainThreadData)
         
