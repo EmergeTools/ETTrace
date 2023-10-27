@@ -21,5 +21,16 @@ void EMGBeginCollectingLibraries(void);
 }
 #endif
 
+@interface EMGTracer : NSObject
+
++ (void)setupStackRecording:(BOOL)recordAllThreads;
++ (void)stopRecording:(void (^)(NSDictionary *))stopped;
+// Must be called on the main thread, before setupStackRecording is called
++ (void)setup;
++ (NSDictionary *)getResults;
++ (BOOL)isRecording;
+
+@end
+
 
 #endif /* EMGWriteLibraries_h */

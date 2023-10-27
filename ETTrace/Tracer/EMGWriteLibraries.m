@@ -14,7 +14,7 @@
 #import <pthread.h>
 #import <QuartzCore/QuartzCore.h>
 
-#import "EMGWriteLibraries.h"
+#import "Tracer.h"
 
 static NSRecursiveLock *sLock;
 static NSMutableArray *sLoadedLibraries;
