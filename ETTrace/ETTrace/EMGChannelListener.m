@@ -65,10 +65,10 @@
         if (runAtStartup) {
             [EMGPerfAnalysis setupRunAtStartup:recordAllThreads];
         } else {
-            [EMGPerfAnalysis setupStackRecording:recordAllThreads];
+            [EMGPerfAnalysis startRecording:recordAllThreads];
         }
     } else if (type == PTFrameTypeStop) {
-        [EMGPerfAnalysis stopRecordingThread];
+        [EMGPerfAnalysis stopRecording];
     } else if (type == PTFrameTypeRequestResults) {
         [self sendReportData];
     }

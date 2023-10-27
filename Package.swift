@@ -12,6 +12,7 @@ let package = Package(
             type: .dynamic,
             targets: ["ETTrace"]
         ),
+        .library(name: "Tracer", targets: ["Tracer"]),
         .executable(
             name: "ETTraceRunner",
             targets: ["ETTraceRunner"]
@@ -26,12 +27,20 @@ let package = Package(
         .target(
             name: "ETTrace",
             dependencies: [
-                "Unwinding",
+                "Tracer",
                 "CommunicationFrame",
                 .product(name: "Peertalk", package: "peertalk")
             ],
             path: "ETTrace/ETTrace",
             publicHeadersPath: "Public"
+        ),
+        .target(
+          name: "Tracer",
+          dependencies: [
+              "Unwinding",
+          ],
+          path: "ETTrace/Tracer",
+          publicHeadersPath: "Public"
         ),
         .target(
             name: "CommunicationFrame",
