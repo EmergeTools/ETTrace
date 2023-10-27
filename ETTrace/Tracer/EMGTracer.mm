@@ -250,7 +250,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 
         NSThread *thread = [NSThread currentThread];
         while (!thread.cancelled) {
-            [self recordStackForAllThreads];
+            // [self recordStackForAllThreads];
             usleep(4500);
         }
     }];
