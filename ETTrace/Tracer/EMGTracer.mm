@@ -137,7 +137,7 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
 }
 
-+ (Thread *) createThread:(thread_t) threadId
+Thread* createThread(thread_t threadId)
 {
     Thread *thread = new Thread;
 
@@ -174,6 +174,16 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
         thread_count = 1;
     }
 
+    std::map<thread_t, Stack *> stackMap;
+    for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
+        if (threads[i] == sETTraceThread) {
+            continue;
+        }
+
+        Stack *stack = new Stack;
+        stackMap.insert(std::pair<unsigned int, Stack *>(threads[i], stack));
+    }
+
     // Suspend all threads but ETTrace's
     for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
         if (threads[i] != sETTraceThread) {
@@ -187,36 +197,41 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
             continue;
         }
 
-        Stack stack;
-        stack.time = time;
-        FIRCLSWriteThreadStack(threads[i], stack.frames, kMaxFramesPerStack, &(stack.frameCount));
-
-        std::vector<Stack> *threadStack;
-        sThreadsLock.lock();
-        if (sThreadsMap->find(threads[i]) == sThreadsMap->end()) {
-            Thread *thread = [self createThread:threads[i]];
-            // Add to hash map
-            sThreadsMap->insert(std::pair<unsigned int, Thread *>(threads[i], thread));
-
-            threadStack = thread->stacks;
-        } else {
-            threadStack = sThreadsMap->at(threads[i])->stacks;
-        }
-
-        try {
-            threadStack->emplace_back(stack);
-        } catch (const std::length_error& le) {
-            fflush(stdout);
-            fflush(stderr);
-            throw le;
-        }
-        sThreadsLock.unlock();
+        Stack *stack = stackMap.at(threads[i]);
+        stack->time = time;
+        FIRCLSWriteThreadStack(threads[i], stack->frames, kMaxFramesPerStack, &(stack->frameCount));
     }
 
     for (mach_msg_type_number_t i = 0; i < thread_count; i++) {
         if (threads[i] != sETTraceThread)
             thread_resume(threads[i]);
     }
+
+    std::vector<Stack> *threadStack;
+    std::map<thread_t, Stack *>::iterator it;
+    sThreadsLock.lock();
+    for (it = stackMap.begin(); it != stackMap.end(); it++) {
+        thread_t t_id = it->first;
+        if (sThreadsMap->find(t_id) == sThreadsMap->end()) {
+            Thread *thread = createThread(t_id);
+            // Add to hash map
+            sThreadsMap->insert(std::pair<thread_t, Thread *>(t_id, thread));
+
+            threadStack = thread->stacks;
+        } else {
+            threadStack = sThreadsMap->at(t_id)->stacks;
+        }
+        Stack *stack = it->second;
+        try {
+            threadStack->emplace_back(*stack);
+        } catch (const std::length_error& le) {
+            fflush(stdout);
+            fflush(stderr);
+            throw le;
+        }
+        delete stack;
+    }
+    sThreadsLock.unlock();
 }
 
 + (void)setup {
