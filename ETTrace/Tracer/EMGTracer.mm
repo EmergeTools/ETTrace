@@ -16,13 +16,7 @@
 #import <sys/utsname.h>
 #import <QuartzCore/QuartzCore.h>
 
-static const int kMaxFramesPerStack = 512;
 static NSThread *sStackRecordingThread = nil;
-typedef struct {
-    CFTimeInterval time;
-    uint64_t frameCount;
-    uintptr_t frames[kMaxFramesPerStack];
-} Stack;
 
 typedef struct {
     std::vector<Stack> *stacks;
@@ -50,11 +44,13 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     [sStackRecordingThread cancel];
     sStackRecordingThread = nil;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        stopped([EMGTracer getResults]);
+      stopped([EMGTracer getResults:^(std::vector<Stack> *) {
+        // Do nothing here
+      }]);
     });
 }
 
-+ (NSDictionary *)getResults {
++ (NSDictionary *)getResults:(void (^)(std::vector<Stack> *))handler {
     sThreadsLock.lock();
     NSMutableDictionary <NSString *, NSDictionary<NSString *, id> *> *threads = [NSMutableDictionary dictionary];
 
@@ -62,10 +58,12 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     for (it = sThreadsMap->begin(); it != sThreadsMap->end(); it++) {
         Thread thread = *it->second;
         NSString *threadId = [[NSNumber numberWithUnsignedInt:it->first] stringValue];
-        threads[threadId] = @{
-            @"name": [NSString stringWithFormat:@"%s", thread.name],
-            @"stacks": [self arrayFromStacks: *thread.stacks]
-        };
+      NSLog(@"Array from stacks %s id %@", thread.name, threadId);
+      handler(thread.stacks);
+//        threads[threadId] = @{
+//            @"name": [NSString stringWithFormat:@"%s", thread.name],
+//            @"stacks": [self arrayFromStacks: thread.stacks]
+//        };
     }
     sThreadsLock.unlock();
 
@@ -81,9 +79,10 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
     };
 }
 
-+ (NSArray <NSDictionary <NSString *, id> *> *) arrayFromStacks: (std::vector<Stack>)stacks {
++ (NSArray <NSDictionary <NSString *, id> *> *) arrayFromStacks: (std::vector<Stack> *)stacks {
     NSMutableArray <NSDictionary <NSString *, id> *> *threadStacks = [NSMutableArray array];
-    for (const auto &cStack : stacks) {
+  NSLog(@"Array from %zu stacks", stacks->size());
+    for (const auto &cStack : *stacks) {
         NSMutableArray <NSNumber *> *stack = [NSMutableArray array];
         // Add the addrs in reverse order so that they start with the lowest frame, e.g. `start`
         for (int j = (int)cStack.frameCount - 1; j >= 0; j--) {
