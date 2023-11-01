@@ -126,17 +126,13 @@ class RunnerHelper {
     
     private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel, _ syms: SymbolicationResult) -> Flamegraph {
         let stacks = thread.stacks
-        let flamegraphNodes = FlamegraphGenerator.generateFlamegraphs(stacks: stacks, syms: syms, writeFolded: verbose)
+      let (flamegraphNodes, eventTimes) = FlamegraphGenerator.generateFlamegraphs(events: responseData.events, stacks: stacks, syms: syms, writeFolded: verbose)
         let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
         
-        let startTime = stacks.sorted { s1, s2 in
-            s1.time < s2.time
-        }.first!.time
-        
-        let events = responseData.events.map { event in
+        let events = zip(responseData.events, eventTimes).map { (event, t) in
             return FlamegraphEvent(name: event.span,
                                    type: event.type.rawValue,
-                                   time: event.time-startTime)
+                                   time: t)
         }
 
         let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
