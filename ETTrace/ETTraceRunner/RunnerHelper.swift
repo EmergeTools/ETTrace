@@ -12,6 +12,7 @@ import CommunicationFrame
 import Swifter
 import JSONWrapper
 import ETModels
+import Symbolicator
 
 class RunnerHelper {
     let dsyms: String?
@@ -21,8 +22,7 @@ class RunnerHelper {
     let multiThread: Bool
 
     var server: HttpServer? = nil
-    var symbolicator: Symbolicator!
-    
+
     init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ multiThread: Bool) {
         self.dsyms = dsyms
         self.launch = launch
@@ -86,23 +86,31 @@ class RunnerHelper {
         }
         var osVersion = responseData.osBuild
         osVersion.removeAll(where: { !$0.isLetter && !$0.isNumber })
-        
-        symbolicator = Symbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
-        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
-        let allStacks = responseData.threads.values.map { $0.stacks }.flatMap { $0 }
-        let syms = symbolicator.symbolicate(allStacks, responseData.libraryInfo.loadedLibraries)
+        let threadIds = responseData.threads.keys
+        let threads = threadIds.map { responseData.threads[$0]!.stacks }
+        let symbolicator = StackSymbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
+        let flamegraphs = FlamegraphGenerator.generate(
+          events: responseData.events,
+          threads: threads,
+          loadedLibraries: responseData.libraryInfo.loadedLibraries,
+          symbolicator: symbolicator)
+        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
         var allThreads:[Flamegraph] = []
         var mainThreadFlamegraph: Flamegraph!
         var mainThreadData: Data!
-        for (threadId, thread) in responseData.threads {
-            let flamegraph = createFlamegraphForThread(thread, responseData, syms)
+        for (threadId, symbolicationResult) in zip(threadIds, flamegraphs) {
+            let thread = responseData.threads[threadId]!
+            let flamegraph = createFlamegraphForThread(symbolicationResult.0, symbolicationResult.1, thread, responseData)
             allThreads.append(flamegraph)
             
             let outJsonData = JSONWrapper.toData(flamegraph)!
             
             if thread.name == "Main Thread" {
+                if verbose {
+                    try symbolicationResult.2.write(toFile: "output.folded", atomically: true, encoding: .utf8)
+                }
                 mainThreadFlamegraph = flamegraph
                 mainThreadData = outJsonData
             }
@@ -124,9 +132,7 @@ class RunnerHelper {
         print("Results saved to \(outputUrl)")
     }
     
-    private func createFlamegraphForThread(_ thread: Thread, _ responseData: ResponseModel, _ syms: SymbolicationResult) -> Flamegraph {
-        let stacks = thread.stacks
-      let (flamegraphNodes, eventTimes) = FlamegraphGenerator.generateFlamegraphs(events: responseData.events, stacks: stacks, syms: syms, writeFolded: verbose)
+  private func createFlamegraphForThread(_ flamegraphNodes: FlameNode, _ eventTimes: [Double], _ thread: Thread, _ responseData: ResponseModel) -> Flamegraph {
         let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
         
         let events = zip(responseData.events, eventTimes).map { (event, t) in

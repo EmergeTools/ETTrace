@@ -8,12 +8,17 @@
 import Foundation
 import ETModels
 
-class FlamegraphGenerator {
-    static func generateFlamegraphs(
+public enum FlamegraphGenerator {
+
+  public static func generate(events: [Event], threads: [[Stack]], loadedLibraries: [LoadedLibrary], symbolicator: StackSymbolicator) -> [(FlameNode, [Double], String)] {
+    let syms = symbolicator.symbolicate(threads.flatMap { $0 }, loadedLibraries)
+    return threads.map { generateFlamegraphs(events: events, stacks: $0, syms: syms) }
+  }
+
+    private static func generateFlamegraphs(
       events: [Event],
       stacks: [Stack],
-      syms: SymbolicationResult,
-      writeFolded: Bool) -> (FlameNode, [Double])
+      syms: SymbolicationResult) -> (FlameNode, [Double], String)
   {
         var eventTimes = [Double](repeating: 0, count: events.count)
         let times = stacks.map { $0.time }
@@ -59,11 +64,9 @@ class FlamegraphGenerator {
             let stack = (nil as String?, "<unattributed>", nil as UInt64?)
             samples.append(Sample(time: unattributedTime, stack: [stack]))
         }
-        if writeFolded {
-            try! samples.map { $0.description }.joined(separator: "\n").write(toFile: "output.folded", atomically: true, encoding: .utf8)
-        }
+        let folded = samples.map { $0.description }.joined(separator: "\n")
         let node = FlameNode.fromSamples(samples)
-        return (node, eventTimes)
+        return (node, eventTimes, folded)
     }
     
     private static func partitions(_ array: [Double], size: Int, step: Int? = nil) -> [(Double, Double)] {

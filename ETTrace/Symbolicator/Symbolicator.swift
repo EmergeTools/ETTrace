@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ETModels
 
 struct Address {
     let originalAddress: UInt64
@@ -15,7 +16,7 @@ struct Address {
 
 typealias SymbolicationResult = [UInt64: (String, String, Bool)]
 
-class Symbolicator {
+public class StackSymbolicator {
     var formatSymbolCache: [String: String] = [:]
     
     let isSimulator: Bool
@@ -24,7 +25,7 @@ class Symbolicator {
     let arch: String
     let verbose: Bool
     
-    init(isSimulator: Bool, dSymsDir: String?, osVersion: String, arch: String, verbose: Bool) {
+    public init(isSimulator: Bool, dSymsDir: String?, osVersion: String, arch: String, verbose: Bool) {
         self.isSimulator = isSimulator
         self.dSymsDir = dSymsDir
         self.osVersion = osVersion

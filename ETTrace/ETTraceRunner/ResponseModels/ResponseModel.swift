@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Symbolicator
 
 struct ResponseModel: Decodable {
     let osBuild: String
@@ -23,29 +24,7 @@ struct LibraryInfo: Decodable {
     let loadedLibraries: [LoadedLibrary]
 }
 
-struct LoadedLibrary: Decodable, Equatable, Hashable {
-    let path: String
-    let loadAddress: UInt64
-    let uuid: String
-}
-
-struct Event: Decodable {
-    let span: String
-    let type: EventType
-    let time: Double
-}
-
-enum EventType: String, Decodable {
-    case start
-    case stop
-}
-
 struct Thread: Decodable {
     let name: String
     let stacks: [Stack]
-}
-
-struct Stack: Decodable {
-    let stack: [UInt64]
-    let time: Double
 }
