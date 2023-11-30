@@ -50,9 +50,24 @@ public class StackSymbolicator {
         var libToAddrToSym: [String: [UInt64: String]] = [:]
         let queue = DispatchQueue(label: "com.emerge.symbolication", qos: .userInitiated, attributes: .concurrent)
         let group = DispatchGroup()
-        for (lib, addrs) in libToAddrs {
-            let cleanedPath = cleanedUpPath(lib.path)
-            libToCleanedPath[lib.path] = (cleanedPath, URL(string: cleanedPath)?.lastPathComponent ?? "")
+
+        for (lib, _) in libToAddrs {
+          let cleanedPath = cleanedUpPath(lib.path)
+          libToCleanedPath[lib.path] = (cleanedPath, URL(string: cleanedPath)?.lastPathComponent ?? "")
+        }
+        let systemLibs = libToAddrs.filter { key, _ in isSystemLib(key.path) }
+        let userLibs = libToAddrs.filter { key, _ in !isSystemLib(key.path) }
+
+        group.enter()
+        try? apiAddrToSymbol(systemLibs.mapKeys { $0.path }) { result in
+          stateLock.lock()
+          for (k, v) in result {
+            libToAddrToSym[k] = v
+          }
+          stateLock.unlock()
+          group.leave()
+        }
+        for (lib, addrs) in userLibs {
             group.enter()
             queue.async {
                 if let dSym = self.dsymForLib(lib) {
@@ -96,9 +111,13 @@ public class StackSymbolicator {
         }
         return result
     }
-    
+
+    private func isSystemLib(_ path: String) -> Bool {
+      path.contains(".app/") && !path.contains("/Xcode.app/")
+    }
+
     private func cleanedUpPath(_ path: String) -> String {
-        if path.contains(".app/") && !path.contains("/Xcode.app/") {
+        if isSystemLib(path) {
             return path.split(separator: "/").drop(while: { $0.hasSuffix(".app") }).joined(separator: "/")
         } else if path.contains("/RuntimeRoot/") {
             if let index = path.range(of: "/RuntimeRoot/")?.upperBound {
@@ -144,6 +163,41 @@ public class StackSymbolicator {
 
         return addrs
     }
+
+  private func apiAddrToSymbol(_ systemLibToAddrs: [String : Set<UInt64>], completion: @escaping ([String: [UInt64: String]]) -> Void) throws {
+    guard let osVersion else {
+      completion([:])
+      return
+    }
+
+    let addressGroups = systemLibToAddrs.map { (path, addrs) in
+        return ["library": path, "addresses": Array(addrs)]
+    }
+    let dataFile = FileManager.default.temporaryDirectory.appendingPathComponent("out.json").path
+    let data: [String: Any] = ["token": "15046010248070008", "addressGroups": addressGroups, "osProductVersion": osVersion, "osBuildVersion": osBuild]
+
+    let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
+    try jsonData.write(to: URL(fileURLWithPath: dataFile))
+
+    let endpoint = "https://api.emergetools.com/symbolication"
+    var request = URLRequest(url: URL(string: endpoint)!)
+    request.httpMethod = "POST"
+    request.httpBody = try? Data(contentsOf: URL(fileURLWithPath: dataFile))
+
+    URLSession.shared.dataTask(with: request) { responseData, _, _ in
+      guard let responseData else {
+        completion([:])
+        return
+      }
+
+      let jsonObject = try? JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any]
+      let libraryToAddressToSymbol = jsonObject?["libraryToAddressToSymbol"] as? [String: [String: String]]
+      let result = libraryToAddressToSymbol?.mapValues({ addressToSymbol in
+        return addressToSymbol.mapKeys { UInt64($0)! }
+      })
+      completion(result ?? [:])
+    }.resume()
+  }
 
     private static func addrToSymForBinary(_ binary: String, _ addrs: Set<UInt64>) -> [UInt64: String] {
         let addrsArray = Array(addrs)
@@ -236,4 +290,14 @@ public class StackSymbolicator {
           }
         }
     }
+}
+
+extension Dictionary {
+  func mapKeys<N>(_ mapper: (Key) -> N) -> [N: Value] {
+    var result = [N: Value]()
+    forEach { key, value in
+      result[mapper(key)] = value
+    }
+    return result
+  }
 }
