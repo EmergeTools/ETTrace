@@ -21,13 +21,15 @@ public class StackSymbolicator {
     
     let isSimulator: Bool
     let dSymsDir: String?
-    let osVersion: String
+    let osBuild: String
+    let osVersion: String?
     let arch: String
     let verbose: Bool
     
-    public init(isSimulator: Bool, dSymsDir: String?, osVersion: String, arch: String, verbose: Bool) {
+    public init(isSimulator: Bool, dSymsDir: String?, osBuild: String, osVersion: String?, arch: String, verbose: Bool) {
         self.isSimulator = isSimulator
         self.dSymsDir = dSymsDir
+        self.osBuild = osBuild
         self.osVersion = osVersion
         self.arch = arch
         self.verbose = verbose
@@ -225,7 +227,7 @@ public class StackSymbolicator {
             let searchFolder = "\(FileManager.default.homeDirectoryForCurrentUser.path)/Library/Developer/Xcode/iOS DeviceSupport"
             let directories = (try? FileManager.default.contentsOfDirectory(atPath: searchFolder)) ?? []
             
-            for folder in directories where folder.contains(osVersion) && folder.hasSuffix(arch){
+            for folder in directories where folder.contains(osBuild) && folder.hasSuffix(arch){
                 return "\(searchFolder)/\(folder)/Symbols\(libPath)"
             }
             return nil

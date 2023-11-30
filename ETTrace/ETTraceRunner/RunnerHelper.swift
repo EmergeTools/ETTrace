@@ -84,12 +84,12 @@ class RunnerHelper {
         } else {
             arch = ""
         }
-        var osVersion = responseData.osBuild
-        osVersion.removeAll(where: { !$0.isLetter && !$0.isNumber })
+        var osBuild = responseData.osBuild
+        osBuild.removeAll(where: { !$0.isLetter && !$0.isNumber })
 
         let threadIds = responseData.threads.keys
         let threads = threadIds.map { responseData.threads[$0]!.stacks }
-        let symbolicator = StackSymbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osVersion: osVersion, arch: arch, verbose: verbose)
+        let symbolicator = StackSymbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osBuild: osBuild, osVersion: responseData.osVersion, arch: arch, verbose: verbose)
         let flamegraphs = FlamegraphGenerator.generate(
           events: responseData.events,
           threads: threads,

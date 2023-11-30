@@ -10,6 +10,7 @@ import Symbolicator
 
 struct ResponseModel: Decodable {
     let osBuild: String
+    let osVersion: String?
     let isSimulator: Bool
     let libraryInfo: LibraryInfo
     let cpuType: String
