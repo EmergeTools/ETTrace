@@ -71,10 +71,12 @@ void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesC
 
     const NXArchInfo *archInfo = NXGetLocalArchInfo();
     NSString *cpuType = [NSString stringWithUTF8String:archInfo->description];
+    NSOperatingSystemVersion version = [NSProcessInfo processInfo].operatingSystemVersion;
     return @{
         @"libraryInfo": EMGLibrariesData(),
         @"isSimulator": @([self isRunningOnSimulator]),
         @"osBuild": [self osBuild],
+        @"osVersion": [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion],
         @"cpuType": cpuType,
         @"device": [self deviceName],
         @"threads": threads,
