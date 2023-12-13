@@ -75,49 +75,18 @@ class RunnerHelper {
         
         print("Stopped recording, symbolicating...")
 
-        let responseData = try JSONDecoder().decode(ResponseModel.self, from: receivedData)
-
-        let isSimulator = responseData.isSimulator
-        var arch = responseData.cpuType.lowercased()
-        if arch == "arm64e" {
-            arch = " arm64e"
-        } else {
-            arch = ""
-        }
-        var osBuild = responseData.osBuild
-        osBuild.removeAll(where: { !$0.isLetter && !$0.isNumber })
-
-        let threadIds = responseData.threads.keys
-        let threads = threadIds.map { responseData.threads[$0]!.stacks }
-        let symbolicator = StackSymbolicator(isSimulator: isSimulator, dSymsDir: dsyms, osBuild: osBuild, osVersion: responseData.osVersion, arch: arch, verbose: verbose)
-        let flamegraphs = FlamegraphGenerator.generate(
-          events: responseData.events,
-          threads: threads,
-          loadedLibraries: responseData.libraryInfo.loadedLibraries,
-          symbolicator: symbolicator)
+        let flamegraphs = try FlamegraphGenerator.generate(data: receivedData, dSymsDir: dsyms, verbose: verbose)
         let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
-        var allThreads:[Flamegraph] = []
-        var mainThreadFlamegraph: Flamegraph!
-        var mainThreadData: Data!
-        for (threadId, symbolicationResult) in zip(threadIds, flamegraphs) {
-            let thread = responseData.threads[threadId]!
-            let flamegraph = createFlamegraphForThread(symbolicationResult.0, symbolicationResult.1, thread, responseData)
-            allThreads.append(flamegraph)
-            
-            let outJsonData = JSONWrapper.toData(flamegraph)!
-            
-            if thread.name == "Main Thread" {
-                if verbose {
-                    try symbolicationResult.2.write(toFile: "output.folded", atomically: true, encoding: .utf8)
-                }
-                mainThreadFlamegraph = flamegraph
-                mainThreadData = outJsonData
+        var mainThreadData: Data?
+        for (name, threadId, data) in flamegraphs {
+            if name == "Main Thread" {
+                mainThreadData = data
             }
-            try saveFlamegraph(outJsonData, outputUrl, threadId)
+            try saveFlamegraph(data, outputUrl, threadId)
         }
         
-        guard mainThreadFlamegraph != nil else {
+        guard let mainThreadData else {
             fatalError("No main thread flamegraphs generated")
         }
         
@@ -130,27 +99,6 @@ class RunnerHelper {
         // Wait 4 seconds for results to be accessed from server, then exit
         sleep(4)
         print("Results saved to \(outputUrl)")
-    }
-    
-  private func createFlamegraphForThread(_ flamegraphNodes: FlameNode, _ eventTimes: [Double], _ thread: Thread, _ responseData: ResponseModel) -> Flamegraph {
-        let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
-        
-        let events = zip(responseData.events, eventTimes).map { (event, t) in
-            return FlamegraphEvent(name: event.span,
-                                   type: event.type.rawValue,
-                                   time: t)
-        }
-
-        let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
-            partialResult[library.path] = library.loadAddress
-        }
-        
-        return Flamegraph(osBuild: responseData.osBuild,
-                          device: responseData.device,
-                          isSimulator: responseData.isSimulator,
-                          libraries: libraries,
-                          events: events,
-                          threadNodes: [threadNode])
     }
     
     func startLocalServer(_ data: Data) throws {

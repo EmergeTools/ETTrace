@@ -7,18 +7,67 @@
 
 import Foundation
 import ETModels
+import JSONWrapper
 
 public enum FlamegraphGenerator {
 
-  public static func generate(events: [Event], threads: [[Stack]], loadedLibraries: [LoadedLibrary], symbolicator: StackSymbolicator) -> [(FlameNode, [Double], String)] {
-    let syms = symbolicator.symbolicate(threads.flatMap { $0 }, loadedLibraries)
-    return threads.map { generateFlamegraphs(events: events, stacks: $0, syms: syms) }
+  public static func generate(data: Data, dSymsDir: String?, verbose: Bool) throws -> [(name: String, threadId: String, flamegraph: Data)] {
+    let responseData = try JSONDecoder().decode(ResponseModel.self, from: data)
+    let isSimulator = responseData.isSimulator
+    var arch = responseData.cpuType.lowercased()
+    if arch == "arm64e" {
+        arch = " arm64e"
+    } else {
+        arch = ""
+    }
+    var osBuild = responseData.osBuild
+    osBuild.removeAll(where: { !$0.isLetter && !$0.isNumber })
+
+    let threadIds = responseData.threads.keys
+    let threads = threadIds.map { responseData.threads[$0]!.stacks }
+    let symbolicator = StackSymbolicator(isSimulator: isSimulator, dSymsDir: dSymsDir, osBuild: osBuild, osVersion: responseData.osVersion, arch: arch, verbose: verbose)
+
+    let syms = symbolicator.symbolicate(threads.flatMap { $0 }, responseData.libraryInfo.loadedLibraries)
+    let flamegraphs = threads.map { generateFlameNode(events: responseData.events, stacks: $0, syms: syms) }
+    var result = [(String, String, Data)]()
+    for (threadId, symbolicationResult) in zip(threadIds, flamegraphs) {
+      let thread = responseData.threads[threadId]!
+      let flamegraph = createFlamegraphForThread(symbolicationResult.0, symbolicationResult.1, thread, responseData)
+      if verbose && thread.name == "Main Thread" {
+          try symbolicationResult.2.write(toFile: "output.folded", atomically: true, encoding: .utf8)
+      }
+
+      let outJsonData = JSONWrapper.toData(flamegraph)!
+      result.append((thread.name, threadId, outJsonData))
+    }
+    return result
   }
 
-    private static func generateFlamegraphs(
+  private static func createFlamegraphForThread(_ flamegraphNodes: FlameNode, _ eventTimes: [Double], _ thread: Thread, _ responseData: ResponseModel) -> Flamegraph {
+        let threadNode = ThreadNode(nodes: flamegraphNodes, threadName: thread.name)
+
+        let events = zip(responseData.events, eventTimes).map { (event, t) in
+            return FlamegraphEvent(name: event.span,
+                                   type: event.type.rawValue,
+                                   time: t)
+        }
+
+        let libraries = responseData.libraryInfo.loadedLibraries.reduce(into: [String:UInt64]()) { partialResult, library in
+            partialResult[library.path] = library.loadAddress
+        }
+
+        return Flamegraph(osBuild: responseData.osBuild,
+                          device: responseData.device,
+                          isSimulator: responseData.isSimulator,
+                          libraries: libraries,
+                          events: events,
+                          threadNodes: [threadNode])
+    }
+
+    private static func generateFlameNode(
       events: [Event],
       stacks: [Stack],
-      syms: SymbolicationResult) -> (FlameNode, [Double], String)
+      syms: SymbolicationResult) -> (root: FlameNode, eventTimes: [Double], folded: String)
   {
         var eventTimes = [Double](repeating: 0, count: events.count)
         let times = stacks.map { $0.time }
