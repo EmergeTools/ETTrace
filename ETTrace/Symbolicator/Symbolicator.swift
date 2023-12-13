@@ -16,7 +16,7 @@ struct Address {
 
 typealias SymbolicationResult = [UInt64: (String, String, Bool)]
 
-public class StackSymbolicator {
+class StackSymbolicator {
     var formatSymbolCache: [String: String] = [:]
     
     let isSimulator: Bool
@@ -26,7 +26,7 @@ public class StackSymbolicator {
     let arch: String
     let verbose: Bool
     
-    public init(isSimulator: Bool, dSymsDir: String?, osBuild: String, osVersion: String?, arch: String, verbose: Bool) {
+    init(isSimulator: Bool, dSymsDir: String?, osBuild: String, osVersion: String?, arch: String, verbose: Bool) {
         self.isSimulator = isSimulator
         self.dSymsDir = dSymsDir
         self.osBuild = osBuild
