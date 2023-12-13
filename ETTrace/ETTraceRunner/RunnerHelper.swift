@@ -97,13 +97,10 @@ class RunnerHelper {
           symbolicator: symbolicator)
         let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
-        var allThreads:[Flamegraph] = []
-        var mainThreadFlamegraph: Flamegraph!
-        var mainThreadData: Data!
+        var mainThreadData: Data?
         for (threadId, symbolicationResult) in zip(threadIds, flamegraphs) {
             let thread = responseData.threads[threadId]!
             let flamegraph = createFlamegraphForThread(symbolicationResult.0, symbolicationResult.1, thread, responseData)
-            allThreads.append(flamegraph)
             
             let outJsonData = JSONWrapper.toData(flamegraph)!
             
@@ -111,13 +108,12 @@ class RunnerHelper {
                 if verbose {
                     try symbolicationResult.2.write(toFile: "output.folded", atomically: true, encoding: .utf8)
                 }
-                mainThreadFlamegraph = flamegraph
                 mainThreadData = outJsonData
             }
             try saveFlamegraph(outJsonData, outputUrl, threadId)
         }
         
-        guard mainThreadFlamegraph != nil else {
+        guard let mainThreadData else {
             fatalError("No main thread flamegraphs generated")
         }
         
