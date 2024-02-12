@@ -7,11 +7,13 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Xcode select
+        run: sudo xcode-select -s '/Applications/Xcode_15.2.app/Contents/Developer'
       - name: Show destinations
         run: xcodebuild -scheme ETTrace -showdestinations
       - name: Build ETTrace for iOS Simulator
@@ -20,3 +22,11 @@ jobs:
         run: xcodebuild build -scheme ETTrace -sdk iphoneos -destination 'generic/platform=iOS' CLANG_CXX_LANGUAGE_STANDARD=c++17
       - name: Build ETTrace for macOS
         run: xcodebuild build -scheme ETTraceRunner -sdk macosx -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO
+      - name: Build ETTrace for tvOS
+        run: xcodebuild build -scheme ETTrace -sdk appletvos -destination 'generic/platform=tvOS' ONLY_ACTIVE_ARCH=NO
+      - name: Build ETTrace for tvOS Simulator
+        run: xcodebuild build -scheme ETTrace -sdk appletvsimulator -destination 'generic/platform=tvOS Simulator' ONLY_ACTIVE_ARCH=NO
+      - name: Build ETTrace for visionOS
+        run: xcodebuild build -scheme ETTrace -sdk xros -destination 'generic/platform=visionOS' ONLY_ACTIVE_ARCH=NO
+      - name: Build ETTrace for visionOS Simulator
+        run: xcodebuild build -scheme ETTrace -sdk xrsimulator -destination 'generic/platform=visionOS Simulator' ONLY_ACTIVE_ARCH=NO

@@ -7,11 +7,13 @@ on:
 
 jobs:
   release:
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Xcode select
+        run: sudo xcode-select -s '/Applications/Xcode_15.2.app/Contents/Developer'
       - name: Setup Signing Certificate
         uses: apple-actions/import-codesign-certs@v2
         with: 
