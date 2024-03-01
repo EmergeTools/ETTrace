@@ -24,7 +24,6 @@ func processWithOutput(_ executable: String, args: [String]) throws -> String {
   let task = Process()
   let pipe = Pipe()
 
-  task.standardOutput = pipe
   task.arguments = args
   task.executableURL = URL(fileURLWithPath: executable)
   task.standardInput = nil
@@ -35,7 +34,6 @@ func processWithOutput(_ executable: String, args: [String]) throws -> String {
 func safeShellWithOutput(_ command: String) throws -> String {
     let task = Process()
 
-    task.standardOutput = pipe
     task.arguments = ["--login", "-c", command]
     task.executableURL = URL(fileURLWithPath: "/bin/zsh")
     task.standardInput = nil
@@ -45,6 +43,7 @@ func safeShellWithOutput(_ command: String) throws -> String {
 
 private func runTask(_ task: Process) throws -> String {
   let pipe = Pipe()
+  task.standardOutput = pipe
   let group = DispatchGroup()
   group.enter()
   var result = String()
