@@ -153,11 +153,7 @@ public class StackSymbolicator {
         let strs = addrsArray.map { String($0 + addition, radix: 16) }
         try! strs.joined(separator: "\n").write(toFile: addrsFile, atomically: true, encoding: .utf8)
 
-        let arch = try? safeShellWithOutput("/usr/bin/file \"\(binary)\"").contains("arm64e") ? "arm64e" : "arm64"
-
-        try! strs.joined(separator: "\n").write(toFile: addrsFile, atomically: true, encoding: .utf8)
-
-        let symsStr = try? safeShellWithOutput("/usr/bin/atos -l \(String(addition, radix: 16)) -arch \(arch!) -o \"\(binary)\" -f \(addrsFile)")
+        let symsStr = try? processWithOutput("/usr/bin/atos", args: ["-l", String(addition, radix: 16), "-o", binary, "-f", addrsFile])
 
         let syms = symsStr!.split(separator: "\n").enumerated().map { (idx, sym) -> (UInt64, String?) in
             let trimmed = sym.trimmingCharacters(in: .whitespacesAndNewlines)
