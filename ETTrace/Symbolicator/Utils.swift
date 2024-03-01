@@ -22,7 +22,6 @@ func safeShell(_ command: String) throws {
 
 func processWithOutput(_ executable: String, args: [String]) throws -> String {
   let task = Process()
-  let pipe = Pipe()
 
   task.arguments = args
   task.executableURL = URL(fileURLWithPath: executable)
