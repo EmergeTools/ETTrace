@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  FlamegraphEvent.swift
 //  
 //
 //  Created by Itay Brenner on 28/6/23.
