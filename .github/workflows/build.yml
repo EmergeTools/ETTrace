@@ -21,6 +21,8 @@ jobs:
       - name: Build ETTrace for iOS
         run: xcodebuild build -scheme ETTrace -sdk iphoneos -destination 'generic/platform=iOS' CLANG_CXX_LANGUAGE_STANDARD=c++17
       - name: Build ETTrace for macOS
+        run: xcodebuild build -scheme ETTrace -sdk macosx -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO
+      - name: Build ETTraceRunner for macOS
         run: xcodebuild build -scheme ETTraceRunner -sdk macosx -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO
       - name: Build ETTrace for tvOS
         run: xcodebuild build -scheme ETTrace -sdk appletvos -destination 'generic/platform=tvOS' ONLY_ACTIVE_ARCH=NO
