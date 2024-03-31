@@ -43,7 +43,7 @@ let package = Package(
           path: "ETTrace/Tracer",
           publicHeadersPath: "Public"
         ),
-        .target(name: "Symbolicator", dependencies: ["ETModels"], path: "ETTrace/Symbolicator"),
+        .target(name: "Symbolicator", dependencies: ["ETModels", "JSONWrapper",], path: "ETTrace/Symbolicator"),
         .target(
             name: "CommunicationFrame",
             path: "ETTrace/CommunicationFrame",
@@ -63,8 +63,6 @@ let package = Package(
             name: "ETTraceRunner",
             dependencies: [
                 "CommunicationFrame",
-                "JSONWrapper",
-                "ETModels",
                 "Symbolicator",
                 .product(name: "Peertalk", package: "peertalk"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
