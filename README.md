@@ -9,11 +9,26 @@ Locally measure performance of your app, without Xcode or Instruments. Read all 
 
 ## Building and Installing
 
-You can add ETTrace as a Swift package, select the "ETTrace" library as the product to add, not "ETTraceRunner".
+ETTrace has two components, the "runner" which is a command line tool, and a framework that your app links to.
+
+First, install the runner with `brew install emergetools/homebrew-tap/ettrace`. Then install the framework using one of the following methods:
+
+### Swift Package Manager
+
+Add this repo as a swift package (either in Xcode or your Package.swift file) using the URL `https://github.com/EmergeTools/ETTrace`. Select "ETTrace" as the package product to add to your app.
+> [!WARNING]
+> Make sure to add the ETTrace package product to your app as shown in the screenshot below.
+
+![SPM Installation](https://raw.githubusercontent.com/EmergeTools/ETTrace/master/images/spm_installation.png)
+
+### Manual
 
 Alternatively, run `./build.sh` to build the xcframework `ETTrace.xcframework`. Link the xcframework to your app.
 
-Install the runner with `brew install emergetools/homebrew-tap/ettrace`
+> [!NOTE]
+> Linking the framework to your app is the only installation step, there are no code changes you need to make.
+
+If everything is set up correctly "Starting ETTrace" will be printed to the console when you launch the app.
 
 ## Testimonials
 
