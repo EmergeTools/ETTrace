@@ -29,6 +29,7 @@ void EMGBeginCollectingLibraries(void);
 + (void)setup;
 + (NSDictionary *)getResults;
 + (BOOL)isRecording;
++ (void)printThreads;
 
 @end
 

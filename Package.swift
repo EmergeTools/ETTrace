@@ -39,9 +39,17 @@ let package = Package(
           name: "Tracer",
           dependencies: [
               "Unwinding",
+              "TracerSwift"
           ],
           path: "ETTrace/Tracer",
           publicHeadersPath: "Public"
+        ),
+        .target(
+          name: "TracerSwift",
+          dependencies: [
+              "Unwinding",
+          ],
+          path: "ETTrace/TracerSwift"
         ),
         .target(name: "Symbolicator", dependencies: ["ETModels"], path: "ETTrace/Symbolicator"),
         .target(
