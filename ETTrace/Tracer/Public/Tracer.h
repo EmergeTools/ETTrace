@@ -29,8 +29,11 @@ void EMGBeginCollectingLibraries(void);
 + (void)setup;
 + (NSDictionary *)getResults;
 + (BOOL)isRecording;
-+ (void)printThreads;
 
+@end
+
+@interface EMGTracer (PrintThread)
++ (void)printThreads;
 @end
 
 
