@@ -56,7 +56,7 @@ public class StackSymbolicator {
             group.enter()
             queue.async {
                 if let dSym = self.dsymForLib(lib) {
-                    let addrToSym = Self.addrToSymForBinary(dSym, addrs)
+                    let addrToSym = Self.addrToSymForBinary(dSym, self.archForBinary(dSym), addrs)
                     stateLock.lock()
                     libToAddrToSym[lib.path] = addrToSym
                     stateLock.unlock()
@@ -145,7 +145,20 @@ public class StackSymbolicator {
         return addrs
     }
 
-    private static func addrToSymForBinary(_ binary: String, _ addrs: Set<UInt64>) -> [UInt64: String] {
+    private func archForBinary(_ binary: String) -> String {
+      let archsStr = try? processWithOutput("/usr/bin/lipo", args: ["-archs", binary])
+      let archs = archsStr?.split(separator: " ").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? []
+      let trimmedArch = self.arch.trimmingCharacters(in: .whitespacesAndNewlines)
+      if archs.contains(trimmedArch) {
+        return trimmedArch
+      }
+      if trimmedArch == "arm64e" && archs.contains("arm64") {
+        return "arm64"
+      }
+      return archs.first ?? trimmedArch
+    }
+
+    private static func addrToSymForBinary(_ binary: String, _ arch: String, _ addrs: Set<UInt64>) -> [UInt64: String] {
         let addrsArray = Array(addrs)
         let addrsFile = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)!.path
 
@@ -153,7 +166,7 @@ public class StackSymbolicator {
         let strs = addrsArray.map { String($0 + addition, radix: 16) }
         try! strs.joined(separator: "\n").write(toFile: addrsFile, atomically: true, encoding: .utf8)
 
-        let symsStr = try? processWithOutput("/usr/bin/atos", args: ["-l", String(addition, radix: 16), "-o", binary, "-f", addrsFile])
+        let symsStr = try? processWithOutput("/usr/bin/atos", args: ["-l", String(addition, radix: 16), "-o", binary, "-f", addrsFile, "-arch", arch])
 
         let syms = symsStr!.split(separator: "\n").enumerated().map { (idx, sym) -> (UInt64, String?) in
             let trimmed = sym.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -189,7 +202,11 @@ public class StackSymbolicator {
         formatSymbolCache[sym] = result
         return result
     }
-    
+
+  private static func fileIfExists(_ path: String) -> String? {
+    FileManager.default.fileExists(atPath: path) ? path : nil
+  }
+
     private func dsymForLib(_ lib: LoadedLibrary) -> String? {
         let libPath = lib.path
         
@@ -222,9 +239,13 @@ public class StackSymbolicator {
             // Get symbols from device support dir
             let searchFolder = "\(FileManager.default.homeDirectoryForCurrentUser.path)/Library/Developer/Xcode/iOS DeviceSupport"
             let directories = (try? FileManager.default.contentsOfDirectory(atPath: searchFolder)) ?? []
-            
-            for folder in directories where folder.contains(osBuild) && folder.hasSuffix(arch){
-                return "\(searchFolder)/\(folder)/Symbols\(libPath)"
+
+            // First look for matching os and arch, then just matching os
+            for folder in directories where folder.contains(osBuild) && folder.hasSuffix(arch) {
+                return Self.fileIfExists("\(searchFolder)/\(folder)/Symbols\(libPath)")
+            }
+            for folder in directories where folder.contains(osBuild) {
+              return Self.fileIfExists("\(searchFolder)/\(folder)/Symbols\(libPath)")
             }
             return nil
           } else {

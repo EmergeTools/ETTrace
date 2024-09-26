@@ -7,13 +7,13 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Xcode select
-        run: sudo xcode-select -s '/Applications/Xcode_15.2.app/Contents/Developer'
+        run: sudo xcode-select -s '/Applications/Xcode_16.0.app/Contents/Developer'
       - name: Show destinations
         run: xcodebuild -scheme ETTrace -showdestinations
       - name: Build ETTrace for iOS Simulator
