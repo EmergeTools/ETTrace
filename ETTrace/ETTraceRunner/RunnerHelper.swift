@@ -120,7 +120,7 @@ class RunnerHelper {
         // Serve Main Thread
         try startLocalServer(mainThreadData)
         
-        let url = URL(string: "https://emergetools.com/flamegraph")!
+        let url = URL(string: "https://emergetools.com/ettrace")!
         NSWorkspace.shared.open(url)
 
         // Wait 4 seconds for results to be accessed from server, then exit
