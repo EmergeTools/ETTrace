@@ -44,7 +44,7 @@ Thread::Thread(thread_t threadId, thread_t mainThreadId) {
 }
 
 std::vector<ThreadSummary> EMGStackTraceRecorder::collectThreadSummaries() {
-    // std::lock_guard<std::mutex> lockGuard(threadsLock);
+    std::lock_guard<std::mutex> lockGuard(threadsLock);
     
     std::vector<ThreadSummary> summaries;
     for (const auto &[threadId, thread] : threadsMap) {
@@ -54,15 +54,18 @@ std::vector<ThreadSummary> EMGStackTraceRecorder::collectThreadSummaries() {
             for (auto i = stack.storageStartIndex; i < stack.storageEndIndex; i++) {
                 addresses.emplace_back(addressStorage[i]);
             }
+            // Reverse the stack addresses to get the correct order
+            std::reverse(addresses.begin(), addresses.end());
             stackSummaries.emplace_back(stack.time, addresses);
         }
+        summaries.emplace_back(threadId, thread.name, stackSummaries);
     }
     return summaries;
 }
 
 // TODO: put recordAllThreads here as parameter?
 void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thread_t mainMachThread, thread_t etTraceThread) {
-    // std::lock_guard<std::mutex> lockGuard(threadsLock);
+    std::lock_guard<std::mutex> lockGuard(threadsLock);
     thread_act_array_t threads = nullptr;
     mach_msg_type_number_t threadCount = 0;
     if (recordAllThreads) {
@@ -77,12 +80,13 @@ void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thre
     
     // TODO: how many blocks is it allocating here?
     // TODO: do thread IDs get reused?
+    // This time gets less accurate for later threads, but still good
+    CFTimeInterval time = CACurrentMediaTime();
     for (mach_msg_type_number_t i = 0; i < threadCount; i++) {
         if (threads[i] == etTraceThread) {
             continue;
         }
 
-        CFTimeInterval time = CACurrentMediaTime();
         uintptr_t frames[kMaxFramesPerStack];
         uint64_t frameCount = 0;
 
@@ -99,7 +103,6 @@ void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thre
         size_t startIndex = addressStorage.size();
         // TODO: previously, we caught an std::length_error here. why was that happening?
         for (int frame_idx = 0; frame_idx < frameCount; frame_idx++) {
-            // TODO: reverse here?
             addressStorage.emplace_back(frames[frame_idx]);
         }
         size_t endIndex = addressStorage.size();

@@ -23,7 +23,12 @@ static BOOL sRecordAllThreads = false;
 
 static thread_t sMainMachThread = {0};
 static thread_t sETTraceThread = {0};
-static void (^sStopped)(NSDictionary *) = nil;
+
+// To avoid static initialization order fiasco, we access it from a function
+EMGStackTraceRecorder &getRecorder() {
+    static EMGStackTraceRecorder recorder;
+    return recorder;
+}
 
 @implementation EMGTracer
 
@@ -32,15 +37,18 @@ static void (^sStopped)(NSDictionary *) = nil;
 }
 
 + (void)stopRecording:(void (^)(NSDictionary *))stopped {
-    sStopped = stopped;
     [sStackRecordingThread cancel];
     sStackRecordingThread = nil;
+    NSLog(@"exiting");
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        stopped([EMGTracer getResults]);
+    });
 }
 
-+ (NSDictionary *)getResultsWithRecorder:(EMGStackTraceRecorder *)recorder {
++ (NSDictionary *)getResults {
     NSMutableDictionary <NSString *, NSDictionary<NSString *, id> *> *threads = [NSMutableDictionary dictionary];
     
-    auto threadSummaries = recorder->collectThreadSummaries();
+    auto threadSummaries = getRecorder().collectThreadSummaries();
     for (const auto &thread : threadSummaries) {
         NSString *threadId = [@(thread.threadId) stringValue];
         threads[threadId] = @{
@@ -144,16 +152,11 @@ static void (^sStopped)(NSDictionary *) = nil;
         if (!sETTraceThread) {
             sETTraceThread = mach_thread_self();
         }
-        
-        EMGStackTraceRecorder recorder;
 
         NSThread *thread = [NSThread currentThread];
         while (!thread.cancelled) {
-            recorder.recordStackForAllThreads(sRecordAllThreads, sMainMachThread, sETTraceThread);
+            getRecorder().recordStackForAllThreads(sRecordAllThreads, sMainMachThread, sETTraceThread);
             usleep(4500);
-        }
-        if (sStopped) {
-            [self getResultsWithRecorder:&recorder];
         }
     }];
     sStackRecordingThread.qualityOfService = NSQualityOfServiceUserInteractive;

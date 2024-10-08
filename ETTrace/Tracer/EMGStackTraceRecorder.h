@@ -18,7 +18,7 @@ struct ThreadSummary {
     std::string name;
     std::vector<StackSummary> stacks;
     
-    ThreadSummary(thread_t threadId, std::string &name, std::vector<StackSummary> &stacks) : threadId(threadId), name(name), stacks(stacks) {
+    ThreadSummary(thread_t threadId, const std::string &name, std::vector<StackSummary> &stacks) : threadId(threadId), name(name), stacks(stacks) {
     }
 };
 
@@ -40,8 +40,8 @@ struct Thread {
 
 class EMGStackTraceRecorder {
     std::unordered_map<unsigned int, Thread> threadsMap;
-    // std::mutex threadsLock;
-    std::deque<ptrdiff_t> addressStorage;
+    std::mutex threadsLock;
+    std::deque<uintptr_t> addressStorage;
     bool recordAllThreads;
     
 public:
