@@ -45,10 +45,6 @@ class EMGStackTraceRecorder {
     bool recordAllThreads;
     
 public:
-    /*EMGStackTraceRecorder() {
-        std::cout << "Construct" << std::endl;
-    }*/
-    
     void recordStackForAllThreads(bool recordAllThreads, thread_t mainMachThread, thread_t etTraceThread);
 
     std::vector<ThreadSummary> collectThreadSummaries();

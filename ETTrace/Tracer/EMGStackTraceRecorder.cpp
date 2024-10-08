@@ -13,9 +13,6 @@ extern "C" {
 void FIRCLSWriteThreadStack(thread_t thread, uintptr_t *frames, uint64_t framesCapacity, uint64_t *framesWritten);
 }
 
-// The block size for deque in my copy of c++ stdlib is:
-// static const _DiffType value = sizeof(_ValueType) < 256 ? 4096 / sizeof(_ValueType) : 16;
-
 static const int kMaxFramesPerStack = 1024;
 
 kern_return_t checkMachCall(kern_return_t result) {
@@ -63,7 +60,6 @@ std::vector<ThreadSummary> EMGStackTraceRecorder::collectThreadSummaries() {
     return summaries;
 }
 
-// TODO: put recordAllThreads here as parameter?
 void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thread_t mainMachThread, thread_t etTraceThread) {
     std::lock_guard<std::mutex> lockGuard(threadsLock);
     thread_act_array_t threads = nullptr;
@@ -78,8 +74,6 @@ void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thre
         threadCount = 1;
     }
     
-    // TODO: how many blocks is it allocating here?
-    // TODO: do thread IDs get reused?
     // This time gets less accurate for later threads, but still good
     CFTimeInterval time = CACurrentMediaTime();
     for (mach_msg_type_number_t i = 0; i < threadCount; i++) {
