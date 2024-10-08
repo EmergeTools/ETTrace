@@ -40,7 +40,7 @@ struct Thread {
 
 class EMGStackTraceRecorder {
     std::unordered_map<unsigned int, Thread> threadsMap;
-    std::mutex threadsLock;
+    // std::mutex threadsLock;
     std::deque<ptrdiff_t> addressStorage;
     bool recordAllThreads;
     

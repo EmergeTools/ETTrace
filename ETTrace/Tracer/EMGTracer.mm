@@ -23,12 +23,7 @@ static BOOL sRecordAllThreads = false;
 
 static thread_t sMainMachThread = {0};
 static thread_t sETTraceThread = {0};
-
-// To avoid static initialization order fiasco, we access it from a function
-EMGStackTraceRecorder &getRecorder() {
-    static EMGStackTraceRecorder recorder;
-    return recorder;
-}
+static void (^sStopped)(NSDictionary *) = nil;
 
 @implementation EMGTracer
 
@@ -37,25 +32,21 @@ EMGStackTraceRecorder &getRecorder() {
 }
 
 + (void)stopRecording:(void (^)(NSDictionary *))stopped {
+    sStopped = stopped;
     [sStackRecordingThread cancel];
     sStackRecordingThread = nil;
-    NSLog(@"exiting");
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        stopped([EMGTracer getResults]);
-    });
 }
 
-+ (NSDictionary *)getResults {
++ (NSDictionary *)getResultsWithRecorder:(EMGStackTraceRecorder *)recorder {
     NSMutableDictionary <NSString *, NSDictionary<NSString *, id> *> *threads = [NSMutableDictionary dictionary];
     
-    auto threadSummaries = getRecorder().collectThreadSummaries();
+    auto threadSummaries = recorder->collectThreadSummaries();
     for (const auto &thread : threadSummaries) {
         NSString *threadId = [@(thread.threadId) stringValue];
         threads[threadId] = @{
             @"name": @(thread.name.c_str()),
             @"stacks": [self arrayFromStacks:thread.stacks]
         };
-        NSLog(@"%@", threads[threadId]);
     }
 
     const NXArchInfo *archInfo = NXGetLocalArchInfo();
@@ -153,11 +144,16 @@ EMGStackTraceRecorder &getRecorder() {
         if (!sETTraceThread) {
             sETTraceThread = mach_thread_self();
         }
+        
+        EMGStackTraceRecorder recorder;
 
         NSThread *thread = [NSThread currentThread];
         while (!thread.cancelled) {
-            getRecorder().recordStackForAllThreads(sRecordAllThreads, sMainMachThread, sETTraceThread);
+            recorder.recordStackForAllThreads(sRecordAllThreads, sMainMachThread, sETTraceThread);
             usleep(4500);
+        }
+        if (sStopped) {
+            [self getResultsWithRecorder:&recorder];
         }
     }];
     sStackRecordingThread.qualityOfService = NSQualityOfServiceUserInteractive;

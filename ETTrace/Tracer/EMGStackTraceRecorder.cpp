@@ -44,7 +44,7 @@ Thread::Thread(thread_t threadId, thread_t mainThreadId) {
 }
 
 std::vector<ThreadSummary> EMGStackTraceRecorder::collectThreadSummaries() {
-    std::lock_guard<std::mutex> lockGuard(threadsLock);
+    // std::lock_guard<std::mutex> lockGuard(threadsLock);
     
     std::vector<ThreadSummary> summaries;
     for (const auto &[threadId, thread] : threadsMap) {
@@ -62,7 +62,7 @@ std::vector<ThreadSummary> EMGStackTraceRecorder::collectThreadSummaries() {
 
 // TODO: put recordAllThreads here as parameter?
 void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thread_t mainMachThread, thread_t etTraceThread) {
-    std::lock_guard<std::mutex> lockGuard(threadsLock);
+    // std::lock_guard<std::mutex> lockGuard(threadsLock);
     thread_act_array_t threads = nullptr;
     mach_msg_type_number_t threadCount = 0;
     if (recordAllThreads) {
