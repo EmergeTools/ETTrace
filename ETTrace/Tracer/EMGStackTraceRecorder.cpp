@@ -20,42 +20,28 @@ static const int kMaxFramesPerStack = 1024;
 
 kern_return_t checkMachCall(kern_return_t result) {
     if (result != KERN_SUCCESS) {
-        std::cerr << "Call failed with " << result << std::endl;
+        std::cerr << "Mach call failed with " << result << std::endl;
     }
     return result;
 }
 
-struct Stack {
-    CFTimeInterval time;
-    size_t storageStartIndex; // Inclusive
-    size_t storageEndIndex; // Exclusive
-    
-    Stack(CFTimeInterval time, size_t storageStartIndex, size_t storageEndIndex) : time(time), storageStartIndex(storageStartIndex), storageEndIndex(storageEndIndex) {
-    }
-};
+Thread::Thread(thread_t threadId, thread_t mainThreadId) {
+    name = "Failed to get name"; // Error case
 
-struct Thread {
-    std::deque<Stack> stacks;
-    std::string name;
-
-    Thread(thread_t threadId, thread_t mainThreadId) {
-        name = "Failed to get name"; // Error case
-
-        if(threadId == mainThreadId) {
-            name = "Main Thread";
-        } else {
-            // Get thread Name
-            char cName[1024];
-            pthread_t pt = pthread_from_mach_thread_np(threadId);
-            if (pt) {
-                int rc = pthread_getname_np(pt, cName, sizeof(cName));
-                if (rc == 0) {
-                    name = cName;
-                }
+    if(threadId == mainThreadId) {
+        name = "Main Thread";
+    } else {
+        // Get thread Name
+        char cName[1024];
+        pthread_t pt = pthread_from_mach_thread_np(threadId);
+        if (pt) {
+            int rc = pthread_getname_np(pt, cName, sizeof(cName));
+            if (rc == 0) {
+                name = cName;
             }
         }
     }
-};
+}
 
 std::vector<ThreadSummary> EMGStackTraceRecorder::collectThreadSummaries() {
     std::lock_guard<std::mutex> lockGuard(threadsLock);
@@ -112,9 +98,9 @@ void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thre
         auto emplaceResult = threadsMap.try_emplace(threads[i], threads[i], mainMachThread);
         size_t startIndex = addressStorage.size();
         // TODO: previously, we caught an std::length_error here. why was that happening?
-        for (int frame = 0; frame < frameCount; frame++) {
+        for (int frame_idx = 0; frame_idx < frameCount; frame_idx++) {
             // TODO: reverse here?
-            addressStorage.emplace_back(frames[frame]);
+            addressStorage.emplace_back(frames[frame_idx]);
         }
         size_t endIndex = addressStorage.size();
         emplaceResult.first->second.stacks.emplace_back(time, startIndex, endIndex);

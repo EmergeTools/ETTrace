@@ -3,8 +3,7 @@
 #import <unordered_map>
 #import <mach/mach.h>
 #import <QuartzCore/QuartzCore.h>
-
-class Thread;
+#import <iostream>
 
 struct StackSummary {
     CFTimeInterval time;
@@ -23,6 +22,22 @@ struct ThreadSummary {
     }
 };
 
+struct Stack {
+    CFTimeInterval time;
+    size_t storageStartIndex; // Inclusive
+    size_t storageEndIndex; // Exclusive
+    
+    Stack(CFTimeInterval time, size_t storageStartIndex, size_t storageEndIndex) : time(time), storageStartIndex(storageStartIndex), storageEndIndex(storageEndIndex) {
+    }
+};
+
+struct Thread {
+    std::deque<Stack> stacks;
+    std::string name;
+    
+    Thread(thread_t threadId, thread_t mainThreadId);
+};
+
 class EMGStackTraceRecorder {
     std::unordered_map<unsigned int, Thread> threadsMap;
     std::mutex threadsLock;
@@ -30,7 +45,10 @@ class EMGStackTraceRecorder {
     bool recordAllThreads;
     
 public:
-    EMGStackTraceRecorder();
+    /*EMGStackTraceRecorder() {
+        std::cout << "Construct" << std::endl;
+    }*/
+    
     void recordStackForAllThreads(bool recordAllThreads, thread_t mainMachThread, thread_t etTraceThread);
 
     std::vector<ThreadSummary> collectThreadSummaries();

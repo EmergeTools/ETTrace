@@ -24,8 +24,11 @@ static BOOL sRecordAllThreads = false;
 static thread_t sMainMachThread = {0};
 static thread_t sETTraceThread = {0};
 
-// To avoid static initialization order fiasco, we construct it in the following way, and leak the memory
-static EMGStackTraceRecorder &sCollector = *new EMGStackTraceRecorder;
+// To avoid static initialization order fiasco, we access it from a function
+EMGStackTraceRecorder &getRecorder() {
+    static EMGStackTraceRecorder recorder;
+    return recorder;
+}
 
 @implementation EMGTracer
 
@@ -36,6 +39,7 @@ static EMGStackTraceRecorder &sCollector = *new EMGStackTraceRecorder;
 + (void)stopRecording:(void (^)(NSDictionary *))stopped {
     [sStackRecordingThread cancel];
     sStackRecordingThread = nil;
+    NSLog(@"exiting");
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         stopped([EMGTracer getResults]);
     });
@@ -44,14 +48,14 @@ static EMGStackTraceRecorder &sCollector = *new EMGStackTraceRecorder;
 + (NSDictionary *)getResults {
     NSMutableDictionary <NSString *, NSDictionary<NSString *, id> *> *threads = [NSMutableDictionary dictionary];
     
-    // TODO: locking
-    auto threadSummaries = sCollector.collectThreadSummaries();
+    auto threadSummaries = getRecorder().collectThreadSummaries();
     for (const auto &thread : threadSummaries) {
         NSString *threadId = [@(thread.threadId) stringValue];
         threads[threadId] = @{
             @"name": @(thread.name.c_str()),
             @"stacks": [self arrayFromStacks:thread.stacks]
         };
+        NSLog(@"%@", threads[threadId]);
     }
 
     const NXArchInfo *archInfo = NXGetLocalArchInfo();
@@ -152,7 +156,7 @@ static EMGStackTraceRecorder &sCollector = *new EMGStackTraceRecorder;
 
         NSThread *thread = [NSThread currentThread];
         while (!thread.cancelled) {
-            sCollector.recordStackForAllThreads(sRecordAllThreads, sMainMachThread, sETTraceThread);
+            getRecorder().recordStackForAllThreads(sRecordAllThreads, sMainMachThread, sETTraceThread);
             usleep(4500);
         }
     }];
