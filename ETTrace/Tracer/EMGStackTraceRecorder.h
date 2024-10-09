@@ -42,7 +42,6 @@ class EMGStackTraceRecorder {
     std::unordered_map<unsigned int, Thread> threadsMap;
     std::mutex threadsLock;
     std::deque<uintptr_t> addressStorage;
-    bool recordAllThreads;
     
 public:
     void recordStackForAllThreads(bool recordAllThreads, thread_t mainMachThread, thread_t etTraceThread);

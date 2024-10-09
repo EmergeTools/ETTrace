@@ -95,7 +95,6 @@ void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thre
 
         auto emplaceResult = threadsMap.try_emplace(threads[i], threads[i], mainMachThread);
         size_t startIndex = addressStorage.size();
-        // TODO: previously, we caught an std::length_error here. why was that happening?
         for (int frame_idx = 0; frame_idx < frameCount; frame_idx++) {
             addressStorage.emplace_back(frames[frame_idx]);
         }

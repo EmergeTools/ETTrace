@@ -19,10 +19,7 @@
 
 static NSThread *sStackRecordingThread = nil;
 
-static BOOL sRecordAllThreads = false;
-
 static thread_t sMainMachThread = {0};
-static thread_t sETTraceThread = {0};
 
 // To avoid static initialization order fiasco, we access it from a function
 EMGStackTraceRecorder &getRecorder() {
@@ -39,7 +36,6 @@ EMGStackTraceRecorder &getRecorder() {
 + (void)stopRecording:(void (^)(NSDictionary *))stopped {
     [sStackRecordingThread cancel];
     sStackRecordingThread = nil;
-    NSLog(@"exiting");
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         stopped([EMGTracer getResults]);
     });
@@ -146,16 +142,12 @@ EMGStackTraceRecorder &getRecorder() {
     // usleep is guaranteed to sleep more than that, in practice ~5ms. We could use a
     // dispatch_timer, which at least tries to compensate for drift etc., but the
     // timer's queue could theoretically end up run on the main thread
-    sRecordAllThreads = recordAllThreads;
-
     sStackRecordingThread = [[NSThread alloc] initWithBlock:^{
-        if (!sETTraceThread) {
-            sETTraceThread = mach_thread_self();
-        }
+        thread_t etTraceThread = mach_thread_self();
 
         NSThread *thread = [NSThread currentThread];
         while (!thread.cancelled) {
-            getRecorder().recordStackForAllThreads(sRecordAllThreads, sMainMachThread, sETTraceThread);
+            getRecorder().recordStackForAllThreads(recordAllThreads, sMainMachThread, etTraceThread);
             usleep(4500);
         }
     }];
