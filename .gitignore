@@ -9,3 +9,4 @@ output.json
 output.folded
 .swiftpm
 .build
+output_*.json
