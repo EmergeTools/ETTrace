@@ -71,18 +71,23 @@ public class ThreadHelper: NSObject {
           // Skip our thread
           continue
         }
-        
+
         let threadName = getThreadName(p_thread) ?? ""
-        
-        thread_suspend(thread)
-        // Ensure any code here does not take locks using @_noLocks
-        getStacktrace(forThread: thread, frames: &frames, maxFrames: UInt64(kMaxFramesPerStack), frameCount: &frameCount)
-        thread_resume(thread)
+
+        withUnsafeMutablePointer(to: &frameCount) { frameCountPtr in
+          frames.withUnsafeMutableBufferPointer { framesPtr in
+            let firstPtr: UnsafeMutablePointer<UInt64> = framesPtr.baseAddress!
+            thread_suspend(thread)
+            // Ensure any code here does not take locks using @_noLocks
+            getStacktrace(forThread: thread, frames: firstPtr, maxFrames: UInt64(kMaxFramesPerStack), frameCount: frameCountPtr)
+            thread_resume(thread)
+          }
+        }
         let stacktrace = Array(frames.prefix(Int(frameCount)))
         let stacks = getCallStack(stacktrace) ?? []
 
         let threadInfo: ThreadInfo = ThreadInfo(name: threadName,number: index)
-        
+
         result[threadInfo] = stacks
       }
     }
@@ -188,11 +193,11 @@ public class ThreadHelper: NSObject {
   }
   
   @_noLocks static func getStacktrace(
-  forThread thread: thread_t,
-  frames: UnsafeMutablePointer<UInt64>,
-  maxFrames: UInt64,
-  frameCount: inout UInt64) {
-    FIRCLSWriteThreadStack(thread, frames, maxFrames, &frameCount)
+    forThread thread: thread_t,
+    frames: UnsafeMutablePointer<UInt64>,
+    maxFrames: UInt64,
+    frameCount: UnsafeMutablePointer<UInt64>) {
+    FIRCLSWriteThreadStack(thread, frames, maxFrames, frameCount)
   }
 }
 
