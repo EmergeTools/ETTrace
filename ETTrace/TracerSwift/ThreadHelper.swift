@@ -191,7 +191,8 @@ public class ThreadHelper: NSObject {
       symbolAddressTuples.append((UInt(nlist.n_value) + UInt(slide), string))
     }
   }
-  
+
+#if swift(>=5.10)
   @_noLocks static func getStacktrace(
     forThread thread: thread_t,
     frames: UnsafeMutablePointer<UInt64>,
@@ -199,6 +200,15 @@ public class ThreadHelper: NSObject {
     frameCount: UnsafeMutablePointer<UInt64>) {
     FIRCLSWriteThreadStack(thread, frames, maxFrames, frameCount)
   }
+#else
+  static func getStacktrace(
+    forThread thread: thread_t,
+    frames: UnsafeMutablePointer<UInt64>,
+    maxFrames: UInt64,
+    frameCount: UnsafeMutablePointer<UInt64>) {
+    FIRCLSWriteThreadStack(thread, frames, maxFrames, frameCount)
+  }
+#endif
 }
 
 @_silgen_name("swift_demangle")
@@ -229,5 +239,10 @@ public func _stdlib_demangleName(_ mangledName: String) -> String {
   }
 }
 
+#if swift(>=5.10)
 @_silgen_name("FIRCLSWriteThreadStack")
 @_noLocks func FIRCLSWriteThreadStack(_ thread: thread_t, _ frames: UnsafeMutablePointer<UInt64>, _ framesCapacity: UInt64, _ framesWritten: UnsafeMutablePointer<UInt64>)
+#else
+@_silgen_name("FIRCLSWriteThreadStack")
+func FIRCLSWriteThreadStack(_ thread: thread_t, _ frames: UnsafeMutablePointer<UInt64>, _ framesCapacity: UInt64, _ framesWritten: UnsafeMutablePointer<UInt64>)
+#endif
