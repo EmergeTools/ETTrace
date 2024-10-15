@@ -29,7 +29,8 @@ public class ThreadHelper: NSObject {
   public static let main_thread_t = mach_thread_self()
   static var symbolsLoaded = false
   static var symbolAddressTuples = [(UInt, String)]()
-  
+  static let kMaxFramesPerStack = 512
+
   @objc
   public static func printThreads() {
     NSLog("Stack trace:")
@@ -53,7 +54,14 @@ public class ThreadHelper: NSObject {
     guard task_threads(mach_task_self_, &(threads), &count) == KERN_SUCCESS else {
       return result
     }
-      
+
+    defer {
+      let size = MemoryLayout<thread_t>.size * Int(count)
+      vm_deallocate(mach_task_self_, vm_address_t(bitPattern: threads), vm_size_t(size))
+    }
+
+    var frameCount: UInt64 = 0
+    var frames = [UInt64](repeating: 0, count: kMaxFramesPerStack)
     for i in 0..<count {
       let index = Int(i)
       if let p_thread = pthread_from_mach_thread_np((threads[index])) {
@@ -63,15 +71,23 @@ public class ThreadHelper: NSObject {
           // Skip our thread
           continue
         }
-        
+
         let threadName = getThreadName(p_thread) ?? ""
-        
-        thread_suspend(thread)
-        let stacks = getCallStack(thread) ?? []
-        thread_resume(thread)
-        
+
+        withUnsafeMutablePointer(to: &frameCount) { frameCountPtr in
+          frames.withUnsafeMutableBufferPointer { framesPtr in
+            let firstPtr: UnsafeMutablePointer<UInt64> = framesPtr.baseAddress!
+            thread_suspend(thread)
+            // Ensure any code here does not take locks using @_noLocks
+            getStacktrace(forThread: thread, frames: firstPtr, maxFrames: UInt64(kMaxFramesPerStack), frameCount: frameCountPtr)
+            thread_resume(thread)
+          }
+        }
+        let stacktrace = Array(frames.prefix(Int(frameCount)))
+        let stacks = getCallStack(stacktrace) ?? []
+
         let threadInfo: ThreadInfo = ThreadInfo(name: threadName,number: index)
-        
+
         result[threadInfo] = stacks
       }
     }
@@ -79,9 +95,8 @@ public class ThreadHelper: NSObject {
     return result
   }
   
-  static func getCallStack(_ threadId: thread_t) -> [StackFrame]? {
+  static func getCallStack(_ array: [UInt64]) -> [StackFrame]? {
     var symbols = [StackFrame]()
-    let array = getStacktrace(forThread: threadId)
     for address in array {
       var info = Dl_info()
       if dladdr(UnsafeRawPointer(bitPattern: UInt(address)), &info) != 0 {
@@ -177,14 +192,12 @@ public class ThreadHelper: NSObject {
     }
   }
   
-  static func getStacktrace(forThread thread: thread_t) -> [UInt64] {
-    var frameCount: UInt64 = 0
-    let kMaxFramesPerStack = 512
-    var frames = [UInt64](repeating: 0, count: kMaxFramesPerStack)
-      
-    FIRCLSWriteThreadStack(thread, &frames, UInt64(kMaxFramesPerStack), &frameCount)
-      
-    return Array(frames.prefix(Int(frameCount)))
+  @_noLocks static func getStacktrace(
+    forThread thread: thread_t,
+    frames: UnsafeMutablePointer<UInt64>,
+    maxFrames: UInt64,
+    frameCount: UnsafeMutablePointer<UInt64>) {
+    FIRCLSWriteThreadStack(thread, frames, maxFrames, frameCount)
   }
 }
 
@@ -217,4 +230,4 @@ public func _stdlib_demangleName(_ mangledName: String) -> String {
 }
 
 @_silgen_name("FIRCLSWriteThreadStack")
-func FIRCLSWriteThreadStack(_ thread: thread_t, _ frames: UnsafeMutablePointer<UInt64>, _ framesCapacity: UInt64, _ framesWritten: UnsafeMutablePointer<UInt64>)
+@_noLocks func FIRCLSWriteThreadStack(_ thread: thread_t, _ frames: UnsafeMutablePointer<UInt64>, _ framesCapacity: UInt64, _ framesWritten: UnsafeMutablePointer<UInt64>)
