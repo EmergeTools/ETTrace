@@ -101,4 +101,7 @@ void EMGStackTraceRecorder::recordStackForAllThreads(bool recordAllThreads, thre
         size_t endIndex = addressStorage.size();
         emplaceResult.first->second.stacks.emplace_back(time, startIndex, endIndex);
     }
+    if (recordAllThreads) {
+      vm_deallocate(mach_task_self(), (vm_address_t) threads, sizeof(thread_t) * threadCount);
+    }
 }
