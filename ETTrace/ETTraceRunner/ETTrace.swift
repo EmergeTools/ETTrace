@@ -24,11 +24,14 @@ struct ETTrace: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Record all threads")
     var multiThread: Bool = false
 
+    @Option(name: .long, help: "Sample rate")
+    var sampleRate: UInt32 = 0
+
     mutating func run() throws {
       if let dsym = dsyms, dsym.hasSuffix(".dSYM") {
         ETTrace.exit(withError: ValidationError("The dsym argument should be set to a folder containing your dSYM files, not the dSYM itself"))
       }
-        let helper = RunnerHelper(dsyms, launch, simulator, verbose, multiThread)
+        let helper = RunnerHelper(dsyms, launch, simulator, verbose, multiThread, sampleRate)
         Task {
             do {
                 try await helper.start()

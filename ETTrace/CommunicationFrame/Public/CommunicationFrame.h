@@ -37,6 +37,8 @@ enum {
 
 typedef struct _PTStartFrame {
     bool runAtStartup;
+    // Added in v1.6
+    uint32_t sampleRate;
 } PTStartFrame;
 
 typedef struct _PTMetadataFrame {

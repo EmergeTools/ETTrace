@@ -17,6 +17,7 @@ struct ResponseModel: Decodable {
     let device: String
     let events: [Event]
     let threads: [String: Thread]
+    let sampleRate: UInt32?
 }
 
 struct LibraryInfo: Decodable {

@@ -10,9 +10,9 @@
 #import "PerfAnalysis.h"
 
 @interface EMGPerfAnalysis (Private)
-+ (void)startRecording:(BOOL) recordAllThreads;
++ (void)startRecording:(BOOL) recordAllThreads rate:(NSInteger)sampleRate;
 +(void)stopRecording;
-+ (void)setupRunAtStartup:(BOOL) recordAllThreads;
++ (void)setupRunAtStartup:(BOOL) recordAllThreads rate:(NSInteger)sampleRate;
 + (NSURL *)outputPath;
 @end
 

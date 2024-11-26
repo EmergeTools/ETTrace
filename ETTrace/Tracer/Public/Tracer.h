@@ -23,7 +23,7 @@ void EMGBeginCollectingLibraries(void);
 
 @interface EMGTracer : NSObject
 
-+ (void)setupStackRecording:(BOOL)recordAllThreads;
++ (void)setupStackRecording:(BOOL)recordAllThreads rate:(useconds_t)sampleRate;
 + (void)stopRecording:(void (^)(NSDictionary *))stopped;
 // Must be called on the main thread, before setupStackRecording is called
 + (void)setup;

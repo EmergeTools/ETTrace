@@ -29,14 +29,15 @@ static dispatch_queue_t fileEventsQueue;
 static EMGChannelListener *channelListener;
 static NSMutableArray <NSDictionary *> *sSpanTimes;
 
-+ (void)startRecording:(BOOL)recordAllThreads {
++ (void)startRecording:(BOOL)recordAllThreads rate:(NSInteger)sampleRate {
   sSpanTimes = [NSMutableArray array];
-  [EMGTracer setupStackRecording:recordAllThreads];
+  [EMGTracer setupStackRecording:recordAllThreads rate:(useconds_t) sampleRate];
 }
 
-+ (void)setupRunAtStartup:(BOOL) recordAllThreads {
++ (void)setupRunAtStartup:(BOOL) recordAllThreads rate:(NSInteger)sampleRate {
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"runAtStartup"];
     [[NSUserDefaults standardUserDefaults] setBool:recordAllThreads forKey:@"recordAllThreads"];
+    [[NSUserDefaults standardUserDefaults] setInteger:sampleRate forKey:@"ETTraceSampleRate"];
     exit(0);
 }
 
@@ -116,8 +117,9 @@ static NSMutableArray <NSDictionary *> *sSpanTimes;
     fileEventsQueue = dispatch_queue_create("com.emerge.file_queue", DISPATCH_QUEUE_SERIAL);
     BOOL infoPlistRunAtStartup = ((NSNumber *) NSBundle.mainBundle.infoDictionary[@"ETTraceRunAtStartup"]).boolValue;
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"runAtStartup"] || infoPlistRunAtStartup) {
+        NSInteger sampleRate = [[NSUserDefaults standardUserDefaults] integerForKey:@"ETTraceSampleRate"];
         BOOL recordAllThreads = [[NSUserDefaults standardUserDefaults] boolForKey:@"recordAllThreads"];
-        [EMGPerfAnalysis startRecording:recordAllThreads];
+        [EMGPerfAnalysis startRecording:recordAllThreads rate:sampleRate];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"runAtStartup"];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"recordAllThreads"];
     }
