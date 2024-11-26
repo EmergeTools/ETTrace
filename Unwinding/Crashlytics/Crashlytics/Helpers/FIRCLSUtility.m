@@ -68,7 +68,12 @@ bool FIRCLSReadMemory(vm_address_t src, void* dest, size_t len) {
 
   vm_size_t readSize = len;
 
-  return vm_read_overwrite(mach_task_self(), src, len, (pointer_t)dest, &readSize) == KERN_SUCCESS;
+  // Originally this was a `vm_read_overwrite` to protect against reading invalid memory.
+  // That can happen in the context of a crash reporter, but should not happen during normal
+  // ettrace operation. Replacing it with memcpy makes this about 5x faster
+  // return vm_read_overwrite(mach_task_self(), src, len, (pointer_t)dest, &readSize) == KERN_SUCCESS;
+  memcpy(dest, src, len);
+  return true;
 }
 
 bool FIRCLSReadString(vm_address_t src, char** dest, size_t maxlen) {
