@@ -62,10 +62,16 @@
         NSLog(@"Start received, with: %i", startFrame->runAtStartup);
         BOOL runAtStartup = startFrame->runAtStartup;
         BOOL recordAllThreads = type == PTFrameTypeStartMultiThread;
+        NSInteger sampleRate = 0;
+        // If the size is smaller it is a message from an older version of the CLI
+        // before sampleRate was added
+        if (payload.length >= sizeof(PTStartFrame)) {
+          sampleRate = startFrame->sampleRate;
+        }
         if (runAtStartup) {
-            [EMGPerfAnalysis setupRunAtStartup:recordAllThreads];
+            [EMGPerfAnalysis setupRunAtStartup:recordAllThreads rate:sampleRate];
         } else {
-            [EMGPerfAnalysis startRecording:recordAllThreads];
+            [EMGPerfAnalysis startRecording:recordAllThreads rate:sampleRate];
         }
     } else if (type == PTFrameTypeStop) {
         [EMGPerfAnalysis stopRecording];

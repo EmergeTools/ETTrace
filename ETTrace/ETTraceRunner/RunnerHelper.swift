@@ -20,15 +20,17 @@ class RunnerHelper {
     let useSimulator: Bool
     let verbose: Bool
     let multiThread: Bool
+    let sampleRate: UInt32
 
     var server: HttpServer? = nil
 
-    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ multiThread: Bool) {
+    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ multiThread: Bool, _ sampleRate: UInt32) {
         self.dsyms = dsyms
         self.launch = launch
         self.useSimulator = simulator
         self.verbose = verbose
         self.multiThread = multiThread
+        self.sampleRate = sampleRate
     }
     
     func start() async throws {
@@ -45,7 +47,7 @@ class RunnerHelper {
 
         try await deviceManager.connect()
 
-       try await deviceManager.sendStartRecording(launch, multiThread)
+        try await deviceManager.sendStartRecording(launch, multiThread, sampleRate)
 
         if launch {
             print("Re-launch the app to start recording, then press return to exit")
@@ -93,6 +95,7 @@ class RunnerHelper {
         let flamegraphs = FlamegraphGenerator.generate(
           events: responseData.events,
           threads: threads,
+          sampleRate: responseData.sampleRate,
           loadedLibraries: responseData.libraryInfo.loadedLibraries,
           symbolicator: symbolicator)
         let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)

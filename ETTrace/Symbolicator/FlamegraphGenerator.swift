@@ -10,20 +10,25 @@ import ETModels
 
 public enum FlamegraphGenerator {
 
-  public static func generate(events: [Event], threads: [[Stack]], loadedLibraries: [LoadedLibrary], symbolicator: StackSymbolicator) -> [(FlameNode, [Double], String)] {
+  public static func generate(events: [Event], threads: [[Stack]], sampleRate: UInt32?, loadedLibraries: [LoadedLibrary], symbolicator: StackSymbolicator) -> [(FlameNode, [Double], String)] {
     let syms = symbolicator.symbolicate(threads.flatMap { $0 }, loadedLibraries)
-    return threads.map { generateFlamegraphs(events: events, stacks: $0, syms: syms) }
+    return threads.map { generateFlamegraphs(events: events, stacks: $0, sampleRate: sampleRate, syms: syms) }
   }
 
     private static func generateFlamegraphs(
       events: [Event],
       stacks: [Stack],
+      sampleRate: UInt32?,
       syms: SymbolicationResult) -> (FlameNode, [Double], String)
   {
         var eventTimes = [Double](repeating: 0, count: events.count)
         let times = stacks.map { $0.time }
         var timeDiffs: [Double] = []
-        let sampleInterval = 0.005
+        let rate = sampleRate == 0 ? 4500 : (sampleRate ?? 4500)
+        // The default sample rate is 4500 microseconds, add 500 because
+        // the samples have slightly more delay than the rate passed to usleep.
+    let sampleInterval = Double(rate + 500) / 1000000.0
+    print("The interval \(sampleInterval)")
         var unattributedTime = 0.0
         let partitions = partitions(times, size: 2, step: 1)
         var eventTime: Double = 0

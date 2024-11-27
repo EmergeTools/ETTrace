@@ -21,6 +21,8 @@ static NSThread *sStackRecordingThread = nil;
 
 static thread_t sMainMachThread = {0};
 
+static useconds_t sSampleRate = 0;
+
 // To avoid static initialization order fiasco, we access it from a function
 EMGStackTraceRecorder &getRecorder() {
     static EMGStackTraceRecorder recorder;
@@ -64,6 +66,7 @@ EMGStackTraceRecorder &getRecorder() {
         @"cpuType": cpuType,
         @"device": [self deviceName],
         @"threads": threads,
+        @"sampleRate": @(sSampleRate),
     };
 }
 
@@ -127,11 +130,12 @@ EMGStackTraceRecorder &getRecorder() {
   EMGBeginCollectingLibraries();
 }
 
-+ (void)setupStackRecording:(BOOL) recordAllThreads
++ (void)setupStackRecording:(BOOL)recordAllThreads rate:(useconds_t)sampleRate
 {
     if (sStackRecordingThread != nil) {
         return;
     }
+    sSampleRate = sampleRate;
 
     // Make sure that +recordStack is always called on the same (non-main) thread.
     // This is because a Process keeps its own "current thread" variable which we need
@@ -148,7 +152,7 @@ EMGStackTraceRecorder &getRecorder() {
         NSThread *thread = [NSThread currentThread];
         while (!thread.cancelled) {
             getRecorder().recordStackForAllThreads(recordAllThreads, sMainMachThread, etTraceThread);
-            usleep(4500);
+            usleep(sampleRate > 0 ? sampleRate : 4500);
         }
     }];
     sStackRecordingThread.qualityOfService = NSQualityOfServiceUserInteractive;
