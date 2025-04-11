@@ -32,14 +32,38 @@ class RunnerHelper {
         self.multiThread = multiThread
         self.sampleRate = sampleRate
     }
+
+    private func printMessageAndWait() {
+      print("Please open the app on the \(useSimulator ? "simulator" : "device")")
+      if !useSimulator {
+          print("Re-run with `--simulator` to connect to the simulator.")
+      }
+      print("Press return when ready...")
+      _ = readLine()
+    }
     
     func start() async throws {
-        print("Please open the app on the \(useSimulator ? "simulator" : "device")")
-        if !useSimulator {
-            print("Re-run with `--simulator` to connect to the simulator.")
+        while useSimulator && !isPortInUse(port: Int(PTPortNumber)) {
+          let running = listRunningProcesses()
+          if !running.isEmpty {
+            print(running.count == 1 ? "1 app was found but it is not running" : "\(running.count) apps were found but they are not running")
+            for p in running {
+              if let bundleId = p.bundleID {
+                print("\tBundle Id: \(bundleId) path: \(p.path)")
+              } else {
+                print("\tPath: \(p.path)")
+              }
+            }
+          } else {
+            print("No apps found running on the simulator")
+          }
+
+          printMessageAndWait()
         }
-        print("Press return when ready...")
-        _ = readLine()
+
+        if !useSimulator {
+          printMessageAndWait()
+        }
 
         print("Connecting to device.")
 
