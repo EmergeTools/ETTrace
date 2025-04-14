@@ -16,6 +16,7 @@ FOUNDATION_EXPORT const unsigned char CommunicationFrameVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <CommunicationFrame/PublicHeader.h>
 
+int inject(pid_t pid, const char *lib);
 
 static const int PTPortNumber = 3116;
 

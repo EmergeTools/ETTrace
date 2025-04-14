@@ -81,6 +81,14 @@ let package = Package(
             path: "ETTrace/ETTraceRunner",
             exclude: [
                 "ETTraceRunner.entitlements"
+            ],
+            linkerSettings: [
+                .unsafeFlags([
+                    "-Xlinker", "-sectcreate",
+                    "-Xlinker", "__TEXT",
+                    "-Xlinker", "__info_plist",
+                    "-Xlinker", "ETTrace/ETTraceRunner/Info.plist"
+                ])
             ]
         ),
         .target(

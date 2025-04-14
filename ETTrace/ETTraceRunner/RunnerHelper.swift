@@ -32,6 +32,45 @@ class RunnerHelper {
         self.multiThread = multiThread
         self.sampleRate = sampleRate
     }
+  
+  //        let running = listRunningProcesses()
+  //        guard let p = running.first else {
+  //          // Prompt to open an app on the simulator
+  //          print("No process found")
+  //          return
+  //        }
+  //        print("Found \(p.bundleID ?? p.path)")
+  //
+  //        // Check if the app is already running ettrace
+  //        relaunchWithSudo()
+  //
+  //        let path = "/Users/noahmartin/ETTrace.framework/ETTrace"
+  //        inject(Int32(p.pid), path.cString(using: .utf8))
+  //      }
+  
+    func relaunchWithSudo() {
+      let args = CommandLine.arguments
+
+      if getuid() != 0 {
+          print("Re-running with sudo...")
+
+          let process = Process()
+          process.launchPath = "/usr/bin/sudo"
+          process.arguments = args
+
+          do {
+              try process.run()
+            if tcsetpgrp(STDIN_FILENO, process.processIdentifier) == -1 {
+              print("failed")
+            }
+            process.waitUntilExit()
+            exit(process.terminationStatus)
+          } catch {
+              print("Failed to execute with sudo: \(error)")
+              exit(1)
+          }
+      }
+    }
 
     private func printMessageAndWait() {
       print("Please open the app on the \(useSimulator ? "simulator" : "device")")
