@@ -20,6 +20,12 @@ struct ETTrace: ParsableCommand {
   
     @Flag(name: .shortAndLong, help: "Verbose logging")
     var verbose: Bool = false
+  
+    @Flag(name: .long, help: "Save intermediate files directly from the phone before processing them.")
+    var saveIntermediate: Bool = false
+  
+    @Option(name: .shortAndLong, help: "Directory for output files")
+    var output: String? = nil
     
     @Flag(name: .shortAndLong, help: "Record all threads")
     var multiThread: Bool = false
@@ -31,7 +37,7 @@ struct ETTrace: ParsableCommand {
       if let dsym = dsyms, dsym.hasSuffix(".dSYM") {
         ETTrace.exit(withError: ValidationError("The dsym argument should be set to a folder containing your dSYM files, not the dSYM itself"))
       }
-        let helper = RunnerHelper(dsyms, launch, simulator, verbose, multiThread, sampleRate)
+        let helper = RunnerHelper(dsyms, launch, simulator, verbose, saveIntermediate, output, multiThread, sampleRate)
         Task {
             do {
                 try await helper.start()
