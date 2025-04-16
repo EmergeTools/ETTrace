@@ -19,16 +19,20 @@ class RunnerHelper {
     let launch: Bool
     let useSimulator: Bool
     let verbose: Bool
+    let saveIntermediate: Bool
+    let outputDirectory: String?
     let multiThread: Bool
     let sampleRate: UInt32
 
     var server: HttpServer? = nil
 
-    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ multiThread: Bool, _ sampleRate: UInt32) {
+    init(_ dsyms: String?, _ launch: Bool, _ simulator: Bool, _ verbose: Bool, _ saveIntermediate: Bool, _ outputDirectory: String?, _ multiThread: Bool, _ sampleRate: UInt32) {
         self.dsyms = dsyms
         self.launch = launch
         self.useSimulator = simulator
         self.verbose = verbose
+        self.saveIntermediate = saveIntermediate
+        self.outputDirectory = outputDirectory
         self.multiThread = multiThread
         self.sampleRate = sampleRate
     }
@@ -65,7 +69,9 @@ class RunnerHelper {
           printMessageAndWait()
         }
 
-        print("Connecting to device.")
+        if verbose {
+          print("Connecting to device.")
+        }
 
         let deviceManager: DeviceManager = useSimulator ? SimulatorDeviceManager(verbose: verbose, relaunch: launch) : PhysicalDevicemanager(verbose: verbose, relaunch: launch)
 
@@ -80,26 +86,31 @@ class RunnerHelper {
         }
 
         _ = readLine()
-        print("            \r")
       
         if launch {
             try await deviceManager.connect()
         }
 
-        print("Waiting for report to be generated...");
+        if verbose {
+          print("Waiting for report to be generated...");
+        }
 
         let receivedData = try await deviceManager.getResults()
 
-        let localFolder = Bundle.main.bundlePath
-        let outFolder = "\(localFolder)/tmp/emerge-perf-analysis/Documents/emerge-output/"
-        try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)
-        let outputPath = "\(outFolder)/output.json"
-        if FileManager.default.fileExists(atPath: outputPath) {
+        if saveIntermediate {
+          let outFolder = "\(NSTemporaryDirectory())/emerge-output"
+          try FileManager.default.createDirectory(atPath: outFolder, withIntermediateDirectories: true)
+          let outputPath = "\(outFolder)/output.json"
+          if FileManager.default.fileExists(atPath: outputPath) {
             try FileManager.default.removeItem(atPath: outputPath)
+          }
+          FileManager.default.createFile(atPath: outputPath, contents: receivedData)
+          print("Intermediate file saved to \(outputPath)")
         }
-        FileManager.default.createFile(atPath: outputPath, contents: receivedData)
         
-        print("Stopped recording, symbolicating...")
+        if verbose {
+          print("Stopped recording, symbolicating...")
+        }
 
         let responseData = try JSONDecoder().decode(ResponseModel.self, from: receivedData)
 
@@ -122,7 +133,7 @@ class RunnerHelper {
           sampleRate: responseData.sampleRate,
           loadedLibraries: responseData.libraryInfo.loadedLibraries,
           symbolicator: symbolicator)
-        let outputUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        let outputUrl = URL(fileURLWithPath: outputDirectory ?? FileManager.default.currentDirectoryPath)
 
         var mainThreadData: Data?
         for (threadId, symbolicationResult) in zip(threadIds, flamegraphs) {
@@ -202,7 +213,7 @@ class RunnerHelper {
         }
         try server?.start(37577)
     }
-    
+
     private func saveFlamegraph(_ outJsonData: Data, _ outputUrl: URL, _ threadId: String? = nil) throws {
         var saveUrl = outputUrl.appendingPathComponent("output.json")
         if let threadId = threadId {

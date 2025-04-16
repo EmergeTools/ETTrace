@@ -27,8 +27,7 @@ public enum FlamegraphGenerator {
         let rate = sampleRate == 0 ? 4500 : (sampleRate ?? 4500)
         // The default sample rate is 4500 microseconds, add 500 because
         // the samples have slightly more delay than the rate passed to usleep.
-    let sampleInterval = Double(rate + 500) / 1000000.0
-    print("The interval \(sampleInterval)")
+        let sampleInterval = Double(rate + 500) / 1000000.0
         var unattributedTime = 0.0
         let partitions = partitions(times, size: 2, step: 1)
         var eventTime: Double = 0
